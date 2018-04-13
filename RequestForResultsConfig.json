@@ -1,0 +1,9 @@
+{
+    action: string,
+    data: {
+        type: string,
+        location: string,
+        params: data,
+    }
+
+}

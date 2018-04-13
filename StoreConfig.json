@@ -1,0 +1,63 @@
+search: {
+    isSearching: bool,
+    
+    criterias: {
+        activeTab: number,
+        
+        locations: {
+            isLoading: bool,
+            items: [
+                {
+                    id: number,
+                    key_name: string,
+                    key_value: string,
+                    title: string,
+                    selected: bool,
+                }
+            ]
+
+        }
+         
+        classificator: {
+            isLoading: bool,
+            items: data,
+            selectedClassItemID: data
+        }
+
+        hieracrhy: {
+            isLoading: bool,
+            data: data
+        }
+
+        materials: {
+            isLoading: bool,
+            data: data
+        }
+
+        
+    }
+
+    results: {
+        lastSearchParameters: data,
+        activeTab: number,
+
+        remnants: {
+            isLoading: bool,
+            config: data,
+            data: data
+        }
+
+        inTransit: {
+            isLoading: bool,
+            config: data,
+            data: data
+        }
+
+        materials: {
+            isLoading: bool,
+            config: data,
+            data: data
+        }
+
+    }
+}

@@ -1,0 +1,70 @@
+@import '../node_modules/antd/dist/antd.css';
+
+.searchContainer
+{
+    min-height: 350px;
+    max-height: 350px;
+    overflow: hidden;
+}
+
+.searchCriteriasBox
+{
+    min-height: 315px;
+    max-height: 315px;
+    overflow: hidden;
+}
+
+.searchCriteriasButtonBox
+{
+    margin-top: 1px;
+    min-height: 35px;
+    max-height: 35px;
+    overflow: hidden;
+}
+
+.searchPanelTabs
+{
+    min-height: 279px;
+    max-height: 279px;
+    margin-top: -16px;
+    overflow: hidden;
+}
+
+.searchPanelTabHeight
+{
+    min-height: 279px;
+    max-height: 279px;
+}
+
+.attributesList
+{
+    float: left;
+    position: relative;
+}
+
+.searchPanelTabAttributesListHeight
+{
+    max-height: 223px;
+}
+
+.scrollable-y
+{
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.scrollable-x
+{
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+.scrollable-x-y
+{
+    overflow: auto;
+}
+
+.scrollable-y-x
+{
+    overflow: auto;
+}
