@@ -1,10 +1,10 @@
-import React, { Component }           from 'react';
-import PropTypes                      from 'prop-types';
-import {Row, Col, Tabs, Alert }       from 'antd';
-import ClassificatorLayout            from './criterias/classificator/layout';
-import SearchButtonBox                from './criterias/searchButtonBox';
-import { selectTab as selectCTab }   from '../../actions/search/criterias/main';
-import { selectTab as selectRTab }   from '../../actions/search/results/main';
+import React, { Component }                         from 'react';
+import PropTypes                                    from 'prop-types';
+import {Row, Col, Tabs, Alert, Button }             from 'antd';
+import ClassificatorLayout                          from './criterias/classificator/layout';
+import SearchButtonBox                              from './criterias/searchButtonBox';
+import { selectTab as selectCTab }                  from '../../actions/search/criterias/main';
+import { selectTab as selectRTab }                  from '../../actions/search/results/main';
 
 const { TabPane } = Tabs;
 
@@ -32,6 +32,21 @@ export default class SearchContainer extends Component {
         break;
       }
     }
+  }
+
+  onConfigEdit(activeTab)
+  {
+
+  }
+
+  getConfigEditButton(activeTab)
+  {
+    return(
+      <Button type    = 'primary' 
+              icon    = 'setting' 
+              onClick = { event => { this.onConfigEdit(activeTab) } }
+              style   = {{ top: -2 }}/>
+    );
   }
 
   render()
@@ -87,9 +102,10 @@ export default class SearchContainer extends Component {
           </Col>
           <Col className  = 'searchContainer'
                span       = { 16 } >
-            <Tabs defaultActiveKey = { this.props.results.activeTab }
-                  size             = 'small'
-                  onChange         = { key => this.onTabSelect(key, 'R') } >
+            <Tabs defaultActiveKey    = { this.props.results.activeTab }
+                  size                = 'small'
+                  onChange            = { key => this.onTabSelect(key, 'R') }
+                  tabBarExtraContent  = { this.getConfigEditButton(this.props.results.activeTab) } >
 
               <TabPane  tab       = 'Остатки'
                         key       = 'RFR'
