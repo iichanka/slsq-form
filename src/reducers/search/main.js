@@ -1,7 +1,8 @@
-import { criterias }        from './criterias/main';
-import { results }          from './results/main';
-import { S_START_SEARCH }   from '../../actions/search/main';
-import { S_END_SEARCH }     from '../../actions/search/main';
+import { criterias }            from './criterias/main';
+import { results }              from './results/main';
+import { S_START_SEARCH }       from '../../actions/search/main';
+import { S_END_SEARCH }         from '../../actions/search/main';
+import { S_RECEIVE_RESULTS }    from '../../actions/search/main';
 
 const isSearching = (state = false, action) => {
     switch(action.type)
@@ -11,6 +12,7 @@ const isSearching = (state = false, action) => {
             return true;
         }
 
+        case S_RECEIVE_RESULTS:
         case S_END_SEARCH:
         {
             return false;
@@ -25,6 +27,10 @@ const isSearching = (state = false, action) => {
 const lastParameters = (state = {}, action) => {
     switch (action.type)
     {
+        case S_START_SEARCH:
+        {
+            return action.parameters;
+        }
         default:
         {
             return state;

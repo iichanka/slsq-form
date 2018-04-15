@@ -1,12 +1,14 @@
 import axios                    from 'axios';
 import { showMessages }         from '../messages';
 
-export const S_START_SEARCH  = 'S_START_SEARCH';
-export const S_END_SEARCH    = 'S_END_SEARCH';
+export const S_START_SEARCH     = 'S_START_SEARCH';
+export const S_END_SEARCH       = 'S_END_SEARCH';
+export const S_RECEIVE_RESULTS  = 'S_RECEIVE_RESULTS';
 
-export const startSearch = () => {
+export const startSearch = (parameters) => {
     return {
         type: S_START_SEARCH,
+        parameters: parameters,
     }
 }
 
@@ -15,6 +17,14 @@ export const endSearch = () => {
         type: S_END_SEARCH,
     }
 }
+
+export const receiveResults = (data) => {
+    return {
+        type: S_RECEIVE_RESULTS,
+        results: data,
+    }
+}
+
 
 const getRequstForClassificator = (state = {}) => {
     let group_ = '';
@@ -55,7 +65,39 @@ const getRequstForClassificator = (state = {}) => {
     }
 }
 
-export const search = () => (dispatch, getState) => {
+
+const loadResults = (parameters = {}) => (dispatch, getState) =>{
+    dispatch(startSearch(parameters));
+    
+    axios.post(localStorage.getItem('AjaxURL'), {
+          action:   'loadResults',              
+          data:     parameters,
+        })
+      .then(response => {
+        let haveError = false;
+        showMessages(response.data.messages, haveError);
+       
+        if(!haveError)
+        {
+            dispatch(receiveResults(response.data));
+            
+        }
+        dispatch(endSearch());
+      })
+      .catch(function (error) {
+        showMessages([{type: 'E', text: 'Не удалось получить результаты поиска.'}]);
+        dispatch(endSearch());
+      });
+}
+
+
+export const search = (lastParameters = false) => (dispatch, getState) => {
+    if(lastParameters)
+    {
+        dispatch(loadResults(lastParameters));
+        return;
+    }
+
     let currentState = getState();
     let request;
     let location = '';
@@ -80,30 +122,10 @@ export const search = () => (dispatch, getState) => {
 
     if(request)
     {
-        dispatch(startSearch());
-        
-        axios.post(localStorage.getItem('AjaxURL'), {
-              action:   'loadResults',              
-              data:     {
-                params:     request, 
-                location:   location,
-                type:       currentState.search.criterias.activeTab,
-              }
-            })
-          .then(response => {
-            let haveError = false;
-            showMessages(response.data.messages, haveError);
-           
-            if(!haveError)
-            {
-                //dispatch(receiveItems(response.data.data));
-                
-            }
-            dispatch(endSearch());
-          })
-          .catch(function (error) {
-            showMessages([{type: 'E', text: 'Не удалось получить результаты поиска.'}]);
-            dispatch(endSearch());
-          });
+        dispatch(loadResults({
+            params:     request, 
+            location:   location,
+            type:       currentState.search.criterias.activeTab,
+        }))
     }
 }

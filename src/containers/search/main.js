@@ -1,20 +1,31 @@
 import React, { Component }                         from 'react';
 import PropTypes                                    from 'prop-types';
-import {Row, Col, Tabs, Alert, Button }             from 'antd';
+import {Row, Col, Tabs, Alert, Button, Icon }       from 'antd';
 import ClassificatorLayout                          from './criterias/classificator/layout';
 import SearchButtonBox                              from './criterias/searchButtonBox';
 import { selectTab as selectCTab }                  from '../../actions/search/criterias/main';
 import { selectTab as selectRTab }                  from '../../actions/search/results/main';
-import { load as loadConfigs }                      from '../../actions/configs/main';
+import ConfigurableTable                            from '../search/results/configurableTable';
 
 const { TabPane } = Tabs;
 
 export default class SearchContainer extends Component {
   static propTypes = {
     isSearching:  PropTypes.bool.isRequired,
+    configs:      PropTypes.object.isRequired,
     criterias:    PropTypes.object.isRequired,
     results:      PropTypes.object.isRequired,
     dispatch:     PropTypes.func.isRequired,    
+  }
+
+  constructor(props)
+  {
+    super(props);
+    this.rfrConfig = {
+      type: 'RFR',
+      columns: [],
+    };
+    this.saveConfigs(props.configs);
   }
 
   onTabSelect(key, type)
@@ -35,10 +46,23 @@ export default class SearchContainer extends Component {
     }
   }
 
-  componentWillMount()
+  saveConfigs(configs)
   {
-    const { dispatch } = this.props;
-    dispatch(loadConfigs());
+    configs.tableConfigs.map(config => {
+      switch(config.type)
+      {
+        case 'RFR':
+        {
+          this.rfrConfig = config;
+        }
+      }
+    })
+  }
+
+
+  componentWillReceiveProps(newProps)
+  {
+    this.saveConfigs(newProps.configs);
   }
 
   onConfigEdit(activeTab)
@@ -117,6 +141,10 @@ export default class SearchContainer extends Component {
               <TabPane  tab       = 'Остатки'
                         key       = 'RFR'
                         className = 'searchPanelTabs'>
+                
+                <ConfigurableTable isSearching  = { this.props.isSearching }
+                                   config       = { this.rfrConfig }
+                                   results      = { this.props.results.remnant } />
 
               </TabPane>
 

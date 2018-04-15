@@ -3,14 +3,22 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {Row, Col} from 'antd';
 
+import { load as loadConfigs }                      from '../actions/configs/main';
 import SearchContainer from './search/main';
 
 class Form extends Component {
   static propTypes = {
+    configs:    PropTypes.object.isRequired,
     search:     PropTypes.object.isRequired,
     positions:  PropTypes.object.isRequired,
     header:     PropTypes.object.isRequired,
     dispatch:   PropTypes.func.isRequired,
+  }
+
+  componentWillMount()
+  {
+    const { dispatch } = this.props;
+    dispatch(loadConfigs());
   }
 
   render()
@@ -19,6 +27,7 @@ class Form extends Component {
     return(
       <div style={{height: "100vh"}}>
         <SearchContainer isSearching  = { this.props.search.isSearching }
+                         configs      = { this.props.configs }
                          criterias    = { this.props.search.criterias }
                          results      = { this.props.search.results }
                          dispatch     = { this.props.dispatch } />
@@ -40,11 +49,12 @@ class Form extends Component {
 
 const mapStateToProps = state => {
   console.log("mapStateToProps:", state);
-  const { search, positions, header } = state;
+  const { search, positions, header, configs } = state;
   return {
     search:     search,
     positions:  positions,
     header:     header,
+    configs:    configs,
   }
 }
 

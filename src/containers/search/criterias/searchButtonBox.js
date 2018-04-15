@@ -1,8 +1,8 @@
-import React                                        from 'react';
-import PropTypes                                    from 'prop-types';
-import { Row, Col, Button, Select, Spin, Popover }  from 'antd';
-import { loadItems, selectItem }                    from '../../../actions/search/criterias/locations';
-import { search }                                   from '../../../actions/search/main';
+import React                                              from 'react';
+import PropTypes                                          from 'prop-types';
+import { Row, Col, Button, Select, Spin, Popover, Icon }  from 'antd';
+import { loadItems, selectItem }                          from '../../../actions/search/criterias/locations';
+import { search }                                         from '../../../actions/search/main';
 
 const Option      = Select.Option;
 const ButtonGroup = Button.Group;

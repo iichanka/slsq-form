@@ -4,7 +4,6 @@ import {
     C_END_REQUEST_CONFIGS }         from '../../actions/configs/main';
 
 import { tableConfigs }             from './tableConfigs';
-import { originalConfigs }          from './originalConfigs';
 
 const isLoading = (state = false, action) => {
     switch(action.type)
@@ -34,6 +33,5 @@ export const configs = (state = {}, action) => {
         ...state,
         isLoading:          isLoading(state.isLoading, action),
         tableConfigs:       tableConfigs(state.tableConfigs, action),
-        originalConfigs:    originalConfigs(state.originalConfigs, action),
     }
 }
