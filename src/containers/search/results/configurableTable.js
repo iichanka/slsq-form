@@ -12,17 +12,15 @@ export default class ConfigurableTable extends React.Component {
   }
 
   buildConfig = (config) => {
-    this.columns = config.columns.map(column => {
-        return column;
-    })
-
-    if(config.type = 'RFR')
+    console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
+    if(config.columns.length > 0)
     {
+        this.columns = [];
         this.columns.push({
             key:    'actions',
             title:  'Действия',
+            width:  50,
             render: (text, record) => {
-                console.log('containers.search.results.ConfigurableTable.renderActions()[record]', record);
                 return(
                     <Button shape   = "circle" 
                             icon    = "plus-circle-o"
@@ -31,6 +29,28 @@ export default class ConfigurableTable extends React.Component {
             }
         });
     }
+
+    /* if(config.type === 'RFR' && this.columns.length > 0)
+    {
+        this.columns.push({
+            key:    'actions',
+            title:  'Действия',
+            render: (text, record) => {
+                return(
+                    <Button shape   = "circle" 
+                            icon    = "plus-circle-o"
+                            onClick = { event => { this.onAddClick(record.key) } } />
+                );
+            }
+        });
+    } */
+
+    config.columns.map(column => {
+        if(column.visible === true)
+        {
+            this.columns.push(column);
+        }
+    })
   }
 
   onAddClick = (key) => {
@@ -40,16 +60,35 @@ export default class ConfigurableTable extends React.Component {
   constructor(props)
   {
       super(props);
+      this.columns = [];
       this.buildConfig(props.config);
+  }
+
+  componentWillReceiveProps(newProps)
+  {
+    this.buildConfig(newProps.config);
   }
 
 
   render() {
       console.log('containers.search.results.ConfigurableTable.render()[props]', this.props);
       console.log('containers.search.results.ConfigurableTable.render()[columns]', this.columns);
-      return(
-        <Table columns      = { this.columns } 
-               dataSource   = { this.props.results } />
-      );
+      if(this.props.results.length > 0)
+      {
+        return(
+            <Table columns      = { this.columns } 
+                   dataSource   = { this.props.results }
+                   size         = 'small'
+                   scroll       = {{ y: 217, x: '100%' }} 
+                   loading      = { this.props.isSearching }/>
+          );
+      }
+      else
+      {
+        return(
+            <div />
+        );
+      }
+      
   };
 }

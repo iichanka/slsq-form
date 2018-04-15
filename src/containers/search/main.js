@@ -140,17 +140,17 @@ export default class SearchContainer extends Component {
 
               <TabPane  tab       = 'Остатки'
                         key       = 'RFR'
-                        className = 'searchPanelTabs'>
+                        className = 'searchPanelTabsFull'>
                 
                 <ConfigurableTable isSearching  = { this.props.isSearching }
                                    config       = { this.rfrConfig }
-                                   results      = { this.props.results.remnant } />
+                                   results      = { this.props.results.remnants } />
 
               </TabPane>
 
               <TabPane tab        = 'В пути'
                        key        = 'RFIT' 
-                       className  = 'searchPanelTabs' >
+                       className  = 'searchPanelTabsFull' >
 
                 <Alert message  = 'В разработке'
                        type     = 'info'
@@ -160,7 +160,7 @@ export default class SearchContainer extends Component {
 
               <TabPane tab        = 'Материалы' 
                        key        = 'RFM' 
-                       className  = 'searchPanelTabs' >
+                       className  = 'searchPanelTabsFull' >
                         
                 <Alert message  = 'В разработке'
                        type     = 'info'

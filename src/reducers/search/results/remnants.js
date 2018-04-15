@@ -1,6 +1,6 @@
 import { S_RECEIVE_RESULTS }                        from '../../../actions/search/main'
 
-export const remnants = (state = {}, action) => {
+export const remnants = (state = [], action) => {
     switch (action.type)
     {
         case S_RECEIVE_RESULTS:

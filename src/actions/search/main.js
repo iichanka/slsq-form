@@ -85,6 +85,7 @@ const loadResults = (parameters = {}) => (dispatch, getState) =>{
         dispatch(endSearch());
       })
       .catch(function (error) {
+        console.log('loadResults[error]:', error);
         showMessages([{type: 'E', text: 'Не удалось получить результаты поиска.'}]);
         dispatch(endSearch());
       });
