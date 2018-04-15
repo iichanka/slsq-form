@@ -60,4 +60,16 @@ search: {
         }
 
     }
+},
+
+isEditable: bool,
+
+configs: {
+    isLoading: bool,
+    tableConfigs: [
+        {
+            type: string,
+            columns: data
+        }
+    ]
 }

@@ -5,6 +5,7 @@ import ClassificatorLayout                          from './criterias/classifica
 import SearchButtonBox                              from './criterias/searchButtonBox';
 import { selectTab as selectCTab }                  from '../../actions/search/criterias/main';
 import { selectTab as selectRTab }                  from '../../actions/search/results/main';
+import { load as loadConfigs }                      from '../../actions/configs/main';
 
 const { TabPane } = Tabs;
 
@@ -32,6 +33,12 @@ export default class SearchContainer extends Component {
         break;
       }
     }
+  }
+
+  componentWillMount()
+  {
+    const { dispatch } = this.props;
+    dispatch(loadConfigs());
   }
 
   onConfigEdit(activeTab)

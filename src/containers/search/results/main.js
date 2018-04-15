@@ -1,11 +1,10 @@
 import React                          from 'react';
-import { Tabs }                       from 'antd';
 import PropTypes                      from 'prop-types'
-import { selectResultTab } from '../actions/search/results/main';
 
-const { TabPane } = Tabs;
 
-export default class ResultsTabs extends React.Component {
+
+
+export default class ResultsTable extends React.Component {
   static PropTypes = {
     isSearching:      PropTypes.bool.isRequired,
     selectedTab:      PropTypes.string.isRequired,
