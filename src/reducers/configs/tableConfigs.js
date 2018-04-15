@@ -1,7 +1,36 @@
 import { C_RECEIVE_CONFIGS }        from '../../actions/configs/main';
 
-const addActionColumn = config => {
-    return config;
+const transformResultsColumns = columns => {
+    let newColumns = [];
+    
+    columns.map((column, index) => {
+        if(column.visible === 'true')
+        {
+            let column_ = {
+                key:        index + '',
+                title:      column.title,
+                dataIndex:  column.dataIndex,
+                sorter:     column.sortable === 'true',
+            };
+
+            if(column.width !== '')
+            {
+                newColumns.push({
+                    ...column_,
+                    width: column.width,
+                });
+            }
+            else
+            {
+                newColumns.push({
+                    ...column_,
+                    width: 100,
+                });
+            }           
+        }
+    });
+
+    return newColumns;
 }
 
 
@@ -17,7 +46,10 @@ export const tableConfigs = (state = [], action) => {
                     case 'RFIT':
                     case 'RFM':
                     {
-                        return addActionColumn(config);
+                        return {
+                            type:       config.type,
+                            columns:    transformResultsColumns(config.columns),
+                        }
                     }
                     
                     default:

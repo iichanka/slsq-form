@@ -72,4 +72,9 @@ configs: {
             columns: data
         }
     ]
+
+    originalsConfigs: [
+        type: string,
+        columns: data
+    ]
 }
