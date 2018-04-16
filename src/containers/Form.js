@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import {Row, Col} from 'antd';
 
 import { load as loadConfigs }                      from '../actions/configs/main';
+import { getEditableStatus as loadStatus }          from '../actions/isEditable';
 import SearchContainer from './search/main';
 
 class Form extends Component {
@@ -12,6 +13,7 @@ class Form extends Component {
     search:     PropTypes.object.isRequired,
     positions:  PropTypes.object.isRequired,
     header:     PropTypes.object.isRequired,
+    isEditable: PropTypes.bool.isRequired,
     dispatch:   PropTypes.func.isRequired,
   }
 
@@ -19,6 +21,7 @@ class Form extends Component {
   {
     const { dispatch } = this.props;
     dispatch(loadConfigs());
+    dispatch(loadStatus());
   }
 
   render()
@@ -30,7 +33,8 @@ class Form extends Component {
                          configs      = { this.props.configs }
                          criterias    = { this.props.search.criterias }
                          results      = { this.props.search.results }
-                         dispatch     = { this.props.dispatch } />
+                         dispatch     = { this.props.dispatch }
+                         isEditable   = { this.props.isEditable } />
         <div>
           <div style={{minHeight: "calc(100vh - 420px)", backgroundColor: "#DBBDFF", clear: "both"}}>
             Position Table
@@ -49,12 +53,13 @@ class Form extends Component {
 
 const mapStateToProps = state => {
   console.log("mapStateToProps:", state);
-  const { search, positions, header, configs } = state;
+  const { search, positions, header, configs, isEditable } = state;
   return {
     search:     search,
     positions:  positions,
     header:     header,
     configs:    configs,
+    isEditable: isEditable,
   }
 }
 

@@ -1,6 +1,6 @@
-import React                          from 'react';
-import PropTypes                      from 'prop-types'
-import { Table, Icon, Button }        from 'antd';
+import React                            from 'react';
+import PropTypes                        from 'prop-types'
+import { Table, Icon, Button, Popover } from 'antd';
 
 
 
@@ -9,10 +9,21 @@ export default class ConfigurableTable extends React.Component {
     isSearching:        PropTypes.bool.isRequired,
     config:             PropTypes.object.isRequired,
     results:            PropTypes.array.isRequired,
+    isEditable:         PropTypes.bool.isRequired,
   }
 
   buildConfig = (config) => {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
+
+    const msg = {
+        content: (
+            <div>
+                <p>Форма заявки находится в режиме просмотра.</p>
+                <p>Чтобы перейти в режим редактирования нажмите кнопку "Обработать".</p>
+            </div>),
+        title: 'Добавление позиций недоступно',
+        }
+
     if(config.columns.length > 0)
     {
         this.columns = [];
@@ -21,10 +32,21 @@ export default class ConfigurableTable extends React.Component {
             title:  'Действия',
             width:  50,
             render: (text, record) => {
+                if(this.props.isEditable)
+                {
+                    return(
+                        <Button shape   = "circle" 
+                                icon    = "plus-circle-o"
+                                onClick = { event => { this.onAddClick(record.key) } } />
+                    );
+                }
                 return(
-                    <Button shape   = "circle" 
-                            icon    = "plus-circle-o"
-                            onClick = { event => { this.onAddClick(record.key) } } />
+                    <Popover content = { msg.content }
+                             title   = { msg.title } >
+                        <Button shape   = "circle" 
+                                icon    = "plus-circle-o"
+                                disabled />
+                    </Popover>
                 );
             }
         });

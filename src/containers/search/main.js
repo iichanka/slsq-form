@@ -15,6 +15,7 @@ export default class SearchContainer extends Component {
     configs:      PropTypes.object.isRequired,
     criterias:    PropTypes.object.isRequired,
     results:      PropTypes.object.isRequired,
+    isEditable:   PropTypes.bool.isRequired,
     dispatch:     PropTypes.func.isRequired,    
   }
 
@@ -144,7 +145,8 @@ export default class SearchContainer extends Component {
                 
                 <ConfigurableTable isSearching  = { this.props.isSearching }
                                    config       = { this.rfrConfig }
-                                   results      = { this.props.results.remnants } />
+                                   results      = { this.props.results.remnants }
+                                   isEditable   = { this.props.isEditable } />
 
               </TabPane>
 
