@@ -27,29 +27,33 @@ export default class ConfigurableTable extends React.Component {
     if(config.columns.length > 0)
     {
         this.columns = [];
-        this.columns.push({
-            key:    'actions',
-            title:  'Действия',
-            width:  50,
-            render: (text, record) => {
-                if(this.props.isEditable)
-                {
+        if(config.type === 'RFR')
+        {
+            this.columns.push({
+                key:    'actions',
+                title:  'Действия',
+                width:  50,
+                render: (text, record) => {
+                    if(this.props.isEditable)
+                    {
+                        return(
+                            <Button shape   = "circle" 
+                                    icon    = "plus-circle-o"
+                                    onClick = { event => { this.onAddClick(record.key) } } />
+                        );
+                    }
                     return(
-                        <Button shape   = "circle" 
-                                icon    = "plus-circle-o"
-                                onClick = { event => { this.onAddClick(record.key) } } />
+                        <Popover content = { msg.content }
+                                 title   = { msg.title } >
+                            <Button shape   = "circle" 
+                                    icon    = "plus-circle-o"
+                                    disabled />
+                        </Popover>
                     );
                 }
-                return(
-                    <Popover content = { msg.content }
-                             title   = { msg.title } >
-                        <Button shape   = "circle" 
-                                icon    = "plus-circle-o"
-                                disabled />
-                    </Popover>
-                );
-            }
-        });
+            });
+        }
+        
     }
 
     /* if(config.type === 'RFR' && this.columns.length > 0)
