@@ -12,7 +12,7 @@ export default class ConfigurableTable extends React.Component {
     isEditable:         PropTypes.bool.isRequired,
   }
 
-  buildConfig = (config) => {
+  buildConfigForResults = (config) => {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
 
     const msg = {
@@ -22,54 +22,37 @@ export default class ConfigurableTable extends React.Component {
                 <p>Чтобы перейти в режим редактирования нажмите кнопку "Обработать".</p>
             </div>),
         title: 'Добавление позиций недоступно',
-        }
+    }  
 
-    if(config.columns.length > 0)
-    {
-        this.columns = [];
-        if(config.type === 'RFR')
-        {
-            this.columns.push({
-                key:    'actions',
-                title:  'Действия',
-                width:  50,
-                render: (text, record) => {
-                    if(this.props.isEditable)
-                    {
-                        return(
-                            <Button shape   = "circle" 
-                                    icon    = "plus-circle-o"
-                                    onClick = { event => { this.onAddClick(record.key) } } />
-                        );
-                    }
-                    return(
-                        <Popover content = { msg.content }
-                                 title   = { msg.title } >
-                            <Button shape   = "circle" 
-                                    icon    = "plus-circle-o"
-                                    disabled />
-                        </Popover>
-                    );
-                }
-            });
-        }
-        
-    }
-
-    /* if(config.type === 'RFR' && this.columns.length > 0)
-    {
-        this.columns.push({
-            key:    'actions',
-            title:  'Действия',
-            render: (text, record) => {
+    this.columns.unshift({
+        key:    'actions',
+        title:  'Действия',
+        width:  50,
+        render: (text, record) => {
+            if(this.props.isEditable)
+            {
                 return(
                     <Button shape   = "circle" 
                             icon    = "plus-circle-o"
-                            onClick = { event => { this.onAddClick(record.key) } } />
+                            onClick = { event => { this.onAddClick(record) } } />
                 );
             }
-        });
-    } */
+            return(
+                <Popover content = { msg.content }
+                            title   = { msg.title } >
+                    <Button shape   = "circle" 
+                            icon    = "plus-circle-o"
+                            disabled />
+                </Popover>
+            );
+        }
+    });
+       
+  }
+
+  buildConfig = (config) => {
+    console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
+    this.columns = [];
 
     config.columns.map(column => {
         if(column.visible === true)
@@ -77,10 +60,27 @@ export default class ConfigurableTable extends React.Component {
             this.columns.push(column);
         }
     })
+
+    if(this.columns.length > 0)
+    {
+        switch(config.type)
+        {
+            case 'RFR':
+            case 'RFIT':
+            case 'RFM':
+            {
+                this.buildConfigForResults(config);
+                break;
+            }
+            default:
+        }
+        
+    }
+    console.log('containers.search.results.ConfigurableTable.buildConfig()[this.columns]', this.columns);
   }
 
-  onAddClick = (key) => {
-    console.log('containers.search.results.ConfigurableTable.onAddClick()[key]', key);
+  onAddClick = (record) => {
+    console.log('containers.search.results.ConfigurableTable.onAddClick()[record]', record);
   }
 
   constructor(props)

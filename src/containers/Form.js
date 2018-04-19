@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import {Row, Col} from 'antd';
+import {Row, Col, Card, Button } from 'antd';
 
 import { load as loadConfigs }                      from '../actions/configs/main';
 import { getEditableStatus as loadStatus }          from '../actions/isEditable';
@@ -24,6 +24,21 @@ class Form extends Component {
     dispatch(loadStatus());
   }
 
+  getConfigEditButton()
+  {
+    return(
+      <Button type    = 'primary' 
+              icon    = 'setting' 
+              onClick = { event => { this.onConfigEdit() } }
+              style   = {{ }}/>
+    );
+  }
+
+  onConfigEdit = () => {
+
+  }
+
+
   render()
   {
     console.log("Form.Render[props]:", this.props);
@@ -36,8 +51,15 @@ class Form extends Component {
                          dispatch     = { this.props.dispatch }
                          isEditable   = { this.props.isEditable } />
         <div>
-          <div style={{minHeight: "calc(100vh - 420px)", backgroundColor: "#DBBDFF", clear: "both"}}>
-            Position Table
+          <div style={{}}>
+          <Card title     = "Позиции" 
+                bordered  = { false }
+                style     = {{ minHeight: "calc(100vh - 420px)", clear: "both"}}
+                extra     = { this.getConfigEditButton() }>
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
+          </Card>
           </div>
           <div style={{minHeight: "35px", backgroundColor: "#AABBFF"}}>
             Recalc Button

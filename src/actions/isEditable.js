@@ -40,12 +40,13 @@ export const getEditableStatus = () => (dispatch, getState) =>{
         }
     })
       .then(response => {
+        console.log('actions.isEditable[response]', response);
         let haveError = false;
         showMessages(response.data.messages, haveError);
        
         if(!haveError)
         {
-            dispatch(receiveEditableStatus(response.data.isEditable));
+            dispatch(receiveEditableStatus(response.data.data.isEditable));
             
         }
         dispatch(endLoadEditableStatus());

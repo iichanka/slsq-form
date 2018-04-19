@@ -7,10 +7,12 @@ import { F_RECEIVE_EDITABLE_STATUS }  from '../actions/isEditable';
 import { F_END_LOAD_EDITABLE_STATUS } from '../actions/isEditable';
 
 const isEditable = (state = false, action) => {
+  console.log('rootReducer.isEditable[action]:', action);
   switch(action.type)
   {
     case F_RECEIVE_EDITABLE_STATUS:
     {
+      
       return action.isEditable === 'true';
     }
 
