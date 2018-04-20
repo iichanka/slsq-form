@@ -2,7 +2,7 @@
   "name": "async",
   "version": "0.0.1",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://sapdc0.spk.ru/sap/bc/bsp/sap/ZBT115QH_SLSQ/js/",
   "devDependencies": {
     "antd": "^3.3.0",
     "babel-polyfill": "^6.26.0",

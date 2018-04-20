@@ -9,6 +9,17 @@
 
 .ant-table td { white-space: nowrap; }
 
+.positionsTable
+{
+    min-height: calc(100vh - 420px);
+}
+
+.positionsTableToolbar
+{
+    height: 35px;
+}
+
+
 .searchCriteriasBox
 {
     min-height: 315px;

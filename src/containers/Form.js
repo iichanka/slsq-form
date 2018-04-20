@@ -6,6 +6,7 @@ import {Row, Col, Card, Button } from 'antd';
 import { load as loadConfigs }                      from '../actions/configs/main';
 import { getEditableStatus as loadStatus }          from '../actions/isEditable';
 import SearchContainer from './search/main';
+import PositionsContainer from './positions/main';
 
 class Form extends Component {
   static propTypes = {
@@ -50,21 +51,12 @@ class Form extends Component {
                          results      = { this.props.search.results }
                          dispatch     = { this.props.dispatch }
                          isEditable   = { this.props.isEditable } />
-        <div>
-          <div style={{}}>
-          <Card title     = "Позиции" 
-                bordered  = { false }
-                style     = {{ minHeight: "calc(100vh - 420px)", clear: "both"}}
-                extra     = { this.getConfigEditButton() }>
-            <p>Card content</p>
-            <p>Card content</p>
-            <p>Card content</p>
-          </Card>
-          </div>
-          <div style={{minHeight: "35px", backgroundColor: "#AABBFF"}}>
-            Recalc Button
-          </div>
-      </div>
+          
+          <PositionsContainer configs     = { this.props.configs }   
+                              positions   = { this.props.positions }
+                              dispatch    = { this.props.dispatch }
+                              isEditable  = { this.props.isEditable } />
+          
         <div style={{minHeight: "35px", backgroundColor: "#AADBFF"}}>
           Quotation Header
         </div>

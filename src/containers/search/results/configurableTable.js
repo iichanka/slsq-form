@@ -50,8 +50,29 @@ export default class ConfigurableTable extends React.Component {
        
   }
 
-  buildConfig = (config) => {
+  buildConfig = (config = {columns:[], type: ''}) => {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
+    switch(config.type)
+    {
+        case 'RFR':
+        case 'RFIT':
+        case 'RFM':
+        {
+            this.scroll = {
+                y: 217, 
+                x: '100%'
+            }
+            break;
+        }
+        default:
+        {
+            this.scroll = {
+                y: '100%', 
+                x: '100%'
+            }
+        }
+    }
+
     this.columns = [];
 
     config.columns.map(column => {
@@ -105,7 +126,7 @@ export default class ConfigurableTable extends React.Component {
             <Table columns      = { this.columns } 
                    dataSource   = { this.props.results }
                    size         = 'small'
-                   scroll       = {{ y: 217, x: '100%' }} 
+                   scroll       = { this.scroll } 
                    loading      = { this.props.isSearching }/>
           );
       }
