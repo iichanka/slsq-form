@@ -1,8 +1,9 @@
 import React                                                from 'react';
 import PropTypes                                            from 'prop-types';
-import { Row, Col, Button, Spin,  }                         from 'antd';
+import { Row, Col, Button, Spin, Popover }                  from 'antd';
 import ConfigurableTable                                    from '../search/results/configurableTable';
 import { loadItems }                                        from '../../actions/positions/main';
+import { calcPositionSum }                                  from '../../actions/positions/calcPositionsSum';
 
 export default class PositionsConainer extends React.Component {
   static propTypes = {   
@@ -21,6 +22,12 @@ export default class PositionsConainer extends React.Component {
     console.log('containers.positions.main.PositionContainer.componentDidMount()[props]:', this.props);
     const { dispatch } = this.props
     dispatch(loadItems());
+  }
+
+  onCalcPositionsSum()
+  {
+    const { dispatch } = this.props
+    dispatch(calcPositionSum());
   }
 
  /*  componentDidMount() {
@@ -57,12 +64,43 @@ export default class PositionsConainer extends React.Component {
 
   render() {
     console.log('containers.positions.main.PositionsConatainer.render()[props]:', this.props);
+
+    const msg = {
+      content: (
+          <div>
+              <p>Форма заявки находится в режиме просмотра.</p>
+              <p>Чтобы перейти в режим редактирования нажмите кнопку "Обработать".</p>
+          </div>),
+      title: 'Рассчет цен недоступен',
+    }
+
     return (
         <Spin spinning = { this.props.positions.isLoading } >
             <Row className = 'positionsTableToolbar' >
-                    <Col span      = { 24 }
+                    <Col span     = { 24 }
                         className = 'positionsTableToolbar' >
-                        Reserved for toolbar
+                        { this.props.isEditable &&
+                         <Button type     = "primary" 
+                                 icon     = "reload" 
+                                 loading  = { this.props.positions.isLoading }
+                                 style    = {{ float: 'right', marginRight: 8 }}
+                                 onClick  = { (event) => { this.onCalcPositionsSum(); } }  >
+                            Рассчитать цены
+                          </Button>
+                        }
+                        { !this.props.isEditable &&
+                          <Popover content = { msg.content }
+                                   title   = { msg.title } >
+                            <Button type     = "primary" 
+                                    icon     = "frown-o"
+                                    loading  = { this.props.positions.isLoading }
+                                    style    = {{ float: 'right', marginRight: 8 }}
+                                    onClick  = { (event) => { this.onCalcPositionsSum(); } }
+                                    disabled  >
+                                Рассчитать цены
+                            </Button>
+                          </Popover>
+                        }
                     </Col>
             </Row>
             <Row className = 'positionsTable' >    
@@ -71,7 +109,8 @@ export default class PositionsConainer extends React.Component {
                     <ConfigurableTable  isSearching = { false }
                                         config      = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
                                         results     = { this.props.positions.items }
-                                        isEditable  = { this.props.isEditable } />
+                                        isEditable  = { this.props.isEditable }
+                                        dispatch    = { this.props.dispatch } />
                 </Col>
             </Row>
         </Spin>);

@@ -1,0 +1,44 @@
+{
+    "BTOrderHeader": {
+        "BTHeaderItemsExt": [
+            {
+            "BTSalesItemsAll.isRequired.needPublish" : [
+                {
+                    "ORDERED_PROD.isRequired": "matnr", 
+                    "ITM_TYPE.isOptional": "ZAGI",
+                    "DESCRIPTION.isOptional": "Описание материала",
+                    "NUMBER_INT.isOptional": "0000000010",
+        
+                    "BTItemProductExt.isOptional": {
+                        "GROSS_WEIGHT": "1.00",
+                        "NET_WEIGHT": "1.00",
+                        "WEIGHT_UNIT": "КГ",
+                        "PROCESS_QTY_NUM": "1",
+                        "PROCESS_QTY_DEN": "1",
+                        "PROCESS_QTY_UNIT": "КГ",
+                        "BASE_QTY_UNIT": "КГ"
+                    },
+        
+                    "BTItemSchedlinExt.isRequired.needPublish": {
+                        "BTSchedlinFirst": {
+                            "QUANTITY.isRequired": "123"
+                        }
+                    },
+        
+                    "BTItemConditionSet": {
+                        "BTCondICondLineAll": [
+                            {
+                                "KSCHL": "Тип ценового условия",
+                                "KBETR_PRT": "ЦЕНА за 1 единицу",
+                                "WAERS": "Валюта цены за одну единицу"
+                            }
+                        ]
+                    }
+                }
+            ]
+    
+            }    
+        ]
+    }
+    
+}

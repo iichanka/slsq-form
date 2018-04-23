@@ -146,7 +146,8 @@ export default class SearchContainer extends Component {
                 <ConfigurableTable isSearching  = { this.props.isSearching }
                                    config       = { this.rfrConfig }
                                    results      = { this.props.results.remnants }
-                                   isEditable   = { this.props.isEditable } />
+                                   isEditable   = { this.props.isEditable }
+                                   dispatch     = { this.props.dispatch } />
 
               </TabPane>
 

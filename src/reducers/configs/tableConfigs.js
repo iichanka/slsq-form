@@ -13,7 +13,6 @@ export const tableConfigs = (state = [], action) => {
                     column.sortable     = column.sortable === 'true';
                     column.visible      = column.visible === 'true';                    
                     column.editable     = column.editable === 'true';
-                    column.width        = parseInt(column.width, 10);
                     return column;
                 })
 

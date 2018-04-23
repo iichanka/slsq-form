@@ -88,3 +88,9 @@
 {
     overflow: auto;
 }
+
+.small-table-line
+{
+    line-height: 0.7;
+}
+

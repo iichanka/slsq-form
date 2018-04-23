@@ -1,7 +1,7 @@
 import React                            from 'react';
 import PropTypes                        from 'prop-types'
-import { Table, Icon, Button, Popover } from 'antd';
-
+import { Table, Icon, Button, Popover, Input } from 'antd';
+import { addPositionItem }              from '../../../actions/positions/addPosition';
 
 
 export default class ConfigurableTable extends React.Component {
@@ -10,7 +10,11 @@ export default class ConfigurableTable extends React.Component {
     config:             PropTypes.object.isRequired,
     results:            PropTypes.array.isRequired,
     isEditable:         PropTypes.bool.isRequired,
+    dispatch:           PropTypes.func.isRequired,
   }
+
+  inputRefs = [];
+  inputValues = [];
 
   buildConfigForResults = (config) => {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
@@ -27,22 +31,27 @@ export default class ConfigurableTable extends React.Component {
     this.columns.unshift({
         key:    'actions',
         title:  'Действия',
-        width:  50,
+        width:  100,
+        className: 'table-actions-without-padding',
         render: (text, record) => {
             if(this.props.isEditable)
             {
                 return(
-                    <Button shape   = "circle" 
-                            icon    = "plus-circle-o"
-                            onClick = { event => { this.onAddClick(record) } } />
+                    <div>
+                        <Input  size = "small" 
+                                placeholder = "0.00"
+                                ref = { (ref) => { this.inputRefs[record.key] = ref; } }
+                                style = {{ width: 100 }}
+                                addonAfter = { <Icon type="plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
+                                onPressEnter = { (e) => { this.onAddClick(record) } } />
+                    </div>
                 );
             }
             return(
                 <Popover content = { msg.content }
                             title   = { msg.title } >
-                    <Button shape   = "circle" 
-                            icon    = "plus-circle-o"
-                            disabled />
+                    <Icon type    = "frown-o"
+                          onClick = { event => { this.onAddClick(record) } } />
                 </Popover>
             );
         }
@@ -101,7 +110,22 @@ export default class ConfigurableTable extends React.Component {
   }
 
   onAddClick = (record) => {
-    console.log('containers.search.results.ConfigurableTable.onAddClick()[record]', record);
+    const { dispatch, config } = this.props;
+    let input = this.inputRefs[record.key].input;
+
+    if(input)
+    {
+        input.blur();
+        switch(config.type)
+        {
+            case 'RFR':
+            {
+                dispatch(addPositionItem({ remnants: {...record, count: input.value } }));
+            }
+        }
+
+        
+    }
   }
 
   constructor(props)
@@ -127,7 +151,8 @@ export default class ConfigurableTable extends React.Component {
                    dataSource   = { this.props.results }
                    size         = 'small'
                    scroll       = { this.scroll } 
-                   loading      = { this.props.isSearching }/>
+                   loading      = { this.props.isSearching }
+                   rowClassName = { ( record, index ) => { return 'small-table-line'; } } />
           );
       }
       else

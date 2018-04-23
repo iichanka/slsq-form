@@ -55,7 +55,8 @@ class Form extends Component {
           <PositionsContainer configs     = { this.props.configs }   
                               positions   = { this.props.positions }
                               dispatch    = { this.props.dispatch }
-                              isEditable  = { this.props.isEditable } />
+                              isEditable  = { this.props.isEditable }
+                              dispatch    = { this.props.dispatch } />
           
         <div style={{minHeight: "35px", backgroundColor: "#AADBFF"}}>
           Quotation Header
