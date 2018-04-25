@@ -59,8 +59,8 @@ export default class SearchButtonBox extends React.Component {
              className = 'searchCriteriasButtonBox' >
           <Spin spinning = { this.props.criterias.locations.isLoading } >
             <Select onChange      = { key => { this.onSelect(parseInt(key)) } }
-                    defaultValue  = { this.getDefaultValueKey(this.props.criterias.locations.items) } 
-                    style         = {{ width: '100%' }} >
+                    value         = { this.getDefaultValueKey(this.props.criterias.locations.items) } 
+                    style         = {{ width: 'calc(100% - 10px)', margin: '5px' }} >
               {
                 this.props.criterias.locations.items.map(item => {
                   return(
@@ -73,8 +73,9 @@ export default class SearchButtonBox extends React.Component {
             </Select>
           </Spin>
         </Col>
-        <Col span = { 8 } >
-        <ButtonGroup style = {{ float: 'right', marginRight: 4 }} >
+        <Col span = { 8 } 
+             className = 'searchCriteriasButtonBox' >
+        <ButtonGroup style = {{ float: 'right', margin: '5px' }} >
           <Popover content = 'Очистить все ранее выбранные критерии поиска' 
                    title   = "Сбросить">
             <Button type = 'danger'

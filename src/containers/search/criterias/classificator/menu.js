@@ -72,10 +72,11 @@ export default class ClassificatorMenu extends React.Component {
       for(let j = 0; j < submenuKeys.length; j ++)
       {
           let title = (submenuKeys[j].title.length >= 14) ? <Tooltip placement="topLeft" mouseLeaveDelay={0} title={submenuKeys[j].title}>{submenuKeys[j].title}</Tooltip> : submenuKeys[j].title;
-          submenuKeysElements.push(<Menu.Item key={submenuKeys[j].id} style={{margin: 0}}>{title}</Menu.Item>);
+          submenuKeysElements.push(<Menu.Item key={submenuKeys[j].id} style={{margin: 0}} className = 'my-menu'>{title}</Menu.Item>);
       }
       rootSubmenuKeysElements.push(
-        <SubMenu key={this.rootSubmenuKeys[i].id} title={this.rootSubmenuKeys[i].title}>
+        <SubMenu key={this.rootSubmenuKeys[i].id} title={this.rootSubmenuKeys[i].title}
+                 className = 'my-menu' >
           {submenuKeysElements}
         </SubMenu>);
     }

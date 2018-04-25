@@ -75,44 +75,45 @@ export default class PositionsConainer extends React.Component {
     }
 
     return (
-        <Spin spinning = { this.props.positions.isLoading } >
-            <Row className = 'positionsTableToolbar' >
-                    <Col span     = { 24 }
-                        className = 'positionsTableToolbar' >
-                        { this.props.isEditable &&
-                         <Button type     = "primary" 
-                                 icon     = "reload" 
-                                 loading  = { this.props.positions.isLoading }
-                                 style    = {{ float: 'right', marginRight: 8 }}
-                                 onClick  = { (event) => { this.onCalcPositionsSum(); } }  >
-                            Рассчитать цены
-                          </Button>
-                        }
-                        { !this.props.isEditable &&
-                          <Popover content = { msg.content }
-                                   title   = { msg.title } >
-                            <Button type     = "primary" 
-                                    icon     = "frown-o"
-                                    loading  = { this.props.positions.isLoading }
-                                    style    = {{ float: 'right', marginRight: 8 }}
-                                    onClick  = { (event) => { this.onCalcPositionsSum(); } }
-                                    disabled  >
-                                Рассчитать цены
+        <div className = 'positions-box' >
+          <Spin spinning = { this.props.positions.isLoading } >
+              <Row className = 'positionsTableToolbar' >
+                      <Col span     = { 24 } >
+                          { this.props.isEditable &&
+                          <Button type     = "primary" 
+                                  icon     = "reload" 
+                                  loading  = { this.props.positions.isLoading }
+                                  style    = {{ float: 'right' }}
+                                  onClick  = { (event) => { this.onCalcPositionsSum(); } }  >
+                              Рассчитать цены
                             </Button>
-                          </Popover>
-                        }
-                    </Col>
-            </Row>
-            <Row className = 'positionsTable' >    
-                <Col span      = { 24 }
-                    className = 'positionsTable' >
-                    <ConfigurableTable  isSearching = { false }
-                                        config      = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
-                                        results     = { this.props.positions.items }
-                                        isEditable  = { this.props.isEditable }
-                                        dispatch    = { this.props.dispatch } />
-                </Col>
-            </Row>
-        </Spin>);
+                          }
+                          { !this.props.isEditable &&
+                            <Popover content = { msg.content }
+                                    title   = { msg.title } >
+                              <Button type     = "primary" 
+                                      icon     = "frown-o"
+                                      loading  = { this.props.positions.isLoading }
+                                      style    = {{ float: 'right' }}
+                                      onClick  = { (event) => { this.onCalcPositionsSum(); } }
+                                      disabled  >
+                                  Рассчитать цены
+                              </Button>
+                            </Popover>
+                          }
+                      </Col>
+              </Row>
+              <Row className = 'positionsTable' >    
+                  <Col span      = { 24 }
+                      className = 'positionsTable' >
+                      <ConfigurableTable  isSearching = { false }
+                                          config      = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
+                                          results     = { this.props.positions.items }
+                                          isEditable  = { this.props.isEditable }
+                                          dispatch    = { this.props.dispatch } />
+                  </Col>
+              </Row>
+          </Spin>
+        </div>);
   } 
 }

@@ -2,7 +2,7 @@
   "name": "async",
   "version": "0.0.1",
   "private": true,
-  "homepage": "https://sapdc0.spk.ru/sap/bc/bsp/sap/ZBT115QH_SLSQ/js/",
+  "homepage": ".",
   "devDependencies": {
     "antd": "^3.3.0",
     "babel-polyfill": "^6.26.0",
@@ -10,8 +10,7 @@
     "react-scripts": "^1.0.2",
     "redux-logger": "^3.0.6"
   },
-  "dependencies": {
-    "@blueprintjs/core": "^2.1.1",
+  "dependencies": { 
     "axios": "^0.18.0",
     "prop-types": "^15.5.10",
     "react": "^15.5.0",
