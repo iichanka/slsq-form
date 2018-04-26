@@ -97,7 +97,7 @@
 
 .small-table-line
 {
-    line-height: 0.7;
+    line-height: 28px;
 }
 
 .ant-menu-submenu-title
@@ -116,4 +116,9 @@
 {
     padding-bottom: 0 !important;
     padding-top: 0 !important;
+}
+
+.ant-table-fixed
+{
+    height: 34px !important;
 }

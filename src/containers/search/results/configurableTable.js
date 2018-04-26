@@ -87,6 +87,9 @@ export default class ConfigurableTable extends React.Component {
     config.columns.map(column => {
         if(column.visible === true)
         {
+            column.className = 'table-actions-without-padding';
+            column.sorter = true;
+            column.sortOrder = 'ascend';
             this.columns.push(column);
         }
     })
@@ -128,6 +131,10 @@ export default class ConfigurableTable extends React.Component {
     }
   }
 
+  handleTableChange(pagination, filters, sorter) {
+    console.log('containers.search.results.ConfigurableTable.handleTableChange()', pagination, filters, sorter);
+  }
+
   constructor(props)
   {
       super(props);
@@ -152,7 +159,8 @@ export default class ConfigurableTable extends React.Component {
                    size         = 'small'
                    scroll       = { this.scroll } 
                    loading      = { this.props.isSearching }
-                   rowClassName = { ( record, index ) => { return 'small-table-line'; } } />
+                   rowClassName = { ( record, index ) => { return 'small-table-line'; } } 
+                   onChange     = { (pagination, filters, sorter) => this.handleTableChange(pagination, filters, sorter) }/>
           );
       }
       else
