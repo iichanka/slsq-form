@@ -2,6 +2,7 @@ import React                            from 'react';
 import PropTypes                        from 'prop-types'
 import { Table, Icon, Button, Popover, Input } from 'antd';
 import { addPositionItem }              from '../../../actions/positions/addPosition';
+import Column                           from '../../../components/column';
 
 
 export default class ConfigurableTable extends React.Component {
@@ -88,9 +89,14 @@ export default class ConfigurableTable extends React.Component {
         if(column.visible === true)
         {
             column.className = 'table-actions-without-padding';
-            column.sorter = true;
-            column.sortOrder = 'ascend';
-            this.columns.push(column);
+            
+            column.sorter = function(a, b) {
+                console.log(this);
+            }
+
+            column.sorter = column.sorter.bind(column);
+
+            this.columns.push(column);          
         }
     })
 
