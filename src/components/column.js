@@ -1,6 +1,6 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { Input, Icon, Button, Popover, Col } from 'antd'
+import React                            from 'react';
+import PropTypes                        from 'prop-types';
+import { Input, Icon, Button, Popover, Row, Col } from 'antd'
 
 const initialState = {
   filterText: '',
@@ -12,25 +12,59 @@ const initialState = {
 
 export default class Column extends React.Component
 {
-  propTypes = {
-    column:             PropTypes.object.isRequired,
-    filterCallback:     PropTypes.func.isRequired,
-    sortCallback:       PropTypes.func.isRequired,
+  /* static PropTypes = {
+    forceUpdateCallback:    PropTypes.func.isRequired,
+  } */
+
+
+  setData(data)
+  {
+    this.state = initialState;
+    this.fillAttributes(data);
+  }
+
+  setCallbacks(onFilterCallback, onSortCallback)
+  {
+    this.onFilterCallback = onFilterCallback;
+    this.onSortCallback = onSortCallback;
+  }
+
+  setUpdateFunc(forceUpdateCallback)
+  {
+    this.forceUpdateF = forceUpdateCallback;
   }
 
   buildDropdown(column)
   {
     return(
       <div className="custom-filter-dropdown">
-          <Input
-            ref={ele => this.searchInput = ele}
-            placeholder="Search name"
-            value={this.state.filterText}
-            onChange={this.onInputChange}
-            onPressEnter={ () => this.props.filterCallback(this.state.filterText)}
-          />
-          <Button type="primary" onClick={ () => this.props.filterCallback(this.state.filterText)}>Search</Button>
-        </div>
+        <Row>
+          <Col span = { 24 }>
+            <Button style = {{ width: '100%' }}
+                    size = 'small'
+                    icon = 'arrow-down'>
+              Сортировать от А до Я
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col span = { 24 } >
+            <Button style = {{ width: '100%' }}
+                    size = 'small'
+                    icon = 'arrow-up'>
+              Сортировать от Я до А
+            </Button>
+          </Col>
+        </Row>
+        <Input
+          ref={ele => this.searchInput = ele}
+          placeholder="Search name"
+          /* value={this.state.filterText}
+          onChange={this.onInputChange}
+          onPressEnter={ () => {}} */
+        />
+        <Button type="primary" /* onClick={ () => this.props.filterCallback(this.state.filterText)} */>Search</Button>
+      </div>
     );
   }
 
@@ -46,31 +80,23 @@ export default class Column extends React.Component
       this.key                            = column.key;
       this.filterDropdown                 = this.buildDropdown(column);
       this.filterDropdownVisible          = this.state.dropdownVisible;
+      this.className                      = 'table-actions-without-padding';
       this.onFilterDropdownVisibleChange  = (visible) => {
-        this.setState({
-          dropdownVisible: visible,
-        }, 
-        () => this.searchInput && this.searchInput.focus());
+        console.log('components.column.onFilterDropdownVisible()[visible]:', visible);
+        this.filterDropdownVisible = visible;
+        this.forceUpdateF();
+        this.forceUpdate();
       }
+      this.width                          = (column.width !== undefined && column.width !== "") ? column.width : undefined;
+      this.visible                        = column.visible;
+      this.searchable                     = column.searchable;
+      this.sortable                       = column.sortable;
     }   
-  }
-
-  constructor(props)
-  {
-    console.log("components.columns.constructor[props]:", props);
-    super(props);
-    this.state = initialState;
-    this.fillAttributes(props.column);
   }
 
   onInputChange = (e) => {
     this.setState({ filterText: e.target.value });
   }
-
-  
-
-  
-
 
   componentWillReceiveProps(newProps)
   {
@@ -78,6 +104,8 @@ export default class Column extends React.Component
   }
 
   render() { 
+    console.log('components.column.render()');
+    this.filterDropdownVisible = this.state.dropdownVisible;
     return false; 
  }
 }

@@ -2,7 +2,7 @@ import React                            from 'react';
 import PropTypes                        from 'prop-types'
 import { Table, Icon, Button, Popover, Input } from 'antd';
 import { addPositionItem }              from '../../../actions/positions/addPosition';
-import Column                           from '../../../components/column';
+
 
 
 export default class ConfigurableTable extends React.Component {
@@ -60,6 +60,7 @@ export default class ConfigurableTable extends React.Component {
        
   }
 
+  //построение конфига колонок
   buildConfig = (config = {columns:[], type: ''}) => {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
     switch(config.type)
@@ -88,15 +89,12 @@ export default class ConfigurableTable extends React.Component {
     config.columns.map(column => {
         if(column.visible === true)
         {
-            column.className = 'table-actions-without-padding';
+            column.setCallbacks(() => {}, () => {});
+            column.setUpdateFunc(this.forceUpdate.bind(this));
+            this.columns.push(column);
+
+            //для каждой фильтруемой колонки делаем список фильтров
             
-            column.sorter = function(a, b) {
-                console.log(this);
-            }
-
-            column.sorter = column.sorter.bind(column);
-
-            this.columns.push(column);          
         }
     })
 
