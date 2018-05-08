@@ -87,8 +87,8 @@ export default class ConfigurableTable extends React.Component {
           console.log('HIT!');
           return null;
         }
+        return record
       });
-      return record
     }).filter( record => !!record );
   }
 
