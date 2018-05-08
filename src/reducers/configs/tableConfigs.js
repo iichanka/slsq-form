@@ -1,5 +1,5 @@
 import { C_RECEIVE_CONFIGS }        from '../../actions/configs/main';
-import Column                       from '../../components/column';
+
 export const tableConfigs = (state = [], action) => {
     switch(action.type)
     {
@@ -12,9 +12,7 @@ export const tableConfigs = (state = [], action) => {
                     column.sortable     = column.sortable === 'true';
                     column.visible      = column.visible === 'true';                    
                     column.editable     = column.editable === 'true';
-                    let result = new Column();
-                    result.setData(column);
-                    return result;
+                    return column;
                 })
 
                 let config_type = config.type;

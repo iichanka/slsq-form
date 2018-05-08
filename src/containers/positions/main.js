@@ -1,7 +1,7 @@
 import React                                                from 'react';
 import PropTypes                                            from 'prop-types';
 import { Row, Col, Button, Spin, Popover }                  from 'antd';
-import ConfigurableTable                                    from '../search/results/configurableTable';
+import ConfigurableTable                                    from '../configurableTable';
 import { loadItems }                                        from '../../actions/positions/main';
 import { calcPositionSum }                                  from '../../actions/positions/calcPositionsSum';
 

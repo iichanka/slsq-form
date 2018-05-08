@@ -1,9 +1,16 @@
 import React                            from 'react';
 import PropTypes                        from 'prop-types'
-import { Table, Icon, Button, Popover, Input } from 'antd';
-import { addPositionItem }              from '../../../actions/positions/addPosition';
+import {  Table, Icon, Button, 
+          Popover, Input, Row, Col }    from 'antd';
+import { addPositionItem }              from '../actions/positions/addPosition';
 
+const Search = Input.Search;
 
+const initialState = {
+  filtered: [],
+  sorted: [],
+  dropdownVisible: [],
+};
 
 export default class ConfigurableTable extends React.Component {
   static PropTypes = {
@@ -16,6 +23,17 @@ export default class ConfigurableTable extends React.Component {
 
   inputRefs = [];
   inputValues = [];
+  filters = [];
+  /*
+  {
+    field: string,
+    values: [
+      val1,
+      val2,
+      ...
+    ]
+  }
+  */
 
   buildConfigForResults = (config) => {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
@@ -43,7 +61,7 @@ export default class ConfigurableTable extends React.Component {
                                 placeholder = "0.00"
                                 ref = { (ref) => { this.inputRefs[record.key] = ref; } }
                                 style = {{ width: 100 }}
-                                addonAfter = { <Icon type="plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
+                                addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
                                 onPressEnter = { (e) => { this.onAddClick(record) } } />
                     </div>
                 );
@@ -59,6 +77,68 @@ export default class ConfigurableTable extends React.Component {
     });
        
   }
+
+  applyFiltersToData()
+  {
+    return this.props.results.map( record => {
+      this.filters.forEach(filter => {
+        if(filter.values.indexOf(record[filter.field]) === -1)
+        {
+          console.log('HIT!');
+          return null;
+        }
+      });
+      return record
+    }).filter( record => !!record );
+  }
+
+  buildDropdown(column)
+  {
+    return(
+      <div className="custom-filter-dropdown">
+        <Row>
+          <Col span = { 24 }>
+            <Button style = {{ width: '100%', marginTop: 5 }}
+                    size = 'small'
+                    icon = 'arrow-down'>
+              Сортировать от А до Я
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col span = { 24 } >
+            <Button style = {{ width: '100%', marginTop: 5 }}
+                    size = 'small'
+                    icon = 'arrow-up'>
+              Сортировать от Я до А
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col span = { 24 } >
+            <Search
+              style       = {{ marginTop: 5 }}
+              placeholder = "Поиск..."
+              onSearch    = { value => { this.filters.push({ field: column.dataIndex, values: [ {value}] }) } }
+              size        = 'small'
+              enterButton
+            />
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  findWithAttr = (array, attr, value) => {
+    console.log('containers.search.results.ConfigurableTable.findWithAttr()[array, attr, value]', array, attr, value);
+    for(var i = 0; i < array.length; i += 1) {
+      if(array[i][attr] === value) {
+          return i;
+      }
+    }
+    return undefined;
+  }
+
 
   //построение конфига колонок
   buildConfig = (config = {columns:[], type: ''}) => {
@@ -87,14 +167,23 @@ export default class ConfigurableTable extends React.Component {
     this.columns = [];
 
     config.columns.map(column => {
-        if(column.visible === true)
+        if(column.visible)
         {
-            column.setCallbacks(() => {}, () => {});
-            column.setUpdateFunc(this.forceUpdate.bind(this));
-            this.columns.push(column);
+            column.className    = 'table-actions-without-padding';
+            column.filterIcon   = ( column.searchable || column.sortable ) && 
+              <Icon type  = "filter" 
+                    style = {{ color: (this.state.filtered[column.key] || this.state.sorted[column.key]) ? '#108ee9' : '#aaa' }} />;
 
-            //для каждой фильтруемой колонки делаем список фильтров
-            
+            column.filterDropdown         = this.buildDropdown(column);
+            column.filterDropdownVisible  = this.state.dropdownVisible[column.key];
+           
+            column.onFilterDropdownVisibleChange  = (visible) => {
+              let dropdownVisibleNew = this.state.dropdownVisible || [];
+              dropdownVisibleNew[column.key] = visible;
+              this.setState({...this.state, dropdownVisible: dropdownVisibleNew})
+            };
+
+            this.columns.push(column);            
         }
     })
 
@@ -142,18 +231,25 @@ export default class ConfigurableTable extends React.Component {
   constructor(props)
   {
       super(props);
-      this.columns = [];
-      this.buildConfig(props.config);
+      
+      this.state = initialState;
   }
 
   componentWillReceiveProps(newProps)
   {
-    this.buildConfig(newProps.config);
+    //this.buildConfig(newProps.config);
   }
 
 
   render() {
+      this.columns = [];
+      let data = this.applyFiltersToData();
+      console.log('containers.search.results.ConfigurableTable.render()[newData]', data);
+      console.log('containers.search.results.ConfigurableTable.render()[filters]', this.filters);
+      
+      this.buildConfig(this.props.config);
       console.log('containers.search.results.ConfigurableTable.render()[props]', this.props);
+      console.log('containers.search.results.ConfigurableTable.render()[state]', this.state);
       console.log('containers.search.results.ConfigurableTable.render()[columns]', this.columns);
       if(this.props.results.length > 0)
       {

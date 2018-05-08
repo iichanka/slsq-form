@@ -6,6 +6,7 @@ import {
   SCC_SELECT_CLASS
 } from '../../../actions/search/criterias/classificator';
 
+import { SC_CLEAR }    from '../../../actions/search/criterias/main';
 
 const classificatorInitState = {
   isLoading: false,
@@ -74,6 +75,25 @@ const onSelectItems = (state = {}, action) => {
   }
 }
 
+const clearSelectedItems = (state = [], action) => {
+  switch(action.key)
+  {
+    case 'SBC':
+    {
+      return state.map(item => {
+        item.selected = false;
+        return item;
+      });
+    }
+
+    default:
+    {
+      return state;
+    }
+  }
+  
+}
+
 const onRequestItems = (state ={}, action) => {
   switch(action.type)
   {
@@ -136,6 +156,14 @@ export const classificator = (state = classificatorInitState, action) => {
       return {
         ...state,
         selectedClassItemID: action.itemID
+      }
+    }
+
+    case SC_CLEAR:
+    {
+      return {
+        ...state,
+        items: clearSelectedItems(state.items, action),
       }
     }
 

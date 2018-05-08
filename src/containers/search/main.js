@@ -5,7 +5,7 @@ import ClassificatorLayout                          from './criterias/classifica
 import SearchButtonBox                              from './criterias/searchButtonBox';
 import { selectTab as selectCTab }                  from '../../actions/search/criterias/main';
 import { selectTab as selectRTab }                  from '../../actions/search/results/main';
-import ConfigurableTable                            from '../search/results/configurableTable';
+import ConfigurableTable                            from '../configurableTable';
 
 const { TabPane } = Tabs;
 
@@ -89,7 +89,7 @@ export default class SearchContainer extends Component {
           <Col className  = 'searchContainer' 
                span       = { 8 } >
             <div className = 'searchCriteriasBox'>
-              <Tabs defaultActiveKey = { this.props.criterias.activeTab }
+              <Tabs defaultActiveKey = 'SBC'
                     size             = 'small'
                     onChange         = { key => this.onTabSelect(key, 'C') } >
 

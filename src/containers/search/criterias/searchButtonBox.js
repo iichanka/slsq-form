@@ -3,6 +3,7 @@ import PropTypes                                          from 'prop-types';
 import { Row, Col, Button, Select, Spin, Popover, Icon }  from 'antd';
 import { loadItems, selectItem }                          from '../../../actions/search/criterias/locations';
 import { search }                                         from '../../../actions/search/main';
+import { clearCriterias }                                 from '../../../actions/search/criterias/main';
 
 const Option      = Select.Option;
 const ButtonGroup = Button.Group;
@@ -51,6 +52,13 @@ export default class SearchButtonBox extends React.Component {
     dispatch(search());
   }
 
+  onClear()
+  {
+    const { dispatch } = this.props;
+    const { activeTab } = this.props.criterias.activeTab;
+    dispatch(clearCriterias(activeTab));
+  }
+
   render() {
     console.log('containers.search.criterias.searchButtonBox.render()[props]:', this.props);
     return (
@@ -79,7 +87,8 @@ export default class SearchButtonBox extends React.Component {
           <Popover content = 'Очистить все ранее выбранные критерии поиска' 
                    title   = "Сбросить">
             <Button type = 'danger'
-                    icon = 'delete' >
+                    icon = 'delete'
+                    onClick = { event => this.onClear() } >
             </Button>
           </Popover>
           <Button type    = 'primary'
