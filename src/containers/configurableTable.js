@@ -1,7 +1,8 @@
 import React                            from 'react';
 import PropTypes                        from 'prop-types'
 import {  Table, Icon, Button, 
-          Popover, Input, Row, Col }    from 'antd';
+          Popover, Input, Row, Col,
+          Checkbox }                    from 'antd';
 import { addPositionItem }              from '../actions/positions/addPosition';
 
 const Search = Input.Search;
@@ -34,6 +35,48 @@ export default class ConfigurableTable extends React.Component {
     ]
   }
   */
+
+  isActiveFilter(values = [])
+  {
+    for(let i = 0; i < values.length; i++)
+    {
+      if(values[i].active)
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  getFilter(fieldName = '', data = [])
+  {
+    let filterValues = [];
+
+    data.map( record => {
+      if(filterValues.indexOf(record[fieldName]) === -1)
+      {
+        filterValues.push(record[fieldName]);
+      }
+    });
+
+    filterValues.sort();
+    return {
+      field: fieldName,
+      values: filterValues.map( val => {
+        if(val === '')
+        {
+          val = '(пусто)';
+        }
+        return {
+          active: false,
+          value: val,
+        }
+      }),
+    }
+  }
+
+
 
   buildConfigForResults = (config) => {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
@@ -80,20 +123,61 @@ export default class ConfigurableTable extends React.Component {
 
   applyFiltersToData()
   {
-    return this.props.results.map( record => {
-      this.filters.forEach(filter => {
-        if(filter.values.indexOf(record[filter.field]) === -1)
+    let clearFilters = [];
+    
+    this.filters.map( filter => {
+      let clearValues = [];
+      clearValues = filter.values.map( filterValue => {
+        if(filterValue.active)
         {
-          console.log('HIT!');
-          return null;
+          return filterValue;
         }
-        return record
+        return null;
+      }).filter( filterValue => !!filterValue);
+
+      if(clearValues.length > 0)
+      {
+        clearFilters.push({
+          field: filter.field,
+          values: clearValues,
+        })
+      }
+    });
+
+    console.log('containers.search.results.ConfigurableTable.applyFiltersToData()[filters, clearFilters]', this.filters, clearFilters);
+    let isOK = true;
+    return this.props.results.map( record => {
+      isOK = true;
+      clearFilters.map(filter => {
+        if(!this.findWithAttr(filter.values, 'value', record[filter.field]))
+        {
+          isOK = false;
+        }
       });
+
+      return isOK ? record : null;
     }).filter( record => !!record );
   }
 
-  buildDropdown(column)
+  buildDropdown(column, data = [])
   {
+    let avaibleValues = [];
+    let filter = this.filters.find( filter => filter.field === column.dataIndex);
+    if(!filter)
+    {
+      this.filters.push(this.getFilter(column.dataIndex, data));
+      filter = this.filters.find( filter => filter.field === column.dataIndex);
+    }
+    else
+    {
+      if(!this.isActiveFilter(filter.values))
+      {
+        filter = this.getFilter(column.dataIndex, data);
+      }
+    }
+
+    console.log('containers.search.results.ConfigurableTable.buildDropdown()[filter]', filter);
+
     return(
       <div className="custom-filter-dropdown">
         <Row>
@@ -119,14 +203,39 @@ export default class ConfigurableTable extends React.Component {
             <Search
               style       = {{ marginTop: 5 }}
               placeholder = "Поиск..."
-              onSearch    = { value => { this.filters.push({ field: column.dataIndex, values: [ {value}] }) } }
+              //onSearch    = { value => { aviableValues.push(value); this.filters.push({ field: column.dataIndex, values: aviableValues}) } }
               size        = 'small'
               enterButton
             />
           </Col>
         </Row>
+        <Row>
+          <Col span = { 24 } className = 'scrollable-y' style = {{ maxHeight: 250 }}>
+            { 
+              filter.values.map( (value) => 
+              <Row>
+                <Col span = { 24 } >
+                  <Checkbox checked = { value.active } 
+                            onChange = { event => { this.toggleFilterValue(filter, value.value, event.target.checked) } } >{ value.value }</Checkbox>
+                </Col>
+              </Row>
+              )
+            }
+          </Col>
+        </Row>
       </div>
     );
+  }
+
+  toggleFilterValue = (filter, value, active) => {
+    for(let i = 0; i < filter.values.length; i++)
+    {
+      if(filter.values[i].value === value)
+      {
+        filter.values[i].active = active;
+        break;
+      }
+    }
   }
 
   findWithAttr = (array, attr, value) => {
@@ -141,7 +250,7 @@ export default class ConfigurableTable extends React.Component {
 
 
   //построение конфига колонок
-  buildConfig = (config = {columns:[], type: ''}) => {
+  buildConfig = (config = {columns:[], type: ''}, data = []) => {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
     switch(config.type)
     {
@@ -174,7 +283,7 @@ export default class ConfigurableTable extends React.Component {
               <Icon type  = "filter" 
                     style = {{ color: (this.state.filtered[column.key] || this.state.sorted[column.key]) ? '#108ee9' : '#aaa' }} />;
 
-            column.filterDropdown         = this.buildDropdown(column);
+            column.filterDropdown         = this.buildDropdown(column, data);
             column.filterDropdownVisible  = this.state.dropdownVisible[column.key];
            
             column.onFilterDropdownVisibleChange  = (visible) => {
@@ -247,7 +356,7 @@ export default class ConfigurableTable extends React.Component {
       console.log('containers.search.results.ConfigurableTable.render()[newData]', data);
       console.log('containers.search.results.ConfigurableTable.render()[filters]', this.filters);
       
-      this.buildConfig(this.props.config);
+      this.buildConfig(this.props.config, data);
       console.log('containers.search.results.ConfigurableTable.render()[props]', this.props);
       console.log('containers.search.results.ConfigurableTable.render()[state]', this.state);
       console.log('containers.search.results.ConfigurableTable.render()[columns]', this.columns);
