@@ -6,6 +6,7 @@ import SearchButtonBox                              from './criterias/searchButt
 import { selectTab as selectCTab }                  from '../../actions/search/criterias/main';
 import { selectTab as selectRTab }                  from '../../actions/search/results/main';
 import ConfigurableTable                            from '../configurableTable';
+import Configurator                                 from '../configurator/configurator';
 
 const { TabPane } = Tabs;
 
@@ -27,6 +28,7 @@ export default class SearchContainer extends Component {
       columns: [],
     };
     this.saveConfigs(props.configs);
+    this.state = { configuratorVisible: false };
   }
 
   onTabSelect(key, type)
@@ -68,7 +70,7 @@ export default class SearchContainer extends Component {
 
   onConfigEdit(activeTab)
   {
-
+    this.setState({configuratorVisible: !this.state.configuratorVisible});
   }
 
   getConfigEditButton(activeTab)
@@ -81,10 +83,20 @@ export default class SearchContainer extends Component {
     );
   }
 
+  onConfigClose = (event) => {
+    this.setState({configuratorVisible: false});
+  }
+
+  onConfigSave = (event) => {
+    this.setState({configuratorVisible: false});
+  }
+
+
   render()
   {
     console.log("containers.search.main.render[props]:", this.props);
     return(
+      <div>
         <Row>
           <Col className  = 'searchContainer' 
                span       = { 8 } >
@@ -172,6 +184,14 @@ export default class SearchContainer extends Component {
               </TabPane>
             </Tabs>
           </Col>
-        </Row>);
+        </Row>
+        <Configurator 
+          visible   = { this.state.configuratorVisible }
+          config    = { this.rfrConfig }
+          onSave    = { this.onConfigSave.bind(this) }
+          onClose   = { this.onConfigClose.bind(this) }
+          dispatch  = { this.props.dispatch }
+        />
+      </div>);
   }
 }

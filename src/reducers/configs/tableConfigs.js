@@ -7,7 +7,7 @@ export const tableConfigs = (state = [], action) => {
         {
             let configs = action.configs.map(config => {
                 let newConfigColumns = config.columns.map((column, index) => {
-                    column.key          = index + '';                    
+                    column.key          = index.toString();
                     column.searchable   = column.searchable === 'true';
                     column.sortable     = column.sortable === 'true';
                     column.visible      = column.visible === 'true';                    
