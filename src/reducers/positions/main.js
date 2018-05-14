@@ -28,7 +28,12 @@ const items = (state = [], action) => {
     {
         case P_RECEIVE_ITEMS:
         {
-            return action.items;
+            return action.items.map( item => {
+                item.quantity   = item.quantity.trim().replace(/\./g,'').replace('.','').replace(',','.');
+                item.price      = item.price.trim().replace(/\./g,'').replace('.','').replace(',','.');
+                item.sum        = item.sum.trim().replace(/\./g,'').replace('.','').replace(',','.');
+                return item;
+            });
         }
 
         default:

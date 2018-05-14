@@ -6,7 +6,7 @@ import SearchButtonBox                              from './criterias/searchButt
 import { selectTab as selectCTab }                  from '../../actions/search/criterias/main';
 import { selectTab as selectRTab }                  from '../../actions/search/results/main';
 import ConfigurableTable                            from '../configurableTable';
-import Configurator                                 from '../configurator/configurator';
+import { ConfiguratorPanel }                        from '../configurator';
 
 const { TabPane } = Tabs;
 
@@ -78,17 +78,13 @@ export default class SearchContainer extends Component {
     return(
       <Button type    = 'primary' 
               icon    = 'setting' 
-              onClick = { event => { this.onConfigEdit(activeTab) } }
+              onClick = { event => { this.toggleConfiguratorVisible(); } }
               style   = {{ top: -2 }}/>
     );
   }
 
-  onConfigClose = (event) => {
-    this.setState({configuratorVisible: false});
-  }
-
-  onConfigSave = (event) => {
-    this.setState({configuratorVisible: false});
+  toggleConfiguratorVisible = (event) => {
+    this.setState({configuratorVisible: !this.state.configuratorVisible});
   }
 
 
@@ -155,9 +151,9 @@ export default class SearchContainer extends Component {
                         key       = 'RFR'
                         className = 'searchPanelTabsFull'>
                 
-                <ConfigurableTable isSearching  = { this.props.isSearching }
+                <ConfigurableTable isProcessing = { this.props.isSearching }
                                    config       = { this.rfrConfig }
-                                   results      = { this.props.results.remnants }
+                                   data         = { this.props.results.remnants }
                                    isEditable   = { this.props.isEditable }
                                    dispatch     = { this.props.dispatch } />
 
@@ -185,12 +181,12 @@ export default class SearchContainer extends Component {
             </Tabs>
           </Col>
         </Row>
-        <Configurator 
-          visible   = { this.state.configuratorVisible }
-          config    = { this.rfrConfig }
-          onSave    = { this.onConfigSave.bind(this) }
-          onClose   = { this.onConfigClose.bind(this) }
-          dispatch  = { this.props.dispatch }
+        <ConfiguratorPanel 
+          visible       = { this.state.configuratorVisible }
+          configs       = { this.props.configs.tableConfigs }
+          isProcessing  = { this.props.configs.isLoading }
+          dispatch      = { this.props.dispatch }
+          toggleVisible = { this.toggleConfiguratorVisible.bind(this) }
         />
       </div>);
   }

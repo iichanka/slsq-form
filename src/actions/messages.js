@@ -1,6 +1,10 @@
 import { notification } from 'antd';
 
 const openNotificationWithIcon = (type, title, text, duration = 7) => {
+  if(duration.toString() === '')
+  {
+    duration = 7;
+  }
   notification[type]({
     message: title,
     description: text,

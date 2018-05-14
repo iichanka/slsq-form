@@ -21,6 +21,7 @@ export const addPositionItem = (record) => dispatch => {
     dispatch(endRequestItems());
   })
   .catch(function (error) {
+    console.log('updatwConfigs: ', error);
     showMessages([{type: 'E', text: 'Не удалось добавить позицию.'}]);
     dispatch(endRequestItems());
   });

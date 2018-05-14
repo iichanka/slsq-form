@@ -106,9 +106,9 @@ export default class PositionsConainer extends React.Component {
               <Row className = 'positionsTable' >    
                   <Col span      = { 24 }
                       className = 'positionsTable' >
-                      <ConfigurableTable  isSearching = { false }
+                      <ConfigurableTable  isProcessing= { false }
                                           config      = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
-                                          results     = { this.props.positions.items }
+                                          data        = { this.props.positions.items }
                                           isEditable  = { this.props.isEditable }
                                           dispatch    = { this.props.dispatch } />
                   </Col>

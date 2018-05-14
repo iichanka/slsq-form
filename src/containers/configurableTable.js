@@ -2,382 +2,443 @@ import React                            from 'react';
 import PropTypes                        from 'prop-types'
 import {  Table, Icon, Button, 
           Popover, Input, Row, Col,
-          Checkbox }                    from 'antd';
+          Checkbox, Select, Divider }   from 'antd';
 import { addPositionItem }              from '../actions/positions/addPosition';
 
 const Search = Input.Search;
+const Option = Select.Option;
 
 const initialState = {
   filtered: [],
   sorted: [],
   dropdownVisible: [],
+  columns: [],
+  data: [],
+  filter: [],
 };
 
 export default class ConfigurableTable extends React.Component {
   static PropTypes = {
-    isSearching:        PropTypes.bool.isRequired,
+    isProcessing:       PropTypes.bool.isRequired,
     config:             PropTypes.object.isRequired,
-    results:            PropTypes.array.isRequired,
+    data:               PropTypes.array.isRequired,
     isEditable:         PropTypes.bool.isRequired,
     dispatch:           PropTypes.func.isRequired,
   }
 
-  inputRefs = [];
-  inputValues = [];
-  filters = [];
-  /*
+  constructor(props)
   {
-    field: string,
-    values: [
-      val1,
-      val2,
-      ...
-    ]
+    super(props);
+    this.state = this.getStateFromProps(props);
+    console.log('containers.configurableTable.constructor(props, state)', props, this.state);
   }
-  */
 
-  isActiveFilter(values = [])
+  componentWillReceiveProps(props)
   {
-    for(let i = 0; i < values.length; i++)
-    {
-      if(values[i].active)
-      {
-        return true;
-      }
-    }
-
-    return false;
+    this.setState(this.getStateFromProps(props));
+    console.log('containers.configurableTable.componentWillReceiveProps(props, state)', props, this.state);
   }
 
-  getFilter(fieldName = '', data = [])
+  getStateFromProps = (props) => {
+    const { config, data, isEditable } = props;
+    let oldState = this.state;
+
+    let state = { 
+      columns: this.getColumns(config, data, isEditable),
+      pagination: this.getPagination(config),
+      scroll: this.getScroll(config),
+      data
+    };
+
+    console.log('containers.configurableTable.getStateFromProps(props, state)', props, this.state);
+    return state;
+  }
+
+  getScroll(config = { type: '' })
   {
-    let filterValues = [];
-
-    data.map( record => {
-      if(filterValues.indexOf(record[fieldName]) === -1)
-      {
-        filterValues.push(record[fieldName]);
-      }
-    });
-
-    filterValues.sort();
-    return {
-      field: fieldName,
-      values: filterValues.map( val => {
-        if(val === '')
-        {
-          val = '(пусто)';
-        }
-        return {
-          active: false,
-          value: val,
-        }
-      }),
-    }
-  }
-
-
-
-  buildConfigForResults = (config) => {
-    console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
-
-    const msg = {
-        content: (
-            <div>
-                <p>Форма заявки находится в режиме просмотра.</p>
-                <p>Чтобы перейти в режим редактирования нажмите кнопку "Обработать".</p>
-            </div>),
-        title: 'Добавление позиций недоступно',
-    }  
-
-    this.columns.unshift({
-        key:    'actions',
-        title:  'Действия',
-        width:  100,
-        className: 'table-actions-without-padding',
-        render: (text, record) => {
-            if(this.props.isEditable)
-            {
-                return(
-                    <div>
-                        <Input  size = "small" 
-                                placeholder = "0.00"
-                                ref = { (ref) => { this.inputRefs[record.key] = ref; } }
-                                style = {{ width: 100 }}
-                                addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
-                                onPressEnter = { (e) => { this.onAddClick(record) } } />
-                    </div>
-                );
-            }
-            return(
-                <Popover content = { msg.content }
-                            title   = { msg.title } >
-                    <Icon type    = "frown-o"
-                          onClick = { event => { this.onAddClick(record) } } />
-                </Popover>
-            );
-        }
-    });
-       
-  }
-
-  applyFiltersToData()
-  {
-    let clearFilters = [];
-    
-    this.filters.map( filter => {
-      let clearValues = [];
-      clearValues = filter.values.map( filterValue => {
-        if(filterValue.active)
-        {
-          return filterValue;
-        }
-        return null;
-      }).filter( filterValue => !!filterValue);
-
-      if(clearValues.length > 0)
-      {
-        clearFilters.push({
-          field: filter.field,
-          values: clearValues,
-        })
-      }
-    });
-
-    console.log('containers.search.results.ConfigurableTable.applyFiltersToData()[filters, clearFilters]', this.filters, clearFilters);
-    let isOK = true;
-    return this.props.results.map( record => {
-      isOK = true;
-      clearFilters.map(filter => {
-        if(!this.findWithAttr(filter.values, 'value', record[filter.field]))
-        {
-          isOK = false;
-        }
-      });
-
-      return isOK ? record : null;
-    }).filter( record => !!record );
-  }
-
-  buildDropdown(column, data = [])
-  {
-    let avaibleValues = [];
-    let filter = this.filters.find( filter => filter.field === column.dataIndex);
-    if(!filter)
-    {
-      this.filters.push(this.getFilter(column.dataIndex, data));
-      filter = this.filters.find( filter => filter.field === column.dataIndex);
-    }
-    else
-    {
-      if(!this.isActiveFilter(filter.values))
-      {
-        filter = this.getFilter(column.dataIndex, data);
-      }
-    }
-
-    console.log('containers.search.results.ConfigurableTable.buildDropdown()[filter]', filter);
-
-    return(
-      <div className="custom-filter-dropdown">
-        <Row>
-          <Col span = { 24 }>
-            <Button style = {{ width: '100%', marginTop: 5 }}
-                    size = 'small'
-                    icon = 'arrow-down'>
-              Сортировать от А до Я
-            </Button>
-          </Col>
-        </Row>
-        <Row>
-          <Col span = { 24 } >
-            <Button style = {{ width: '100%', marginTop: 5 }}
-                    size = 'small'
-                    icon = 'arrow-up'>
-              Сортировать от Я до А
-            </Button>
-          </Col>
-        </Row>
-        <Row>
-          <Col span = { 24 } >
-            <Search
-              style       = {{ marginTop: 5 }}
-              placeholder = "Поиск..."
-              //onSearch    = { value => { aviableValues.push(value); this.filters.push({ field: column.dataIndex, values: aviableValues}) } }
-              size        = 'small'
-              enterButton
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Col span = { 24 } className = 'scrollable-y' style = {{ maxHeight: 250 }}>
-            { 
-              filter.values.map( (value) => 
-              <Row>
-                <Col span = { 24 } >
-                  <Checkbox checked = { value.active } 
-                            onChange = { event => { this.toggleFilterValue(filter, value.value, event.target.checked) } } >{ value.value }</Checkbox>
-                </Col>
-              </Row>
-              )
-            }
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-
-  toggleFilterValue = (filter, value, active) => {
-    for(let i = 0; i < filter.values.length; i++)
-    {
-      if(filter.values[i].value === value)
-      {
-        filter.values[i].active = active;
-        break;
-      }
-    }
-  }
-
-  findWithAttr = (array, attr, value) => {
-    console.log('containers.search.results.ConfigurableTable.findWithAttr()[array, attr, value]', array, attr, value);
-    for(var i = 0; i < array.length; i += 1) {
-      if(array[i][attr] === value) {
-          return i;
-      }
-    }
-    return undefined;
-  }
-
-
-  //построение конфига колонок
-  buildConfig = (config = {columns:[], type: ''}, data = []) => {
-    console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
     switch(config.type)
     {
-        case 'RFR':
-        case 'RFIT':
-        case 'RFM':
-        {
-            this.scroll = {
-                y: 217, 
-                x: '100%'
-            }
-            break;
+      case 'RFR':
+      case 'RFIT':
+      case 'RFM':
+      {
+        return {
+          y: 217, 
+          x: '100%'
         }
-        default:
-        {
-            this.scroll = {
-                y: '100%', 
-                x: '100%'
-            }
-        }
+      }
+      default:
+      {
+        return {
+          y: '100%', 
+          x: '100%'
+        };
+      }
     }
-
-    this.columns = [];
-
-    config.columns.map(column => {
-        if(column.visible)
-        {
-            column.className    = 'table-actions-without-padding';
-            column.filterIcon   = ( column.searchable || column.sortable ) && 
-              <Icon type  = "filter" 
-                    style = {{ color: (this.state.filtered[column.key] || this.state.sorted[column.key]) ? '#108ee9' : '#aaa' }} />;
-
-            column.filterDropdown         = this.buildDropdown(column, data);
-            column.filterDropdownVisible  = this.state.dropdownVisible[column.key];
-           
-            column.onFilterDropdownVisibleChange  = (visible) => {
-              let dropdownVisibleNew = this.state.dropdownVisible || [];
-              dropdownVisibleNew[column.key] = visible;
-              this.setState({...this.state, dropdownVisible: dropdownVisibleNew})
-            };
-
-            this.columns.push(column);            
-        }
-    })
-
-    if(this.columns.length > 0)
-    {
-        switch(config.type)
-        {
-            case 'RFR':
-            case 'RFIT':
-            case 'RFM':
-            {
-                this.buildConfigForResults(config);
-                break;
-            }
-            default:
-        }
-        
-    }
-    console.log('containers.search.results.ConfigurableTable.buildConfig()[this.columns]', this.columns);
   }
 
-  onAddClick = (record) => {
+  getColumns(config, data, isEditable)
+  {
+    if(config && data)
+    {
+      if(config.columns && config.columns.length > 0)
+      {
+        let columns = config.columns.map( column => {
+          if(column.visible && !column.technical)
+          {
+            column.className    = 'table-actions-without-padding';
+            if(column.dataType === 'C' || column.dataType === 'Q')
+            {
+              column.className    = 'table-actions-without-padding numeric-field';
+            }
+            column.filterIcon   = ( column.searchable || column.sortable ) && 
+              <Icon type  = "filter" 
+                    style = {{ color: this.getColorForFilterIcon(column.dataIndex) }} />;
+  
+            column.filterDropdown         = this.buildDropdownForColumn(column, data);
+            column.filterDropdownVisible  = this.getDropdownVisible(column.dataIndex);
+            
+            column.onFilterDropdownVisibleChange  = (visible) => { this.onFilterDropdownVisibleChange(visible, column.dataIndex) };
+            
+            if(column.dataType === 'C' || column.dataType === 'Q')
+            {
+              column.render = (text, record) => { return this.renderForCurrencyOrQuantity(text, record, column) };
+            }
+
+            if(column.editable && isEditable)
+            {
+              column.render = (text, record) => { return this.renderForEditableColumn(text, record, column) };
+            }
+            return column;
+          }
+          return null;
+        }).filter( column => !!column );
+
+        this.getColumnsExtended(config, data, isEditable, columns);
+
+        console.log('containers.configurableTable.getColumns(config, data, isEditable, columns)', config, data, isEditable, columns);
+        return columns;
+      }
+    }
+    return [];
+  }
+
+  getActionsColmunForResults()
+  {
+    return {
+      key:    'actions',
+      title:  'Действия',
+      width:  100,
+      className: 'table-actions-without-padding',
+      render: (text, record) => {
+        return(
+            <div>
+                <Input  size = "small" 
+                        placeholder = "1,000"
+                        defaultValue = '1,000'
+                        ref = { (ref) => { this.saveInputReference(record.key, ref) } }
+                        style = {{ width: 100 }}
+                        addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
+                        onPressEnter = { (e) => { this.onAddClick(record) } } />
+            </div>
+        ); 
+      }
+    };
+  }
+
+  getColumnsExtended(config, data, isEditable, columns = [])
+  {
+    if(columns.length === 0 || !isEditable)
+    {
+      return;
+    }
+
+    switch(config.type)
+    {
+      case 'RFR':
+      case 'RFIT':
+      case 'RFM':
+      {
+        columns.unshift(this.getActionsColmunForResults());
+        break;
+      }
+
+      case 'POS':
+      {
+        columns.push(this.getActionsColmunForPositions());
+      }
+    }
+  }
+
+  getActionsColmunForPositions()
+  {
+    return {
+      key:    'actions',
+      title:  'Действия',
+      width:  150,
+      className: 'table-actions-without-padding',
+      render: (text, record) => {
+        return(
+            <span>
+              <a>Удалить</a>
+              {
+                record.isModified &&
+                <span>
+                  <Divider type="vertical" />
+                  <a>Обновить</a>
+                </span>
+              }              
+            </span>
+        ); 
+      }
+    };
+  }
+
+  onAddClick(record)
+  {
     const { dispatch, config } = this.props;
-    let input = this.inputRefs[record.key].input;
+    let input = this.state.inputReference[record.key].input;
 
     if(input)
     {
-        input.blur();
-        switch(config.type)
+      input.blur();
+      switch(config.type)
+      {
+        case 'RFR':
         {
-            case 'RFR':
-            {
-                dispatch(addPositionItem({ remnants: {...record, count: input.value } }));
-            }
+          dispatch(addPositionItem({ remnants: {...record, count: input.value } }));
         }
-
-        
+      }
     }
   }
 
-  handleTableChange(pagination, filters, sorter) {
-    console.log('containers.search.results.ConfigurableTable.handleTableChange()', pagination, filters, sorter);
-  }
-
-  constructor(props)
+  saveInputReference(key, ref)
   {
-      super(props);
-      
-      this.state = initialState;
+    let inputReference = this.state.inputReference || [];
+    inputReference = inputReference.slice(0);
+
+    if(!inputReference[key])
+    {
+      inputReference[key] = ref;
+      this.setState({ inputReference });
+    }
   }
 
-  componentWillReceiveProps(newProps)
+  buildDropdownForColumn(column, data)
   {
-    //this.buildConfig(newProps.config);
+    return null;
+  }
+
+  onFilterDropdownVisibleChange(visible, columnName)
+  {
+    let dropdownVisible = this.state.dropdownVisible || [];
+    dropdownVisible[columnName] = visible;
+    this.setState( { dropdownVisible });
+  }
+
+  renderForCurrencyOrQuantity(text, record, column)
+  {
+    return(
+      <span style = {{ textAlign: 'right' }}>
+        { this.formatValueToCurrency(record[column.dataIndex]) }
+      </span>
+    );
+  };
+
+  formatValueToCurrency = (data) => {
+    return Number(data.replace(',','')).toLocaleString('en', {style: 'currency', currency: 'USD'}).replace('$', '').replace('NaN', '0.00');
+  }
+
+  renderForEditableColumn(text, record, column)
+  {
+    let allowedValues = record.allowedValues.find( allowedValuesForFields => allowedValuesForFields.fieldName === column.dataIndex);
+    if(allowedValues)
+    {
+      return(
+        <Select         
+          showSearch
+          style             = {{ width: column.width }}
+          optionFilterProp  = "children"
+          onChange          = { (newValue) => { this.onFieldChange(record, column, newValue); } }
+          onBlur            = { this.onFieldBlur(record, column) }
+          value             = { record[column.dataIndex] }
+          filterOption      = { (input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 }
+          size              = 'small'
+        >
+        {
+          allowedValues.values.map( valueRange => {
+            return(
+              <Option value = { valueRange.low } >
+                { valueRange.lowTitle }
+              </Option>
+            );
+          })
+        }
+        </Select>);
+    }
+    if(column.dataType === 'CB')
+    {
+      return(
+        <Checkbox
+          style         = {{ width: column.width, textAlign: 'center' }}
+          value         = { record[column.dataIndex] }
+          onChange      = { (event) => { this.onFieldChange(record, column, event.target.checked); } }
+          size          = 'small'
+        />
+      );
+    }
+    return(
+      <Input 
+        style         = {{ width: column.width, textAlign: (column.dataType === 'C' || column.dataType === 'Q') ? 'right' : 'left' }}
+        value         = { (column.dataType === 'C' || column.dataType === 'Q') ? this.formatValueToCurrency(record[column.dataIndex]) : record[column.dataIndex] }
+        onChange      = { (event) => { this.onFieldChange(record, column, event.target.value); } }
+        onBlur        = { this.onFieldBlur(record, column) }
+        onPressEnter  = { (event) => this.onFieldPressEnter(record, column, event) }
+        size          = 'small'
+      />
+    );
+  };
+
+  onFieldBlur = (record, column) => {
+    console.log('containers.configurableTable.onFieldBlur()[record, column]', record, column);
+  }
+
+  onFieldPressEnter = (record, column, event) => {
+    console.log('containers.configurableTable.onFieldPressEnter()[record, column, event]', record, column, event);
   }
 
 
-  render() {
-      this.columns = [];
-      let data = this.applyFiltersToData();
-      console.log('containers.search.results.ConfigurableTable.render()[newData]', data);
-      console.log('containers.search.results.ConfigurableTable.render()[filters]', this.filters);
-      
-      this.buildConfig(this.props.config, data);
-      console.log('containers.search.results.ConfigurableTable.render()[props]', this.props);
-      console.log('containers.search.results.ConfigurableTable.render()[state]', this.state);
-      console.log('containers.search.results.ConfigurableTable.render()[columns]', this.columns);
-      if(this.props.results.length > 0)
+  onFieldChange = (record, column, newValue) => {
+    console.log('containers.configurableTable.onFieldChange()[record, column, newValue]', record, column, newValue);
+    let data = this.state.data.slice(0);
+    for(let i = 0; i < data.length; i++)
+    {
+      if(data[i].guid === record.guid)
       {
-        return(
-            <Table columns      = { this.columns } 
-                   dataSource   = { this.props.results }
-                   size         = 'small'
-                   scroll       = { this.scroll } 
-                   loading      = { this.props.isSearching }
-                   rowClassName = { ( record, index ) => { return 'small-table-line'; } } 
-                   onChange     = { (pagination, filters, sorter) => this.handleTableChange(pagination, filters, sorter) }/>
-          );
+        data[i].isModified = data[i][column.dataIndex] !== newValue;
+        data[i][column.dataIndex] = newValue;
+        break;
+      }
+    }
+
+    this.setState({ data });
+  }
+
+  getDropdownVisible(columnName)
+  {
+    let visible = false;
+    try {
+      visible = this.state.dropdownVisible[columnName];
+    } catch (error) {
+    }
+
+    return visible;
+  }
+
+  getColorForFilterIcon(columnName)
+  {
+    let applyed = false;
+    try {
+      applyed = this.state.filter[columnName].applyed;
+    } catch (error) {
+    }
+    
+    return applyed ? '#108ee9' : '#aaa';
+  }
+
+  getPagination(config)
+  {
+    if(config)
+    {
+      if(config.pageSize)
+      {
+        return config.pageSize > 0 ? { pageSize: config.pageSize } : { pageSize: false };
       }
       else
       {
+        return false;
+      }
+    }
+  }
+
+  onTableFilterChange = (pagination, filters, sorter) => {
+    console.log('containers.configurableTable.onTableFilterChange(pagination, filters, sorter)', pagination, filters, sorter);
+  }
+
+  getFooterForTable(currentPageData)
+  {
+    console.log('containers.configurableTable.getFooterForTable(currentPageData, state)', currentPageData, this.state);
+    let updateAllButton = false;
+    let data = this.state.data || [];
+    data = data.slice(0);
+
+    for(let i = 0; i < data.length; i++)
+    {
+      if(data[i].isModified)
+      {
+        updateAllButton = true;
+        break;
+      }     
+    }
+    
+    return(
+      updateAllButton ? 
+        <Button type = "primary" icon = 'save' style = {{ float: 'right', top: -8 }} >Сохранить все изменения</Button> :
+        <Button type = "primary" icon = 'save' style = {{ float: 'right', top: -8 }} disabled>Сохранить все изменения</Button>
+    );
+  }
+
+  getRowClassName(record, index)
+  {
+    console.log('containers.configurableTable.getRowClassName(record, index)', record, index);
+    if(record.isModified)
+    {
+      return 'small-table-line highlighted-row';
+    }
+    return 'small-table-line'
+  }
+
+  render() {
+    console.log('containers.configurableTable.render(state)', this.state);
+    
+
+    if(this.state.data && this.state.data.length > 0)
+    {
+      if( this.props.isEditable && this.props.config.type === 'POS' )
+      {
         return(
-            <div />
+          <Table 
+            columns      = { this.state.columns } 
+            dataSource   = { this.state.data }
+            size         = 'small'
+            scroll       = { this.state.scroll } 
+            loading      = { this.props.isProcessing }
+            rowClassName = { this.getRowClassName.bind(this) } 
+            onChange     = { this.onTableFilterChange.bind(this) }
+            pagination   = { this.state.pagination }
+            footer       = { this.getFooterForTable.bind(this) }
+            />
         );
       }
+      return(
+        <Table 
+          columns      = { this.state.columns } 
+          dataSource   = { this.state.data }
+          size         = 'small'
+          scroll       = { this.state.scroll } 
+          loading      = { this.props.isProcessing }
+          rowClassName = { this.getRowClassName.bind(this) } 
+          onChange     = { this.onTableFilterChange.bind(this) }
+          pagination   = { this.state.pagination }
+          />
+      );
+    }
+    else
+    {
+      return(
+          <div />
+      );
+    }
       
   };
 }

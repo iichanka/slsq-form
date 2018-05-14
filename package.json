@@ -7,10 +7,11 @@
     "antd": "^3.3.0",
     "babel-polyfill": "^6.26.0",
     "rc-tabs": "^9.2.4",
+    "react-drag-listview": "0.0.9",
     "react-scripts": "^1.0.2",
     "redux-logger": "^3.0.6"
   },
-  "dependencies": { 
+  "dependencies": {
     "axios": "^0.18.0",
     "prop-types": "^15.5.10",
     "react": "^15.5.0",

@@ -8,17 +8,20 @@ export const tableConfigs = (state = [], action) => {
             let configs = action.configs.map(config => {
                 let newConfigColumns = config.columns.map((column, index) => {
                     column.key          = index.toString();
-                    column.searchable   = column.searchable === 'true';
+                    /* column.searchable   = column.searchable === 'true';
                     column.sortable     = column.sortable === 'true';
                     column.visible      = column.visible === 'true';                    
                     column.editable     = column.editable === 'true';
+                    column.technical    = column.technical === 'true'; */
                     return column;
                 })
 
-                let config_type = config.type;
+                let configType      = config.type;
+                let configPageSize  = config.pageSize;
                 return {
-                    type: config_type,
+                    type: configType,
                     columns: newConfigColumns,
+                    pageSize: configPageSize,
                 }
             });
 

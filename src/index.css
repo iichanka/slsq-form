@@ -27,6 +27,10 @@
     height: 42px;
 }
 
+.ant-table table .numeric-field
+{
+    text-align: right !important;
+}
 
 .searchCriteriasBox
 {
@@ -123,6 +127,11 @@
     height: 34px !important;
 }
 
+.ant-modal-body
+{
+    padding: 0 !important;
+}
+
 .custom-filter-dropdown {
     padding: 8px;
     border-radius: 6px;
@@ -135,3 +144,11 @@
     width: 130px;
     margin-right: 8px;
   }
+
+  .ant-tabs-vertical.ant-tabs-left .ant-tabs-bar .ant-tabs-tab {
+    text-align: left !important;
+}
+
+.highlighted-row {
+    background-color:rgb(230, 247, 255);
+}

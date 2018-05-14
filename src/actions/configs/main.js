@@ -43,9 +43,37 @@ export const load = () => (dispatch, getState) => {
         {
             dispatch(receiveConfigs(response.data.data || []));
         }
+        dispatch(endRequestConfigs());
       })
       .catch(function (error) {
         showMessages([{type: 'E', text: 'Не удалось получить конфигурации таблиц.'}]);
         dispatch(endRequestConfigs());
       });
 }
+
+export const updateConfigs = (data, toggleVisible) => dispatch => {
+    dispatch(requestConfigs());
+  
+    axios.post(localStorage.getItem('AjaxURL'), {
+      action:   'updateConfigs',              
+      data:     data,
+    })
+    .then(response => {
+      let haveError = false;
+      showMessages(response.data.messages || [], haveError);
+     
+      if(!haveError)
+      {
+          dispatch(receiveConfigs(response.data.data || []));
+      }
+      dispatch(endRequestConfigs());
+      toggleVisible();
+    })
+    .catch(function (error) {
+        console.log('updateConfigs: ', error, data);
+        showMessages([{type: 'E', text: 'Не удалось обновить конфигурации таблиц.'}]);
+        dispatch(endRequestConfigs());
+        toggleVisible();
+    });
+    
+  }

@@ -69,6 +69,7 @@ configs: {
     tableConfigs: [
         {
             type: string,
+            pageSize: number,
             columns: data
         }
     ]

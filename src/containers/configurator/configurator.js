@@ -1,15 +1,21 @@
 import React                                                from 'react';
-import { Modal }                                            from 'antd';
+import { Transfer, InputNumber, Row, Col }                  from 'antd';
 import PropTypes                                            from 'prop-types';
-import Transfer                                             from '../../components/transfer/index';
+
+const initialState = {
+  allFields: [],
+  selectedKeys: [],
+  visibleFields: [],
+  pageSize: 0,
+}
 
 export default class Configurator extends React.Component {
   static propTypes = {   
-    visible:        PropTypes.bool.isRequired,
-    config:         PropTypes.object.isRequired,
-    onSave:         PropTypes.func.isRequired,
-    onClose:        PropTypes.func.isRequired,
-    dispatch:       PropTypes.func.isRequired,
+    allFields:          PropTypes.object.isRequired,
+    visibleFields:      PropTypes.func.isRequired,
+    pageSize:           PropTypes.number.isRequired,
+    onTargetKeysChange: PropTypes.func.isRequired,
+    onPageSizeChange:   PropTypes.func.isRequired,
   }
 
   constructor(props)
@@ -25,16 +31,24 @@ export default class Configurator extends React.Component {
 
   getStateFromProps = (props) => {
     console.log('containers.configurator.configurator.getStateFromProps[props]', props);
-    const { config, visible } = props;
+    const { allFields, visibleFields, pageSize } = props;
+
+    if(!allFields)
+    {
+      return initialState;
+    }
 
     let newState = { 
-      ...this.state,
-      visible: visible,
       selectedKeys: [],
-      allFields: config.columns,
-      visibleFields: config.columns.map( column => {
-        return column.visible ? column.key : null;
-      }).filter( column => !!column )
+      allFields: allFields.map( field => {
+        if(field.technical)
+        {
+          return null;
+        }
+        return field;
+      }).filter( field => !!field ),
+      visibleFields: visibleFields,
+      pageSize: pageSize,
     }
 
     console.log('containers.configurator.configurator.getStateFromProps[newState]', newState);
@@ -48,6 +62,7 @@ export default class Configurator extends React.Component {
 
   handleChange = (targetKeys) => {
     console.log('containers.configurator.configurator.handleChange[targetKeys]', targetKeys);
+    this.props.onTargetKeysChange(targetKeys);
     this.setState({ targetKeys });
   }
 
@@ -58,29 +73,42 @@ export default class Configurator extends React.Component {
 
   render() {
     return (
-      <Modal
-          title     = "Конфигуратор"
-          visible   = { this.state.visible }
-          onOk      = { this.props.onSave }
-          onCancel  = { this.props.onClose }
-          okText    = 'Сохранить'
-          style     = {{ width: 700 }}
-        >
-          <Transfer
-            dataSource        = { this.state.allFields}
-            showSearch        = { true }
-            filterOption      = { this.filterOption }
-            targetKeys        = { this.state.visibleFields }
-            onChange          = { this.handleChange }
-            render            = { item => item.title }
-            onSelectChange    = { this.onSelectChange }
-            searchPlaceholder = 'Введите название столбца'
-            listStyle         = {{
-              width: 250,
-              height: 400,
-            }}
-          />
-        </Modal>
+      <div>
+        <Row>
+          <Col span = { 24 } >
+            Количество строк на страницу: 
+            <InputNumber 
+              value     = { this.props.pageSize }
+              onChange  = { this.props.onPageSizeChange }
+              min       = { 0 }
+              size      = 'small'
+              style     = {{ marginLeft: 5 }}
+              />
+            {
+              this.props.pageSize === 0 && <span style = {{ marginLeft: 5 }}>Бесконечная страница</span>
+            }
+          </Col>
+        </Row>
+        <Row style = {{ marginTop: 15 }}>
+          <Col span = { 24 } >
+            <Transfer
+              dataSource        = { this.state.allFields}
+              showSearch        = { true }
+              filterOption      = { this.filterOption }
+              targetKeys        = { this.state.visibleFields }
+              onChange          = { this.handleChange }
+              render            = { item => item.title }
+              onSelectChange    = { this.onSelectChange }
+              searchPlaceholder = 'Введите название столбца'
+              titles            = { ['Доступные столбцы', 'Показываемые столбцы'] }
+              listStyle         = {{
+                width: 250,
+                height: 300,
+              }}
+            />
+          </Col>
+        </Row>
+      </div>
     );
   }
 }
