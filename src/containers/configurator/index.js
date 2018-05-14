@@ -58,18 +58,18 @@ export class ConfiguratorPanel extends React.Component {
   }
 
   onTargetKayesChange = (type, targetKeys) => {
-    let visibleFields     = this.state.visibleFields;
-    let allFields         = this.state.allFields;
+    let visibleFields     = this.state.visibleFields.slice(0);
+    let allFields         = this.state.allFields.slice(0);
     let orderIndex        = 0;
+
+    allFields[type] = allFields[type].map( field => {
+      field.visible     = false;
+      field.orderIndex  = -1;
+    });
 
     targetKeys.map( key => {
       for(let i = 0; i < allFields[type].length; i++)
-      {
-        if(targetKeys.indexOf(allFields[type][i].key) === -1)
-        {
-          allFields[type][i].visible = false;
-        }
-        
+      { 
         if(allFields[type][i].key === key)
         {
           allFields[type][i].orderIndex = orderIndex;
@@ -81,6 +81,8 @@ export class ConfiguratorPanel extends React.Component {
     });
 
     allFields[type].sort( (a, b) => a.orderIndex - b.orderIndex );
+
+    console.log('containers.configurator.index.onTargetKayesChange(allFields, targetKeys, updatedAllFields)', this.state.allFields[type], targetKeys, allFields[type]);
     
     visibleFields[type] = targetKeys;
     this.setState({ visibleFields, allFields });

@@ -1,6 +1,7 @@
 import { P_REQUEST_ITEMS }      from '../../actions/positions/main';
 import { P_RECEIVE_ITEMS }      from '../../actions/positions/main';
 import { P_END_REQUEST_ITEM }   from '../../actions/positions/main';
+import { P_LOCAL_UPDATE_ITEM }  from '../../actions/positions/main';
 
 const isLoading = (state = false, action) => {
     switch(action.type)
@@ -36,11 +37,29 @@ const items = (state = [], action) => {
             });
         }
 
+        case P_LOCAL_UPDATE_ITEM:
+        {
+            return localUpdateItem(state, action);
+        }
+
         default:
         {
             return state;
         }
     }
+}
+
+const localUpdateItem = (items = [], action) => {
+  let updatedItemsList = items.map( item => {
+    if(item.guid === action.item.guid)
+    {
+      item = {...action.item};
+    }
+    return item;
+  });
+
+  console.log('reducers.positions.main.localUpdateItem(oldItems, action, newItems)', items, action, updatedItemsList);
+  return updatedItemsList;
 }
 
 

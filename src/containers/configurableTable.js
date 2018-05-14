@@ -4,6 +4,7 @@ import {  Table, Icon, Button,
           Popover, Input, Row, Col,
           Checkbox, Select, Divider }   from 'antd';
 import { addPositionItem }              from '../actions/positions/addPosition';
+import { localUpdateItem }              from '../actions/positions/main';
 
 const Search = Input.Search;
 const Option = Select.Option;
@@ -309,19 +310,23 @@ export default class ConfigurableTable extends React.Component {
 
 
   onFieldChange = (record, column, newValue) => {
+    const { dispatch } = this.props;
+    const { data } = this.state;
+
     console.log('containers.configurableTable.onFieldChange()[record, column, newValue]', record, column, newValue);
-    let data = this.state.data.slice(0);
     for(let i = 0; i < data.length; i++)
     {
       if(data[i].guid === record.guid)
       {
-        data[i].isModified = data[i][column.dataIndex] !== newValue;
-        data[i][column.dataIndex] = newValue;
+        let item = { ...data[i] };
+        item.isModified = item[column.dataIndex] !== newValue;
+        item[column.dataIndex] = newValue;
+        dispatch(localUpdateItem(item));
         break;
       }
     }
 
-    this.setState({ data });
+    //this.setState({ data });
   }
 
   getDropdownVisible(columnName)
