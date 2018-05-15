@@ -9,7 +9,11 @@
     border-left: 1px solid rgb(232, 232, 232);
 }
 
-.ant-table td { white-space: nowrap; }
+.field-no-wrap { 
+    white-space: nowrap; /* Запрещаем перенос строк */
+    overflow: hidden; /* Обрезаем все, что не помещается в область */
+    text-overflow: ellipsis; /* Добавляем многоточие */
+ }
 
 .positions-box
 {
@@ -116,10 +120,14 @@
     height: 28px !important;
 }
 
-.table-actions-without-padding
+.table-line-without-padding
 {
-    padding-bottom: 0 !important;
-    padding-top: 0 !important;
+    padding: 0px !important;
+}
+
+.ant-table-small .ant-table-content .ant-table-scroll .ant-table-body table .ant-table-tbody tr td
+{
+    padding: 0px !important;
 }
 
 .ant-table-fixed

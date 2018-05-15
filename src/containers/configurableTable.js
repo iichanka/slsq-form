@@ -2,7 +2,8 @@ import React                            from 'react';
 import PropTypes                        from 'prop-types'
 import {  Table, Icon, Button, 
           Popover, Input, Row, Col,
-          Checkbox, Select, Divider }   from 'antd';
+          Checkbox, Select, Divider,
+          Tooltip }                     from 'antd';
 import { addPositionItem }              from '../actions/positions/addPosition';
 import { localUpdateItem }              from '../actions/positions/main';
 
@@ -17,6 +18,75 @@ const initialState = {
   data: [],
   filter: [],
 };
+
+
+
+
+const TableCell = ({ children, style, className, column, action, ...props}) => {
+  let needPopOver = false;
+  let width = 1;
+  let length = 1;
+  let classNameFinal = 'field-no-wrap';
+  let styleFinal = { float: 'right' };
+
+  if(style)
+  {
+    if(style.maxWidth)
+    {
+      let widthString = style.maxWidth.toString().replace('px', '');
+      width = Number(widthString);
+      styleFinal = {...styleFinal, width: style.maxWidth };
+    }
+    styleFinal = {...style, ...styleFinal };
+  }
+
+  if(column)
+  {
+    if(column.width)
+    {
+      styleFinal = {...styleFinal, maxWidth: column.width, width: column.width };
+    }
+  }
+
+  if(children)
+  {
+      length = children.length;
+  }
+
+  if(className)
+  {
+    classNameFinal = `${className} ${classNameFinal}`;
+  }
+
+  if(action)
+  {
+    return children;
+  }
+
+  needPopOver = (width / length) < 10;
+
+  if(needPopOver)
+  {
+    return(
+      <div { ...props }
+            style      = { styleFinal }
+            className  = { classNameFinal } >
+        <Tooltip 
+          title     = { children }
+          placement = 'topLeft' >
+          <span style ={{ marginLeft: 5, marginRight: 5 }}>{ children }</span>
+        </Tooltip>
+      </div>
+    );
+  }
+  return(
+    <div  { ...props }
+          style      = { styleFinal }
+          className  = { classNameFinal }>
+      <span style ={{ marginLeft: 5, marginRight: 5 }}>{ children }</span>
+    </div>
+  );
+}
 
 export default class ConfigurableTable extends React.Component {
   static PropTypes = {
@@ -100,6 +170,8 @@ export default class ConfigurableTable extends React.Component {
             column.filterDropdownVisible  = this.getDropdownVisible(column.dataIndex);
             
             column.onFilterDropdownVisibleChange  = (visible) => { this.onFilterDropdownVisibleChange(visible, column.dataIndex) };
+
+            column.render = (text, record) => { return this.simpleFieldRender(text, record, column) };
             
             if(column.dataType === 'C' || column.dataType === 'Q')
             {
@@ -124,6 +196,14 @@ export default class ConfigurableTable extends React.Component {
     return [];
   }
 
+  simpleFieldRender(text, record, column)
+  {
+    return (
+      <TableCell column = { column } >
+        { text }
+      </TableCell> );
+  }
+
   getActionsColmunForResults()
   {
     return {
@@ -133,7 +213,7 @@ export default class ConfigurableTable extends React.Component {
       className: 'table-actions-without-padding',
       render: (text, record) => {
         return(
-            <div>
+            <TableCell action = { true } >
                 <Input  size = "small" 
                         placeholder = "1,000"
                         defaultValue = '1,000'
@@ -141,7 +221,7 @@ export default class ConfigurableTable extends React.Component {
                         style = {{ width: 100 }}
                         addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
                         onPressEnter = { (e) => { this.onAddClick(record) } } />
-            </div>
+            </TableCell>
         ); 
       }
     };
@@ -240,13 +320,13 @@ export default class ConfigurableTable extends React.Component {
   renderForCurrencyOrQuantity(text, record, column)
   {
     return(
-      <span style = {{ textAlign: 'right' }}>
+      <TableCell column = { column } >
         { this.formatValueToCurrency(record[column.dataIndex]) }
-      </span>
+      </TableCell>
     );
   };
 
-  formatValueToCurrency = (data) => {
+  formatValueToCurrency = (data = '') => {
     return Number(data.replace(',','')).toLocaleString('en', {style: 'currency', currency: 'USD'}).replace('$', '').replace('NaN', '0.00');
   }
 
@@ -256,56 +336,60 @@ export default class ConfigurableTable extends React.Component {
     if(allowedValues)
     {
       return(
-        <Select         
-          showSearch
-          style             = {{ width: column.width }}
-          optionFilterProp  = "children"
-          onChange          = { (newValue) => { this.onFieldChange(record, column, newValue); } }
-          onBlur            = { this.onFieldBlur(record, column) }
-          value             = { record[column.dataIndex] }
-          filterOption      = { (input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 }
-          size              = 'small'
-        >
-        {
-          allowedValues.values.map( valueRange => {
-            return(
-              <Option value = { valueRange.low } >
-                { valueRange.lowTitle }
-              </Option>
-            );
-          })
-        }
-        </Select>);
+        <TableCell column = { column }>
+          <Select         
+            showSearch
+            style             = {{ width: column.width }}
+            optionFilterProp  = "children"
+            onChange          = { (newValue) => { this.onFieldChange(record, column, newValue); } }
+            onBlur            = { this.onFieldBlur(record, column) }
+            value             = { record[column.dataIndex] }
+            filterOption      = { (input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 }
+            size              = 'small'
+          >
+          {
+            allowedValues.values.map( valueRange => {
+              return(
+                <Option value = { valueRange.low } >
+                  { valueRange.lowTitle }
+                </Option>
+              );
+            })
+          }
+          </Select>
+        </TableCell>);
     }
     if(column.dataType === 'CB')
     {
       return(
-        <Checkbox
-          style         = {{ width: column.width, textAlign: 'center' }}
-          value         = { record[column.dataIndex] }
-          onChange      = { (event) => { this.onFieldChange(record, column, event.target.checked); } }
-          size          = 'small'
-        />
+        <TableCell column = { column }>
+          <Checkbox
+            style         = {{ width: column.width, textAlign: 'center' }}
+            value         = { record[column.dataIndex] }
+            onChange      = { (event) => { this.onFieldChange(record, column, event.target.checked); } }
+            size          = 'small' />
+        </TableCell>
       );
     }
     return(
-      <Input 
-        style         = {{ width: column.width, textAlign: (column.dataType === 'C' || column.dataType === 'Q') ? 'right' : 'left' }}
-        value         = { (column.dataType === 'C' || column.dataType === 'Q') ? this.formatValueToCurrency(record[column.dataIndex]) : record[column.dataIndex] }
-        onChange      = { (event) => { this.onFieldChange(record, column, event.target.value); } }
-        onBlur        = { this.onFieldBlur(record, column) }
-        onPressEnter  = { (event) => this.onFieldPressEnter(record, column, event) }
-        size          = 'small'
-      />
+      <TableCell column = { column }>
+        <Input 
+          style         = {{ width: column.width, textAlign: (column.dataType === 'C' || column.dataType === 'Q') ? 'right' : 'left' }}
+          value         = { (column.dataType === 'C' || column.dataType === 'Q') ? this.formatValueToCurrency(record[column.dataIndex]) : record[column.dataIndex] }
+          onChange      = { (event) => { this.onFieldChange(record, column, event.target.value); } }
+          onBlur        = { this.onFieldBlur(record, column) }
+          onPressEnter  = { (event) => this.onFieldPressEnter(record, column, event) }
+          size          = 'small' />
+      </TableCell>
     );
   };
 
   onFieldBlur = (record, column) => {
-    console.log('containers.configurableTable.onFieldBlur()[record, column]', record, column);
+    //console.log('containers.configurableTable.onFieldBlur()[record, column]', record, column);
   }
 
   onFieldPressEnter = (record, column, event) => {
-    console.log('containers.configurableTable.onFieldPressEnter()[record, column, event]', record, column, event);
+    //console.log('containers.configurableTable.onFieldPressEnter()[record, column, event]', record, column, event);
   }
 
 
@@ -325,8 +409,6 @@ export default class ConfigurableTable extends React.Component {
         break;
       }
     }
-
-    //this.setState({ data });
   }
 
   getDropdownVisible(columnName)
@@ -370,32 +452,27 @@ export default class ConfigurableTable extends React.Component {
     console.log('containers.configurableTable.onTableFilterChange(pagination, filters, sorter)', pagination, filters, sorter);
   }
 
-  getFooterForTable(currentPageData)
+  isModified(data = [])
   {
-    console.log('containers.configurableTable.getFooterForTable(currentPageData, state)', currentPageData, this.state);
-    let updateAllButton = false;
-    let data = this.state.data || [];
-    data = data.slice(0);
-
     for(let i = 0; i < data.length; i++)
     {
       if(data[i].isModified)
       {
-        updateAllButton = true;
-        break;
+        return true;
       }     
     }
-    
+    return false;
+  }
+
+  getFooterForTable(currentPageData)
+  {  
     return(
-      updateAllButton ? 
-        <Button type = "primary" icon = 'save' style = {{ float: 'right', top: -8 }} >Сохранить все изменения</Button> :
-        <Button type = "primary" icon = 'save' style = {{ float: 'right', top: -8 }} disabled>Сохранить все изменения</Button>
+      <Button type = "primary" icon = 'save' style = {{ float: 'right', top: -8 }} >Сохранить все изменения</Button>
     );
   }
 
   getRowClassName(record, index)
   {
-    console.log('containers.configurableTable.getRowClassName(record, index)', record, index);
     if(record.isModified)
     {
       return 'small-table-line highlighted-row';
@@ -411,6 +488,22 @@ export default class ConfigurableTable extends React.Component {
     {
       if( this.props.isEditable && this.props.config.type === 'POS' )
       {
+        if(this.isModified(this.state.data))
+        {
+          return(
+            <Table 
+              columns      = { this.state.columns } 
+              dataSource   = { this.state.data }
+              size         = 'small'
+              scroll       = { this.state.scroll } 
+              loading      = { this.props.isProcessing }
+              rowClassName = { this.getRowClassName.bind(this) } 
+              onChange     = { this.onTableFilterChange.bind(this) }
+              pagination   = { this.state.pagination }
+              footer       = { this.getFooterForTable.bind(this) }
+              />
+          );
+        }
         return(
           <Table 
             columns      = { this.state.columns } 
@@ -421,7 +514,6 @@ export default class ConfigurableTable extends React.Component {
             rowClassName = { this.getRowClassName.bind(this) } 
             onChange     = { this.onTableFilterChange.bind(this) }
             pagination   = { this.state.pagination }
-            footer       = { this.getFooterForTable.bind(this) }
             />
         );
       }

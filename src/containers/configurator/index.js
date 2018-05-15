@@ -3,6 +3,7 @@ import { Modal, Tabs, Spin }                                from 'antd';
 import PropTypes                                            from 'prop-types';
 import Configurator                                         from './configurator';
 import { updateConfigs }                                    from '../../actions/configs/main';
+import { clone }                                            from '../../utils';
 
 const { TabPane } = Tabs;
 
@@ -57,17 +58,47 @@ export class ConfiguratorPanel extends React.Component {
     return newState;
   }
 
-  onTargetKayesChange = (type, targetKeys) => {
-    let visibleFields     = this.state.visibleFields.slice(0);
-    let allFields         = this.state.allFields.slice(0);
-    let orderIndex        = 0;
+  onTargetKayesChange = (type, targetKeys = []) => {
+    let visibleFields   = clone(this.state.visibleFields);
+    let allFields       = clone(this.state.allFields);
+    let orderIndex      = 0;
 
+    console.log('containers.configurator.panel.onTargetKayesChange[visibleFields, allFields, targetKeys]', visibleFields, allFields, targetKeys);
+
+    //получаем список добавленных полей
+    if( targetKeys.length > visibleFields[type].length )
+    {
+      let newKeys = targetKeys.map( key => {
+        if(visibleFields[type].indexOf(key) === -1)
+        {
+          return key;
+        }
+        return null;
+      }).filter( key => !!key );
+
+      //добавляем их в конец
+      if(newKeys.length > 0)
+      {
+        for(let i = 0; i < newKeys.length; i++)
+        {
+          visibleFields[type].push(newKeys[i]);
+        }
+      }
+    }
+    else
+    {
+      visibleFields[type] = targetKeys;
+    }
+
+    //скрываем все елементы
     allFields[type] = allFields[type].map( field => {
       field.visible     = false;
       field.orderIndex  = -1;
+      return field;
     });
 
-    targetKeys.map( key => {
+    //выбираем какие поля показывать и присваиваем им новые индексы
+    visibleFields[type].map( key => {
       for(let i = 0; i < allFields[type].length; i++)
       { 
         if(allFields[type][i].key === key)
@@ -81,10 +112,6 @@ export class ConfiguratorPanel extends React.Component {
     });
 
     allFields[type].sort( (a, b) => a.orderIndex - b.orderIndex );
-
-    console.log('containers.configurator.index.onTargetKayesChange(allFields, targetKeys, updatedAllFields)', this.state.allFields[type], targetKeys, allFields[type]);
-    
-    visibleFields[type] = targetKeys;
     this.setState({ visibleFields, allFields });
   }
 
@@ -122,8 +149,20 @@ export class ConfiguratorPanel extends React.Component {
     const { toggleVisible, dispatch } = this.props;
 
     let newConfigs = [];
+
+    for(let type in this.state.allFields)
+    {
+      console.log('containers.configurator.index.onSave(type)', type);
+      newConfigs.push({
+        type,
+        columns: this.clearConfigFields(this.state.allFields[type]),
+        pageSize: this.state.pageSize[type],
+      })
+    }
+
+    console.log('containers.configurator.index.onSave(new configs)', newConfigs);
     
-    newConfigs.push(
+    /* newConfigs.push(
       {
         type: 'RFR',
         columns: this.clearConfigFields(this.state.allFields['RFR']),
@@ -153,7 +192,7 @@ export class ConfiguratorPanel extends React.Component {
         columns: this.clearConfigFields(this.state.allFields['POS']),
         pageSize: this.state.pageSize['POS'],
       }
-    );
+    ); */
 
     dispatch(updateConfigs(newConfigs, toggleVisible));
   }

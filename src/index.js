@@ -21,6 +21,8 @@ const store = createStore(
   applyMiddleware(...middleware)
 )
 
+
+
 render(
   <Provider store={store}>
     <LocaleProvider locale = { ru_RU } >
