@@ -1,6 +1,6 @@
 import React                                                from 'react';
 import PropTypes                                            from 'prop-types';
-import { Row, Col, Button, Spin, Popover }                  from 'antd';
+import { Row, Col, Button, Spin, Popover, Divider }         from 'antd';
 import ConfigurableTable                                    from '../configurableTable';
 import { loadItems }                                        from '../../actions/positions/main';
 import { calcPositionSum }                                  from '../../actions/positions/calcPositionsSum';
@@ -30,37 +30,48 @@ export default class PositionsConainer extends React.Component {
     dispatch(calcPositionSum());
   }
 
- /*  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(loadItems(dispatch));
-  } */
-
-  /* getDefaultValueKey(items)
+  onPositionDelete(record)
   {
-    console.log('containers.search.criterias.searchButtonBox.getDefaultValueKey()[items]:', items);
-    let selectedItemID;
-    items.find(item => {
-      if(item.selected === true)
-      {
-        selectedItemID = item.id;
-        return true;
-      }
-    })
-    console.log('containers.search.criterias.searchButtonBox.getDefaultValueKey()[result]:', selectedItemID);
-    return selectedItemID;
+
   }
 
-  onSelect(itemID)
+  onPositionUpdate(record)
   {
-    const { dispatch } = this.props;
-    dispatch(selectItem(itemID));
+
   }
 
-  onSearch()
+  addActions(config, data, isEditable, columns = [])
   {
-    const { dispatch } = this.props;
-    dispatch(search());
-  } */
+    if(columns.length === 0 || !isEditable)
+    {
+      return;
+    }
+
+    if(config.type === 'POS')
+    {
+      columns.push({
+        key:    'actions',
+        title:  'Действия',
+        width:  150,
+        className: 'table-actions-without-padding',
+        render: (text, record) => {
+          return(
+              <span>
+                <a onClick = { event => { this.onPositionDelete(record) }} >Удалить</a>
+                {
+                  record.isModified &&
+                  <span>
+                    <Divider type="vertical" />
+                    <a onClick = { event => { this.onPositionUpdate(record) } }>Обновить</a>
+                  </span>
+                }              
+              </span>
+          ); 
+        }
+      });
+    }
+  }
+
 
   render() {
     console.log('containers.positions.main.PositionsConatainer.render()[props]:', this.props);
@@ -106,11 +117,14 @@ export default class PositionsConainer extends React.Component {
               <Row className = 'positionsTable' >    
                   <Col span      = { 24 }
                       className = 'positionsTable' >
-                      <ConfigurableTable  isProcessing= { false }
-                                          config      = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
-                                          data        = { this.props.positions.items }
-                                          isEditable  = { this.props.isEditable }
-                                          dispatch    = { this.props.dispatch } />
+                      <ConfigurableTable  isProcessing      = { false }
+                                          config            = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
+                                          data              = { this.props.positions.items }
+                                          isEditable        = { this.props.isEditable }
+                                          dispatch          = { this.props.dispatch }
+                                          modifyColumns     = { this.addActions.bind(this) }
+                                          onPositionDelete  = { this.onPositionDelete.bind(this) }
+                                          onPositionUpdate  = { this.onPositionUpdate.bind(this) } />
                   </Col>
               </Row>
           </Spin>

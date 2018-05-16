@@ -25,21 +25,6 @@ class Form extends Component {
     dispatch(loadStatus());
   }
 
-  getConfigEditButton()
-  {
-    return(
-      <Button type    = 'primary' 
-              icon    = 'setting' 
-              onClick = { event => { this.onConfigEdit() } }
-              style   = {{ }}/>
-    );
-  }
-
-  onConfigEdit = () => {
-
-  }
-
-
   render()
   {
     console.log("Form.Render[props]:", this.props);

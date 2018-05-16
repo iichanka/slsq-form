@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Menu, Tooltip, Button, Popover, Col } from 'antd'
 
-export default class AttributeGroup extends React.Component
+export class AttributeGroup extends React.Component
 {
   propTypes = {
     attributes:         PropTypes.array.isRequired,

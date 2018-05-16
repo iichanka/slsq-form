@@ -1,12 +1,17 @@
 import React, { Component }                         from 'react';
 import PropTypes                                    from 'prop-types';
-import {Row, Col, Tabs, Alert, Button, Icon }       from 'antd';
+import {Row, Col, Tabs, Alert, Button, Icon, 
+        Input }                                     from 'antd';
 import ClassificatorLayout                          from './criterias/classificator/layout';
 import SearchButtonBox                              from './criterias/searchButtonBox';
 import { selectTab as selectCTab }                  from '../../actions/search/criterias/main';
 import { selectTab as selectRTab }                  from '../../actions/search/results/main';
 import ConfigurableTable                            from '../configurableTable';
 import { ConfiguratorPanel }                        from '../configurator';
+import { clone }                                    from '../../utils';
+import { addPositionItem }                          from '../../actions/positions/addPosition';
+import { TableCell, ConfigEditorButtons }           from '../../components';
+
 
 const { TabPane } = Tabs;
 
@@ -28,7 +33,6 @@ export default class SearchContainer extends Component {
       columns: [],
     };
     this.saveConfigs(props.configs);
-    this.state = { configuratorVisible: false };
   }
 
   onTabSelect(key, type)
@@ -73,20 +77,60 @@ export default class SearchContainer extends Component {
     this.setState({configuratorVisible: !this.state.configuratorVisible});
   }
 
-  getConfigEditButton(activeTab)
+  onAddClick(record)
   {
-    return(
-      <Button type    = 'primary' 
-              icon    = 'setting' 
-              onClick = { event => { this.toggleConfiguratorVisible(); } }
-              style   = {{ top: -2 }}/>
-    );
+    const { dispatch } = this.props;   
+
+    if(record.countInputReference)
+    {
+      record.countInputReference.input.blur();
+      switch(record.itemType)
+      {
+        case 'RFR':
+        {
+          dispatch(addPositionItem({ remnants: {...record, count: record.countInputReference.input.value } }));
+        }
+      }
+    }
   }
 
-  toggleConfiguratorVisible = (event) => {
-    this.setState({configuratorVisible: !this.state.configuratorVisible});
-  }
+  addActions(config, data, isEditable, columns = [])
+  {
+    if(columns.length === 0 || !isEditable)
+    {
+      return;
+    }
 
+    switch(config.type)
+    {
+      case 'RFR':
+      case 'RFIT':
+      case 'RFM':
+      {
+        columns.unshift({
+          key:    'actions',
+          title:  'Действия',
+          width:  100,
+          className: 'table-actions-without-padding',
+          render: (text, record) => { 
+            return(
+              <TableCell action = { true } >
+                <Input  
+                  size = "small" 
+                  placeholder = "1,000"
+                  defaultValue = '1,000'
+                  ref = { (ref) => { record.countInputReference = ref; } }
+                  style = {{ width: 100 }}
+                  addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
+                  onPressEnter = { (e) => { this.onAddClick(record) } } />
+              </TableCell>
+            );
+          },
+        });
+        break;
+      }
+    }
+  }
 
   render()
   {
@@ -145,17 +189,23 @@ export default class SearchContainer extends Component {
             <Tabs defaultActiveKey    = { this.props.results.activeTab }
                   size                = 'small'
                   onChange            = { key => this.onTabSelect(key, 'R') }
-                  tabBarExtraContent  = { this.getConfigEditButton(this.props.results.activeTab) } >
+                  tabBarExtraContent  = { <ConfigEditorButtons 
+                                            isPersonalizationActive = { this.props.configs.isPersonalizationActive }
+                                            isConfiguratorVisible   = { this.props.configs.isConfiguratorVisible }
+                                            dispatch                = { this.props.dispatch } /> } >
 
               <TabPane  tab       = 'Остатки'
                         key       = 'RFR'
                         className = 'searchPanelTabsFull'>
                 
-                <ConfigurableTable isProcessing = { this.props.isSearching }
-                                   config       = { this.rfrConfig }
-                                   data         = { this.props.results.remnants }
-                                   isEditable   = { this.props.isEditable }
-                                   dispatch     = { this.props.dispatch } />
+                <ConfigurableTable isProcessing       = { this.props.isSearching }
+                                   config             = { this.rfrConfig }
+                                   data               = { this.props.results.remnants.map( r => { r.itemType = 'RFR'; return r; }) }
+                                   isEditable         = { this.props.isEditable }
+                                   dispatch           = { this.props.dispatch }
+                                   modifyColumns      = { this.addActions.bind(this) } 
+                                   onAddClick         = { this.onAddClick.bind(this) }
+                                   scrollHeight       = { 217 } />
 
               </TabPane>
 
@@ -182,11 +232,10 @@ export default class SearchContainer extends Component {
           </Col>
         </Row>
         <ConfiguratorPanel 
-          visible       = { this.state.configuratorVisible }
+          visible       = { this.props.configs.isConfiguratorVisible }
           configs       = { this.props.configs.tableConfigs }
           isProcessing  = { this.props.configs.isLoading }
           dispatch      = { this.props.dispatch }
-          toggleVisible = { this.toggleConfiguratorVisible.bind(this) }
         />
       </div>);
   }

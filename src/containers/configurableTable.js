@@ -4,8 +4,8 @@ import {  Table, Icon, Button,
           Popover, Input, Row, Col,
           Checkbox, Select, Divider,
           Tooltip }                     from 'antd';
-import { addPositionItem }              from '../actions/positions/addPosition';
 import { localUpdateItem }              from '../actions/positions/main';
+import { TableCell }                    from '../components';
 
 const Search = Input.Search;
 const Option = Select.Option;
@@ -20,74 +20,6 @@ const initialState = {
 };
 
 
-
-
-const TableCell = ({ children, style, className, column, action, ...props}) => {
-  let needPopOver = false;
-  let width = 1;
-  let length = 1;
-  let classNameFinal = 'field-no-wrap';
-  let styleFinal = { float: 'right' };
-
-  if(style)
-  {
-    if(style.maxWidth)
-    {
-      let widthString = style.maxWidth.toString().replace('px', '');
-      width = Number(widthString);
-      styleFinal = {...styleFinal, width: style.maxWidth };
-    }
-    styleFinal = {...style, ...styleFinal };
-  }
-
-  if(column)
-  {
-    if(column.width)
-    {
-      styleFinal = {...styleFinal, maxWidth: column.width, width: column.width };
-    }
-  }
-
-  if(children)
-  {
-      length = children.length;
-  }
-
-  if(className)
-  {
-    classNameFinal = `${className} ${classNameFinal}`;
-  }
-
-  if(action)
-  {
-    return children;
-  }
-
-  needPopOver = (width / length) < 10;
-
-  if(needPopOver)
-  {
-    return(
-      <div { ...props }
-            style      = { styleFinal }
-            className  = { classNameFinal } >
-        <Tooltip 
-          title     = { children }
-          placement = 'topLeft' >
-          <span style ={{ marginLeft: 5, marginRight: 5 }}>{ children }</span>
-        </Tooltip>
-      </div>
-    );
-  }
-  return(
-    <div  { ...props }
-          style      = { styleFinal }
-          className  = { classNameFinal }>
-      <span style ={{ marginLeft: 5, marginRight: 5 }}>{ children }</span>
-    </div>
-  );
-}
-
 export default class ConfigurableTable extends React.Component {
   static PropTypes = {
     isProcessing:       PropTypes.bool.isRequired,
@@ -95,57 +27,42 @@ export default class ConfigurableTable extends React.Component {
     data:               PropTypes.array.isRequired,
     isEditable:         PropTypes.bool.isRequired,
     dispatch:           PropTypes.func.isRequired,
+    modifyColumns:      PropTypes.func,
+    onPositionDelete:   PropTypes.func,
+    onPositionUpdate:   PropTypes.func,
+    onAddClick:         PropTypes.func,
+    scrollWidth:        PropTypes.any,
+    scrollHeight:       PropTypes.any,
   }
 
   constructor(props)
   {
     super(props);
     this.state = this.getStateFromProps(props);
-    console.log('containers.configurableTable.constructor(props, state)', props, this.state);
   }
 
   componentWillReceiveProps(props)
   {
     this.setState(this.getStateFromProps(props));
-    console.log('containers.configurableTable.componentWillReceiveProps(props, state)', props, this.state);
   }
 
   getStateFromProps = (props) => {
     const { config, data, isEditable } = props;
-    let oldState = this.state;
-
-    let state = { 
+    
+    return {
       columns: this.getColumns(config, data, isEditable),
       pagination: this.getPagination(config),
-      scroll: this.getScroll(config),
+      scroll: this.getScroll(props),
       data
     };
-
-    console.log('containers.configurableTable.getStateFromProps(props, state)', props, this.state);
-    return state;
   }
 
-  getScroll(config = { type: '' })
+  getScroll({ scrollWidth, scrollHeight, ...props})
   {
-    switch(config.type)
-    {
-      case 'RFR':
-      case 'RFIT':
-      case 'RFM':
-      {
-        return {
-          y: 217, 
-          x: '100%'
-        }
-      }
-      default:
-      {
-        return {
-          y: '100%', 
-          x: '100%'
-        };
-      }
-    }
+    return {
+      x: scrollWidth  ? scrollWidth  : '100%',
+      y: scrollHeight ? scrollHeight : '100%',
+    };
   }
 
   getColumns(config, data, isEditable)
@@ -187,7 +104,10 @@ export default class ConfigurableTable extends React.Component {
           return null;
         }).filter( column => !!column );
 
-        this.getColumnsExtended(config, data, isEditable, columns);
+        if(this.props.modifyColumns)
+        {
+          this.props.modifyColumns(config, data, isEditable, columns);
+        }
 
         console.log('containers.configurableTable.getColumns(config, data, isEditable, columns)', config, data, isEditable, columns);
         return columns;
@@ -202,108 +122,7 @@ export default class ConfigurableTable extends React.Component {
       <TableCell column = { column } >
         { text }
       </TableCell> );
-  }
-
-  getActionsColmunForResults()
-  {
-    return {
-      key:    'actions',
-      title:  'Действия',
-      width:  100,
-      className: 'table-actions-without-padding',
-      render: (text, record) => {
-        return(
-            <TableCell action = { true } >
-                <Input  size = "small" 
-                        placeholder = "1,000"
-                        defaultValue = '1,000'
-                        ref = { (ref) => { this.saveInputReference(record.key, ref) } }
-                        style = {{ width: 100 }}
-                        addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
-                        onPressEnter = { (e) => { this.onAddClick(record) } } />
-            </TableCell>
-        ); 
-      }
-    };
-  }
-
-  getColumnsExtended(config, data, isEditable, columns = [])
-  {
-    if(columns.length === 0 || !isEditable)
-    {
-      return;
-    }
-
-    switch(config.type)
-    {
-      case 'RFR':
-      case 'RFIT':
-      case 'RFM':
-      {
-        columns.unshift(this.getActionsColmunForResults());
-        break;
-      }
-
-      case 'POS':
-      {
-        columns.push(this.getActionsColmunForPositions());
-      }
-    }
-  }
-
-  getActionsColmunForPositions()
-  {
-    return {
-      key:    'actions',
-      title:  'Действия',
-      width:  150,
-      className: 'table-actions-without-padding',
-      render: (text, record) => {
-        return(
-            <span>
-              <a>Удалить</a>
-              {
-                record.isModified &&
-                <span>
-                  <Divider type="vertical" />
-                  <a>Обновить</a>
-                </span>
-              }              
-            </span>
-        ); 
-      }
-    };
-  }
-
-  onAddClick(record)
-  {
-    const { dispatch, config } = this.props;
-    let input = this.state.inputReference[record.key].input;
-
-    if(input)
-    {
-      input.blur();
-      switch(config.type)
-      {
-        case 'RFR':
-        {
-          dispatch(addPositionItem({ remnants: {...record, count: input.value } }));
-        }
-      }
-    }
-  }
-
-  saveInputReference(key, ref)
-  {
-    let inputReference = this.state.inputReference || [];
-    inputReference = inputReference.slice(0);
-
-    if(!inputReference[key])
-    {
-      inputReference[key] = ref;
-      this.setState({ inputReference });
-    }
-  }
+  } 
 
   buildDropdownForColumn(column, data)
   {

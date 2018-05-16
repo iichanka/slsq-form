@@ -6,6 +6,7 @@
   "devDependencies": {
     "antd": "^3.3.0",
     "babel-polyfill": "^6.26.0",
+    "dotenv-cli": "^1.4.0",
     "rc-tabs": "^9.2.4",
     "react-drag-listview": "0.0.9",
     "react-scripts": "^1.0.2",
@@ -24,6 +25,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build-dev": "dotenv -e .env.development react-scripts build",
     "eject": "react-scripts eject",
     "test": "react-scripts test"
   }

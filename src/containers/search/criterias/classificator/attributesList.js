@@ -3,7 +3,7 @@ import PropTypes                        from 'prop-types'
 import { Checkbox, Spin, Tooltip, Row } from 'antd';
 import { toggleClassificatorItem, 
          selectClassificatorItems }     from '../../../../actions/search/criterias/classificator';
-import AttributeGroup                   from '../../../../components/AttributeGroup';
+import { AttributeGroup }                   from '../../../../components';
 
 export default class ClassificatorAttributesList extends React.Component {
   static propTypes = {

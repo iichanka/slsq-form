@@ -5,7 +5,11 @@ import Configurator                                         from './configurator
 import { updateConfigs }                                    from '../../actions/configs/main';
 import { clone }                                            from '../../utils';
 
+import { toggleConfiguratorVisible }                        from '../../actions/configs/main'
+
 const { TabPane } = Tabs;
+
+
 
 export class ConfiguratorPanel extends React.Component {
   static propTypes = {
@@ -13,7 +17,6 @@ export class ConfiguratorPanel extends React.Component {
     configs:        PropTypes.array.isRequired,
     isProcessing:   PropTypes.bool.isRequired,
     dispatch:       PropTypes.func.isRequired,
-    toggleVisible:  PropTypes.func.isRequired,
   }
 
   constructor(props)
@@ -122,9 +125,9 @@ export class ConfiguratorPanel extends React.Component {
   }
 
   onClose = (event) => {
-    const { toggleVisible } = this.props;
+    const { dispatch } = this.props;
     this.setState(this.getStateFromProps(this.props));
-    toggleVisible();
+    dispatch(toggleConfiguratorVisible());
   }
 
   clearConfigFields = ( fields = [] ) => {
@@ -160,41 +163,8 @@ export class ConfiguratorPanel extends React.Component {
       })
     }
 
-    console.log('containers.configurator.index.onSave(new configs)', newConfigs);
-    
-    /* newConfigs.push(
-      {
-        type: 'RFR',
-        columns: this.clearConfigFields(this.state.allFields['RFR']),
-        pageSize: this.state.pageSize['RFR'],
-      }
-    );
-
-    newConfigs.push(
-      {
-        type: 'RFIT',
-        columns: this.clearConfigFields(this.state.allFields['RFIT']),
-        pageSize: this.state.pageSize['RFIT'],
-      }
-    );
-
-    newConfigs.push(
-      {
-        type: 'RFM',
-        columns: this.clearConfigFields(this.state.allFields['RFM']),
-        pageSize: this.state.pageSize['RFM'],
-      }
-    );
-
-    newConfigs.push(
-      {
-        type: 'POS',
-        columns: this.clearConfigFields(this.state.allFields['POS']),
-        pageSize: this.state.pageSize['POS'],
-      }
-    ); */
-
     dispatch(updateConfigs(newConfigs, toggleVisible));
+    dispatch(toggleConfiguratorVisible());
   }
 
 

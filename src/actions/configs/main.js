@@ -1,13 +1,27 @@
 import axios                    from 'axios';
 import { showMessages }         from '../messages';
 
-export const C_REQUEST_CONFIGS          = 'C_REQUEST_CONFIGS';
-export const C_RECEIVE_CONFIGS          = 'C_RECEIVE_CONFIGS';
-export const C_END_REQUEST_CONFIGS      = 'C_END_REQUEST_CONFIGS';
+export const C_REQUEST_CONFIGS                  = 'C_REQUEST_CONFIGS';
+export const C_RECEIVE_CONFIGS                  = 'C_RECEIVE_CONFIGS';
+export const C_END_REQUEST_CONFIGS              = 'C_END_REQUEST_CONFIGS';
+export const C_TOGGLE_PERSONALIZATION_ACTIVE    = 'C_TOGGLE_PERSONALIZATION_ACTIVE';
+export const C_TOGGLE_CONFIGURATOR_VISIBLE      = 'C_TOGGLE_CONFIGURATOR_VISIBLE';
 
 export const requestConfigs = () => {
     return {
         type: C_REQUEST_CONFIGS,
+    }
+}
+
+export const toggleConfiguratorVisible = () => {
+    return {
+        type: C_TOGGLE_CONFIGURATOR_VISIBLE
+    }
+}
+
+export const togglePersonalizationActive = () => {
+    return {
+        type: C_TOGGLE_PERSONALIZATION_ACTIVE
     }
 }
 
