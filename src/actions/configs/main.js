@@ -65,7 +65,7 @@ export const load = () => (dispatch, getState) => {
       });
 }
 
-export const updateConfigs = (data, toggleVisible) => dispatch => {
+export const updateConfigs = (data) => dispatch => {
     dispatch(requestConfigs());
   
     axios.post(localStorage.getItem('AjaxURL'), {
@@ -81,13 +81,13 @@ export const updateConfigs = (data, toggleVisible) => dispatch => {
           dispatch(receiveConfigs(response.data.data || []));
       }
       dispatch(endRequestConfigs());
-      toggleVisible();
+      dispatch(toggleConfiguratorVisible());
     })
     .catch(function (error) {
         console.log('updateConfigs: ', error, data);
         showMessages([{type: 'E', text: 'Не удалось обновить конфигурации таблиц.'}]);
         dispatch(endRequestConfigs());
-        toggleVisible();
+        dispatch(toggleConfiguratorVisible());
     });
     
   }

@@ -6,6 +6,26 @@ import {  Table, Icon, Button,
           Tooltip }                     from 'antd';
 import { localUpdateItem }              from '../actions/positions/main';
 import { TableCell }                    from '../components';
+import { PersonalizationModifier }      from '../components';
+import { ResizableColumn }              from '../components';
+import { isEqual }                      from '../utils';
+
+/* import { Resizable } from 'react-resizable';
+import 'react-resizable/css/styles.css';
+
+const ResizeableTitle = props => {
+  const { onResize, width, ...restProps } = props;
+
+  if (!width) {
+    return <th {...restProps} />;
+  }
+
+  return (
+    <Resizable width={width} height={0} onResize={onResize}>
+      <th {...restProps} />
+    </Resizable>
+  );
+}; */
 
 const Search = Input.Search;
 const Option = Select.Option;
@@ -19,26 +39,39 @@ const initialState = {
   filter: [],
 };
 
-
 export default class ConfigurableTable extends React.Component {
   static PropTypes = {
-    isProcessing:       PropTypes.bool.isRequired,
-    config:             PropTypes.object.isRequired,
-    data:               PropTypes.array.isRequired,
-    isEditable:         PropTypes.bool.isRequired,
-    dispatch:           PropTypes.func.isRequired,
-    modifyColumns:      PropTypes.func,
-    onPositionDelete:   PropTypes.func,
-    onPositionUpdate:   PropTypes.func,
-    onAddClick:         PropTypes.func,
-    scrollWidth:        PropTypes.any,
-    scrollHeight:       PropTypes.any,
+    isProcessing:             PropTypes.bool.isRequired,
+    config:                   PropTypes.object.isRequired,
+    data:                     PropTypes.array.isRequired,
+    isEditable:               PropTypes.bool.isRequired,
+    isPersonalizationActive:  PropTypes.bool.isRequired,
+    dispatch:                 PropTypes.func.isRequired,
+    modifyColumns:            PropTypes.func,
+    onPositionDelete:         PropTypes.func,
+    onPositionUpdate:         PropTypes.func,
+    onAddClick:               PropTypes.func,
+    scrollWidth:              PropTypes.any,
+    scrollHeight:             PropTypes.any,
   }
 
   constructor(props)
   {
     super(props);
     this.state = this.getStateFromProps(props);
+
+    const that = this;
+    this.dragConfig = {
+      onDragEnd(fromIndex, toIndex) {
+        const columns = that.state.columns;
+        const item = columns.splice(fromIndex, 1)[0];
+        columns.splice(toIndex, 0, item);
+        that.setState({
+            columns
+        });
+      },
+      nodeSelector: "th"
+    };
   }
 
   componentWillReceiveProps(props)
@@ -46,14 +79,35 @@ export default class ConfigurableTable extends React.Component {
     this.setState(this.getStateFromProps(props));
   }
 
-  getStateFromProps = (props) => {
-    const { config, data, isEditable } = props;
+  getStateFromProps = (newProps) => {
+    const { config, data, isEditable, isPersonalizationActive } = newProps;
+    let oldConfig                   = {}, 
+        oldData                     = [], 
+        oldColumns                  = [], 
+        oldComponents               = {},
+        oldIsPersonalizationActive  = false;
     
+    if(this.state)
+    {
+      oldConfig                   = this.state.config;
+      oldData                     = this.state.data;
+      oldIsPersonalizationActive  = this.state.isPersonalizationActive;
+      oldColumns                  = this.state.columns;
+      oldComponents               = this.state.components;
+    }
+    
+
     return {
       columns: this.getColumns(config, data, isEditable),
       pagination: this.getPagination(config),
-      scroll: this.getScroll(props),
-      data
+      scroll: this.getScroll(newProps),
+      isPersonalizationActive,
+      data,
+      components: {
+        header: {
+          cell: ResizableColumn,
+        },
+      },
     };
   }
 
@@ -71,13 +125,13 @@ export default class ConfigurableTable extends React.Component {
     {
       if(config.columns && config.columns.length > 0)
       {
-        let columns = config.columns.map( column => {
+        let columns = config.columns.map( (column, index) => {
           if(column.visible && !column.technical)
           {
-            column.className    = 'table-actions-without-padding';
+            column.className    = 'table-line-without-padding';
             if(column.dataType === 'C' || column.dataType === 'Q')
             {
-              column.className    = 'table-actions-without-padding numeric-field';
+              column.className    = 'table-line-without-padding numeric-field';
             }
             column.filterIcon   = ( column.searchable || column.sortable ) && 
               <Icon type  = "filter" 
@@ -99,6 +153,15 @@ export default class ConfigurableTable extends React.Component {
             {
               column.render = (text, record) => { return this.renderForEditableColumn(text, record, column) };
             }
+
+            column.onHeaderCell = (cell) => {
+              console.log('onHeaderCell', cell);
+              return {
+                width: cell.width,
+                onResize: this.onColumnResize(index),
+              }
+            };
+
             return column;
           }
           return null;
@@ -135,6 +198,18 @@ export default class ConfigurableTable extends React.Component {
     dropdownVisible[columnName] = visible;
     this.setState( { dropdownVisible });
   }
+
+  onColumnResize = index => (e, { size }) => {
+    console.log('onColumnResize', e, size);
+    this.setState(({ columns }) => {
+      const nextColumns = [...columns];
+      nextColumns[index] = {
+        ...nextColumns[index],
+        width: size.width,
+      };
+      return { columns: nextColumns };
+    });
+  };
 
   renderForCurrencyOrQuantity(text, record, column)
   {
@@ -301,7 +376,6 @@ export default class ConfigurableTable extends React.Component {
 
   render() {
     console.log('containers.configurableTable.render(state)', this.state);
-    
 
     if(this.state.data && this.state.data.length > 0)
     {
@@ -310,8 +384,31 @@ export default class ConfigurableTable extends React.Component {
         if(this.isModified(this.state.data))
         {
           return(
+            <PersonalizationModifier 
+              isPersonalizationActive = { this.props.isPersonalizationActive }
+              components              = { this.state.components }
+              {...this.dragConfig} >
+              <Table 
+                columns      = { this.state.columns }
+                dataSource   = { this.state.data }
+                size         = 'small'
+                scroll       = { this.state.scroll } 
+                loading      = { this.props.isProcessing }
+                rowClassName = { this.getRowClassName.bind(this) } 
+                onChange     = { this.onTableFilterChange.bind(this) }
+                pagination   = { this.state.pagination }
+                footer       = { this.getFooterForTable.bind(this) }
+                />
+            </PersonalizationModifier>
+          );
+        }
+        return(
+          <PersonalizationModifier 
+            isPersonalizationActive = { this.props.isPersonalizationActive }
+            components              = { this.state.components }
+            {...this.dragConfig} >
             <Table 
-              columns      = { this.state.columns } 
+              columns      = { this.state.columns }
               dataSource   = { this.state.data }
               size         = 'small'
               scroll       = { this.state.scroll } 
@@ -319,13 +416,18 @@ export default class ConfigurableTable extends React.Component {
               rowClassName = { this.getRowClassName.bind(this) } 
               onChange     = { this.onTableFilterChange.bind(this) }
               pagination   = { this.state.pagination }
-              footer       = { this.getFooterForTable.bind(this) }
               />
-          );
-        }
-        return(
+          </PersonalizationModifier>
+        );
+      }
+      let columns = this.getColumns(this.props.config, this.props.data, this.props.isEditable);
+      return(
+        <PersonalizationModifier 
+          isPersonalizationActive = { this.props.isPersonalizationActive }
+          components              = { this.state.components }
+          {...this.dragConfig} >
           <Table 
-            columns      = { this.state.columns } 
+            columns      = { columns }
             dataSource   = { this.state.data }
             size         = 'small'
             scroll       = { this.state.scroll } 
@@ -334,19 +436,7 @@ export default class ConfigurableTable extends React.Component {
             onChange     = { this.onTableFilterChange.bind(this) }
             pagination   = { this.state.pagination }
             />
-        );
-      }
-      return(
-        <Table 
-          columns      = { this.state.columns } 
-          dataSource   = { this.state.data }
-          size         = 'small'
-          scroll       = { this.state.scroll } 
-          loading      = { this.props.isProcessing }
-          rowClassName = { this.getRowClassName.bind(this) } 
-          onChange     = { this.onTableFilterChange.bind(this) }
-          pagination   = { this.state.pagination }
-          />
+        </PersonalizationModifier>
       );
     }
     else

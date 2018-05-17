@@ -9,6 +9,7 @@
     "dotenv-cli": "^1.4.0",
     "rc-tabs": "^9.2.4",
     "react-drag-listview": "0.0.9",
+    "react-resizable": "^1.7.5",
     "react-scripts": "^1.0.2",
     "redux-logger": "^3.0.6"
   },

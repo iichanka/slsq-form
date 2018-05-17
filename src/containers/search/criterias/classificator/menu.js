@@ -12,14 +12,11 @@ export default class ClassificatorMenu extends React.Component {
   };
 
   componentDidMount() {
-    console.log('containers.search.criterias.classificator.menu.componentDidMount()[props]:', this.props);
     const { dispatch } = this.props
     dispatch(loadItemsIfNeeded(-1))
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('containers.search.criterias.classificator.menu.componentWillReceiveProps()[props]:', this.props);
-    console.log('containers.search.criterias.classificator.menu.componentWillReceiveProps()[nextProps]:', nextProps);
     if(!this.props.items || ( this.props.items.length == 0 && nextProps.items.length != 0))
     {
       if(nextProps.items)
@@ -63,7 +60,6 @@ export default class ClassificatorMenu extends React.Component {
   }
 
   render() {
-    console.log('containers.search.criterias.classificator.menu.render()[props]:', this.props);
     let rootSubmenuKeysElements = [];
     for(let i = 0; i < this.rootSubmenuKeys.length; i++)
     {

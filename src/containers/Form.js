@@ -5,8 +5,8 @@ import {Row, Col, Card, Button } from 'antd';
 
 import { load as loadConfigs }                      from '../actions/configs/main';
 import { getEditableStatus as loadStatus }          from '../actions/isEditable';
-import SearchContainer from './search/main';
-import PositionsContainer from './positions/main';
+import SearchContainer                              from './search/main';
+import { PositionsContainer }                       from './positions';
 
 class Form extends Component {
   static propTypes = {
@@ -37,11 +37,11 @@ class Form extends Component {
                          dispatch     = { this.props.dispatch }
                          isEditable   = { this.props.isEditable } />
           
-          <PositionsContainer configs     = { this.props.configs }   
-                              positions   = { this.props.positions }
-                              dispatch    = { this.props.dispatch }
-                              isEditable  = { this.props.isEditable }
-                              dispatch    = { this.props.dispatch } />
+        <PositionsContainer configs     = { this.props.configs }   
+                            positions   = { this.props.positions }
+                            dispatch    = { this.props.dispatch }
+                            isEditable  = { this.props.isEditable }
+                            dispatch    = { this.props.dispatch } />
           
         <div style={{minHeight: "35px", backgroundColor: "#AADBFF"}}>
           Quotation Header

@@ -19,6 +19,11 @@
 
 
 export const clone = (element, references = [], cachedResults = []) => {
+  if(element === undefined || element === null)
+  {
+    return null;
+  }
+
   if (typeof element !== 'object')
   {
     return element;
@@ -30,11 +35,10 @@ export const clone = (element, references = [], cachedResults = []) => {
     return cachedResults[index];
   }
       
-  references.push(element);
-
-  let result = Array.isArray(element) ? [] :
+  let result = (element instanceof Array) ? [] :
       element.constructor ? new element.constructor() : {};
 
+  references.push(element);
   cachedResults.push(result);
 
   for (var key in element)
@@ -46,4 +50,13 @@ export const clone = (element, references = [], cachedResults = []) => {
   }
           
   return result;
+}
+
+export const isEqual = (a,b) => {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+export default {
+  isEqual,
+  clone
 }

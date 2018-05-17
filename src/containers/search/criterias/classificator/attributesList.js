@@ -51,9 +51,6 @@ export default class ClassificatorAttributesList extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('containers.search.criterias.classificator.atrributesList.componentWillReceiveProps()[props]:', this.props);
-    console.log('containers.search.criterias.classificator.atrributesList.componentWillReceiveProps()[nextProps]:', nextProps);
-
     if(this.props.selectedClass && nextProps.selectedClass
         && this.props.items && nextProps.items)
     {
@@ -97,7 +94,6 @@ export default class ClassificatorAttributesList extends React.Component {
   }
 
   render() {
-    console.log('containers.search.criterias.classificator.atrributesList.render()[props]:', this.props);
     return(
         <Spin spinning={this.props.isLoading}>
           <Row  className = 'scrollable-x searchPanelTabHeight'>

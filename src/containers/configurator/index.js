@@ -57,7 +57,6 @@ export class ConfiguratorPanel extends React.Component {
       pageSize: pageSize,
     }
 
-    console.log('containers.configurator.panel.getStateFromProps[newState]', newState);
     return newState;
   }
 
@@ -126,6 +125,12 @@ export class ConfiguratorPanel extends React.Component {
 
   onClose = (event) => {
     const { dispatch } = this.props;
+
+    if(this.props.isProcessing)
+    {
+      return;
+    }
+
     this.setState(this.getStateFromProps(this.props));
     dispatch(toggleConfiguratorVisible());
   }
@@ -163,8 +168,7 @@ export class ConfiguratorPanel extends React.Component {
       })
     }
 
-    dispatch(updateConfigs(newConfigs, toggleVisible));
-    dispatch(toggleConfiguratorVisible());
+    dispatch(updateConfigs(newConfigs));
   }
 
 

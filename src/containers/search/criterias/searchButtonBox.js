@@ -27,7 +27,6 @@ export default class SearchButtonBox extends React.Component {
 
   getDefaultValueKey(items)
   {
-    console.log('containers.search.criterias.searchButtonBox.getDefaultValueKey()[items]:', items);
     let selectedItemID;
     items.find(item => {
       if(item.selected === true)
@@ -36,7 +35,7 @@ export default class SearchButtonBox extends React.Component {
         return true;
       }
     })
-    console.log('containers.search.criterias.searchButtonBox.getDefaultValueKey()[result]:', selectedItemID);
+
     return selectedItemID;
   }
 
@@ -60,7 +59,6 @@ export default class SearchButtonBox extends React.Component {
   }
 
   render() {
-    console.log('containers.search.criterias.searchButtonBox.render()[props]:', this.props);
     return (
       <Row>
         <Col span      = { 16 }

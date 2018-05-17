@@ -5,7 +5,7 @@ import ConfigurableTable                                    from '../configurabl
 import { loadItems }                                        from '../../actions/positions/main';
 import { calcPositionSum }                                  from '../../actions/positions/calcPositionsSum';
 
-export default class PositionsConainer extends React.Component {
+export class PositionsConainer extends React.Component {
   static propTypes = {   
     positions:      PropTypes.object.isRequired,
     configs:        PropTypes.object.isRequired,
@@ -19,7 +19,6 @@ export default class PositionsConainer extends React.Component {
   }
 
   componentDidMount() {
-    console.log('containers.positions.main.PositionContainer.componentDidMount()[props]:', this.props);
     const { dispatch } = this.props
     dispatch(loadItems());
   }
@@ -74,8 +73,6 @@ export default class PositionsConainer extends React.Component {
 
 
   render() {
-    console.log('containers.positions.main.PositionsConatainer.render()[props]:', this.props);
-
     const msg = {
       content: (
           <div>
@@ -117,17 +114,20 @@ export default class PositionsConainer extends React.Component {
               <Row className = 'positionsTable' >    
                   <Col span      = { 24 }
                       className = 'positionsTable' >
-                      <ConfigurableTable  isProcessing      = { false }
-                                          config            = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
-                                          data              = { this.props.positions.items }
-                                          isEditable        = { this.props.isEditable }
-                                          dispatch          = { this.props.dispatch }
-                                          modifyColumns     = { this.addActions.bind(this) }
-                                          onPositionDelete  = { this.onPositionDelete.bind(this) }
-                                          onPositionUpdate  = { this.onPositionUpdate.bind(this) } />
+                      <ConfigurableTable  isProcessing            = { false }
+                                          config                  = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
+                                          data                    = { this.props.positions.items }
+                                          isEditable              = { this.props.isEditable }
+                                          isPersonalizationActive = { this.props.configs.isPersonalizationActive }
+                                          dispatch                = { this.props.dispatch }
+                                          modifyColumns           = { this.addActions.bind(this) }
+                                          onPositionDelete        = { this.onPositionDelete.bind(this) }
+                                          onPositionUpdate        = { this.onPositionUpdate.bind(this) } />
                   </Col>
               </Row>
           </Spin>
         </div>);
   } 
 }
+
+export default PositionsConainer;

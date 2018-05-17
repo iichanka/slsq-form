@@ -198,14 +198,15 @@ export default class SearchContainer extends Component {
                         key       = 'RFR'
                         className = 'searchPanelTabsFull'>
                 
-                <ConfigurableTable isProcessing       = { this.props.isSearching }
-                                   config             = { this.rfrConfig }
-                                   data               = { this.props.results.remnants.map( r => { r.itemType = 'RFR'; return r; }) }
-                                   isEditable         = { this.props.isEditable }
-                                   dispatch           = { this.props.dispatch }
-                                   modifyColumns      = { this.addActions.bind(this) } 
-                                   onAddClick         = { this.onAddClick.bind(this) }
-                                   scrollHeight       = { 217 } />
+                <ConfigurableTable isProcessing             = { this.props.isSearching }
+                                   config                   = { this.rfrConfig }
+                                   data                     = { this.props.results.remnants.map( r => { r.itemType = 'RFR'; return r; }) }
+                                   isEditable               = { this.props.isEditable }
+                                   isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
+                                   dispatch                 = { this.props.dispatch }
+                                   modifyColumns            = { this.addActions.bind(this) } 
+                                   onAddClick               = { this.onAddClick.bind(this) }
+                                   scrollHeight             = { 217 } />
 
               </TabPane>
 

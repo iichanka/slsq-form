@@ -18,15 +18,22 @@ export const ConfigEditorButtons = ( {isPersonalizationActive, isConfiguratorVis
       onClick = { event => { dispatch(togglePersonalizationActive()); } }
       style   = {{ top: -2 }}/>;
     
+  let configurationButton = isPersonalizationActive ?
+    <Button 
+      type    = 'primary' 
+      icon    = 'setting' 
+      style   = {{ top: -2 }}
+      disabled /> :
+    <Button 
+      type    = 'primary' 
+      icon    = 'setting' 
+      onClick = { event => { dispatch(toggleConfiguratorVisible()); } }
+      style   = {{ top: -2 }}/>;
 
   return(
     <ButtonGroup>
       { personalizationButton }
-      <Button 
-        type    = 'primary' 
-        icon    = 'setting' 
-        onClick = { event => { dispatch(toggleConfiguratorVisible()); } }
-        style   = {{ top: -2 }}/>  
+      { configurationButton }
     </ButtonGroup>
   );
 }
