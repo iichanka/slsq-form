@@ -63,6 +63,7 @@ export default class ConfigurableTable extends React.Component {
     const that = this;
     this.dragConfig = {
       onDragEnd(fromIndex, toIndex) {
+        console.log('onDragEnd');
         const columns = that.state.columns;
         const item = columns.splice(fromIndex, 1)[0];
         columns.splice(toIndex, 0, item);
@@ -158,7 +159,7 @@ export default class ConfigurableTable extends React.Component {
               console.log('onHeaderCell', cell);
               return {
                 width: cell.width,
-                onResize: this.onColumnResize(index),
+                onResize: this.onColumnResize(index).bind(this),
               }
             };
 

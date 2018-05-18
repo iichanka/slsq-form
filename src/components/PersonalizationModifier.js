@@ -9,9 +9,12 @@ export const PersonalizationModifier = ( {isPersonalizationActive, components, c
         { React.cloneElement(children, { components: components }) }
       </ReactDragListView.DragColumn>
     ); */
-    return React.cloneElement(children, { components: components });
-  }
 
+    return(
+      <div>
+      { React.cloneElement(children, { components: components }) }
+      </div>);
+  }
   return children;  
 }
 
