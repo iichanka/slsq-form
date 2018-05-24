@@ -2,6 +2,8 @@ import { P_REQUEST_ITEMS }      from '../../actions/positions/main';
 import { P_RECEIVE_ITEMS }      from '../../actions/positions/main';
 import { P_END_REQUEST_ITEM }   from '../../actions/positions/main';
 import { P_LOCAL_UPDATE_ITEM }  from '../../actions/positions/main';
+import { P_UPDATE_ITEMS }       from '../../actions/positions/main';
+import { P_DELETE_ITEMS }       from '../../actions/positions/main';
 
 const isLoading = (state = false, action) => {
     switch(action.type)
@@ -24,22 +26,36 @@ const isLoading = (state = false, action) => {
     }
 }
 
+const clearItems = (items = []) => {
+  return items.map( item => {
+    item.quantity   = item.quantity.trim().replace(/\./g,'').replace('.','').replace(',','.');
+    item.price      = item.price.trim().replace(/\./g,'').replace('.','').replace(',','.');
+    item.sum        = item.sum.trim().replace(/\./g,'').replace('.','').replace(',','.');
+    return item;
+  });
+}
+
 const items = (state = [], action) => {
     switch(action.type)
     {
         case P_RECEIVE_ITEMS:
         {
-            return action.items.map( item => {
-                item.quantity   = item.quantity.trim().replace(/\./g,'').replace('.','').replace(',','.');
-                item.price      = item.price.trim().replace(/\./g,'').replace('.','').replace(',','.');
-                item.sum        = item.sum.trim().replace(/\./g,'').replace('.','').replace(',','.');
-                return item;
-            });
+            return clearItems(action.items);
         }
 
         case P_LOCAL_UPDATE_ITEM:
         {
             return localUpdateItem(state, action);
+        }
+
+        case P_UPDATE_ITEMS:
+        {
+            return updateItems(state, action);
+        }
+
+        case P_DELETE_ITEMS:
+        {
+            return deleteItems(state, action);
         }
 
         default:
@@ -50,16 +66,55 @@ const items = (state = [], action) => {
 }
 
 const localUpdateItem = (items = [], action) => {
-  let updatedItemsList = items.map( item => {
+  return items.map( item => {
     if(item.guid === action.item.guid)
     {
       item = {...action.item};
     }
     return item;
   });
+}
 
-  console.log('reducers.positions.main.localUpdateItem(oldItems, action, newItems)', items, action, updatedItemsList);
-  return updatedItemsList;
+const updateItems = (items = [], action) => {
+  let newItems      = items.map(item => item);
+  let updatedItems  = clearItems(action.items);
+
+  let found         = false;
+
+  console.log('updateItems(newItems)', newItems);
+    
+  updatedItems.map(updatedItem => {
+    found = false;
+    for(let i = 0; i < newItems.length; i++)
+    {
+      console.log('updateItems(newItems[i], updatedItem)', newItems[i], updatedItem);
+      if(newItems[i].guid === updatedItem.guid)
+      {
+        newItems[i] = updatedItem;
+        found = true;
+        break;
+      }
+    }
+
+    if(!found)
+    {
+      newItems.push(updatedItem);
+    }
+  });
+
+  return newItems;
+}
+
+
+const deleteItems = (items = [], action) => {
+    return items.map(item => {
+        let needSaveItem = action.items.find(delItem => delItem.guid === item.guid) === undefined;
+        if(!needSaveItem)
+        {
+            return null;
+        }
+        return item;
+    }).filter(item => !!item);
 }
 
 

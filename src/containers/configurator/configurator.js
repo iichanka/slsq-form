@@ -61,8 +61,12 @@ export default class Configurator extends React.Component {
   }
 
   handleChange = (targetKeys) => {
+    const { onTargetKeysChange } = this.props;
     console.log('containers.configurator.configurator.handleChange[targetKeys]', targetKeys);
-    this.props.onTargetKeysChange(targetKeys);
+    if(onTargetKeysChange)
+    {
+      onTargetKeysChange(targetKeys);
+    }
     this.setState({ targetKeys });
   }
 

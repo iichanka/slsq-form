@@ -50,10 +50,14 @@ export default class ConfigurableTable extends React.Component {
     modifyColumns:            PropTypes.func,
     onPositionDelete:         PropTypes.func,
     onPositionUpdate:         PropTypes.func,
+    onPositionsUpdateAll:     PropTypes.func,
     onAddClick:               PropTypes.func,
     scrollWidth:              PropTypes.any,
     scrollHeight:             PropTypes.any,
   }
+
+  filters = [];
+  sorters = [];
 
   constructor(props)
   {
@@ -99,11 +103,9 @@ export default class ConfigurableTable extends React.Component {
     
 
     return {
-      columns: this.getColumns(config, data, isEditable),
       pagination: this.getPagination(config),
       scroll: this.getScroll(newProps),
       isPersonalizationActive,
-      data,
       components: {
         header: {
           cell: ResizableColumn,
@@ -112,7 +114,92 @@ export default class ConfigurableTable extends React.Component {
     };
   }
 
-  getScroll({ scrollWidth, scrollHeight, ...props})
+  filterData = () =>
+  {
+    const { data } = this.props;
+    
+    if(data)
+    {
+      let filteredData = data.map(record => record);
+      
+      for(let field in this.filters)
+      {
+        if(this.filters[field].active === true)
+        {
+          filteredData = filteredData.map(record => {
+            if(this.filters[field].selectedValues.indexOf(record[field]) === -1)
+            {
+              return null;
+            }
+            return record;
+          }).filter(record => !!record);
+        }       
+
+        if(this.sorters[field] === 'asc')
+        {
+          filteredData.sort((a, b) => {
+            if(a[field] < b[field]) return -1;
+            if(a[field] > b[field]) return 1;
+            return 0;
+          });
+        }
+
+        if(this.sorters[field] === 'desc')
+        {
+          filteredData.sort((a, b) => {
+            if(a[field] > b[field]) return -1;
+            if(a[field] < b[field]) return 1;
+            return 0;
+          });
+        }
+      }
+
+      return filteredData;
+    }
+    return null;
+  }
+
+
+  updateFilters = (data) =>
+  {
+    let columns = [];
+    if(this.props.config)
+    {
+      columns = this.props.config.columns;
+    }
+
+    if(data && columns)
+    {
+      columns.map(column => {
+        if(!this.filters[column.dataIndex])
+        {
+          this.filters[column.dataIndex] = { };
+        }
+
+        if(!this.filters[column.dataIndex].active)
+        {
+          if(!this.filters[column.dataIndex].selectedValues)
+          {
+            this.filters[column.dataIndex].selectedValues = [];
+          }
+
+          this.filters[column.dataIndex].allValues = [];
+
+          data.map(record => {
+            if(this.filters[column.dataIndex].allValues.indexOf(record[column.dataIndex]) === -1)
+            {
+              this.filters[column.dataIndex].allValues.push(record[column.dataIndex]);
+            }
+          })
+
+          this.filters[column.dataIndex].allValues.sort((a, b) => a > b );    
+        }
+      })
+    }
+  }
+
+
+  getScroll({ scrollWidth, scrollHeight})
   {
     return {
       x: scrollWidth  ? scrollWidth  : '100%',
@@ -120,8 +207,10 @@ export default class ConfigurableTable extends React.Component {
     };
   }
 
-  getColumns(config, data, isEditable)
+  getColumns()
   {
+    const {config, data, isEditable} = this.props;
+
     if(config && data)
     {
       if(config.columns && config.columns.length > 0)
@@ -182,15 +271,131 @@ export default class ConfigurableTable extends React.Component {
 
   simpleFieldRender(text, record, column)
   {
+    if(!record.allowedValues)
+    {
+      record.allowedValues = [];
+    }
+    let allowedValues     = record.allowedValues.find( allowedValuesForFields => allowedValuesForFields.fieldName === column.dataIndex);
+    let replacmentValue   = text;  
+    if(allowedValues)
+    {
+      allowedValues.values.find( valueRange => {
+        if(valueRange.low === text)
+        {
+          replacmentValue = valueRange.lowTitle;
+          return true;
+        }
+        return false;
+      });
+    }
     return (
       <TableCell column = { column } >
-        { text }
+        { replacmentValue }
       </TableCell> );
   } 
 
+  onSorterToogle = (column, type) => {
+    if(this.sorters[column.dataIndex] === type)
+    {
+      this.sorters[column.dataIndex] = '';
+    }
+    else
+    {
+      this.sorters[column.dataIndex] = type;
+    }
+
+    this.forceUpdate();
+  }
+
+  getSortButton = (column, type) => {
+    let label = '';
+    let icon  = ''
+    switch(type)
+    {
+      case 'asc'  : { label = 'Сортировать от А до Я'; icon = 'arrow-down'; break; }
+      case 'desc' : { label = 'Сортировать от Я до А'; icon = 'arrow-up';   break; }
+    }
+
+    if(this.sorters[column.dataIndex] === type)
+    {
+      return(
+        <Button style = {{ width: '100%', marginTop: 5 }}
+                size = 'small'
+                icon = { icon }
+                type = 'primary'
+                onClick = { event => { this.onSorterToogle(column, type) } }>
+          { label }
+        </Button>
+      )
+    }
+    return(
+      <Button style = {{ width: '100%', marginTop: 5 }}
+              size = 'small'
+              icon = { icon }
+              onClick = { event => { this.onSorterToogle(column, type) } }>
+        { label }
+      </Button>);
+  }
+
   buildDropdownForColumn(column, data)
   {
-    return null;
+    if(column.searchable)
+    return(
+      <div className="custom-filter-dropdown">
+        <Row>
+          <Col span = { 24 }>
+            { this.getSortButton(column, 'asc') }
+          </Col>
+        </Row>
+        <Row>
+          <Col span = { 24 } >
+          { this.getSortButton(column, 'desc') }
+          </Col>
+        </Row>
+{/*         <Row>
+          <Col span = { 24 } >
+            <Search
+              style       = {{ marginTop: 5 }}
+              placeholder = "Поиск..."
+              //onSearch    = { value => { aviableValues.push(value); this.filters.push({ field: column.dataIndex, values: aviableValues}) } }
+              size        = 'small'
+              enterButton
+            />
+          </Col>
+        </Row> */}
+        <Row>
+          <Col span = { 24 } className = 'scrollable-y' style = {{ maxHeight: 250 }}>
+            { 
+              this.filters[column.dataIndex].allValues.map( (value) => 
+              <Row>
+                <Col span = { 24 } >
+                  <Checkbox checked = { this.filters[column.dataIndex].selectedValues.indexOf(value) !== -1 } 
+                            onChange = { event => { this.onFilterSelect(column.dataIndex, value, event.target.checked) } }>
+                    { value }
+                  </Checkbox>
+                </Col>
+              </Row>
+              )
+            }
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  onFilterSelect = (field, value, checked) =>
+  {
+    if(checked)
+    {
+      this.filters[field].selectedValues.push(value);
+      this.filters[field].active = true;
+    }
+    else
+    {
+      this.filters[field].selectedValues.splice(this.filters[field].selectedValues.indexOf(value), 1);
+      this.filters[field].active = this.filters[field].selectedValues.length !== 0;
+    }
+    this.forceUpdate();
   }
 
   onFilterDropdownVisibleChange(visible, columnName)
@@ -289,8 +494,8 @@ export default class ConfigurableTable extends React.Component {
 
 
   onFieldChange = (record, column, newValue) => {
-    const { dispatch } = this.props;
-    const { data } = this.state;
+    const { dispatch, data } = this.props;
+    
 
     console.log('containers.configurableTable.onFieldChange()[record, column, newValue]', record, column, newValue);
     for(let i = 0; i < data.length; i++)
@@ -321,7 +526,7 @@ export default class ConfigurableTable extends React.Component {
   {
     let applyed = false;
     try {
-      applyed = this.state.filter[columnName].applyed;
+      applyed = this.filters[columnName].active || this.sorters[columnName] === 'asc' || this.sorters[columnName] === 'desc';
     } catch (error) {
     }
     
@@ -361,9 +566,16 @@ export default class ConfigurableTable extends React.Component {
 
   getFooterForTable(currentPageData)
   {  
-    return(
-      <Button type = "primary" icon = 'save' style = {{ float: 'right', top: -8 }} >Сохранить все изменения</Button>
-    );
+    if(this.props.onPositionsUpdateAll)
+    {
+      return(
+        <Button 
+          type = "primary" 
+          icon = 'save' 
+          onClick = { event => { this.props.onPositionsUpdateAll(this.props.data.map(item => item.isModified ? item : null).filter(item => !!item)) } }
+          style = {{ float: 'right', top: -8 }} >Сохранить все изменения</Button>
+      );
+    }
   }
 
   getRowClassName(record, index)
@@ -376,13 +588,21 @@ export default class ConfigurableTable extends React.Component {
   }
 
   render() {
-    console.log('containers.configurableTable.render(state)', this.state);
+    
 
-    if(this.state.data && this.state.data.length > 0)
+    let data = this.filterData();
+    this.updateFilters(data);
+    let columns = this.getColumns();
+
+    console.log('containers.configurableTable.render(state)', this.state);
+    console.log('containers.configurableTable.render(data, filteredData)', this.props.data, data);
+    console.log('containers.configurableTable.render(sorters, filters)', this.sorters, this.filters);
+
+    if(data.length > 0)
     {
       if( this.props.isEditable && this.props.config.type === 'POS' )
       {
-        if(this.isModified(this.state.data))
+        if(this.isModified(data))
         {
           return(
             <PersonalizationModifier 
@@ -390,8 +610,8 @@ export default class ConfigurableTable extends React.Component {
               components              = { this.state.components }
               {...this.dragConfig} >
               <Table 
-                columns      = { this.state.columns }
-                dataSource   = { this.state.data }
+                columns      = { columns }
+                dataSource   = { data }
                 size         = 'small'
                 scroll       = { this.state.scroll } 
                 loading      = { this.props.isProcessing }
@@ -409,8 +629,8 @@ export default class ConfigurableTable extends React.Component {
             components              = { this.state.components }
             {...this.dragConfig} >
             <Table 
-              columns      = { this.state.columns }
-              dataSource   = { this.state.data }
+              columns      = { columns }
+              dataSource   = { data }
               size         = 'small'
               scroll       = { this.state.scroll } 
               loading      = { this.props.isProcessing }
@@ -421,7 +641,6 @@ export default class ConfigurableTable extends React.Component {
           </PersonalizationModifier>
         );
       }
-      let columns = this.getColumns(this.props.config, this.props.data, this.props.isEditable);
       return(
         <PersonalizationModifier 
           isPersonalizationActive = { this.props.isPersonalizationActive }
@@ -429,7 +648,7 @@ export default class ConfigurableTable extends React.Component {
           {...this.dragConfig} >
           <Table 
             columns      = { columns }
-            dataSource   = { this.state.data }
+            dataSource   = { data }
             size         = 'small'
             scroll       = { this.state.scroll } 
             loading      = { this.props.isProcessing }

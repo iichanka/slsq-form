@@ -4,6 +4,8 @@ import { Row, Col, Button, Spin, Popover, Divider }         from 'antd';
 import ConfigurableTable                                    from '../configurableTable';
 import { loadItems }                                        from '../../actions/positions/main';
 import { calcPositionSum }                                  from '../../actions/positions/calcPositionsSum';
+import { updatePositions }                                  from '../../actions/positions/updatePositions';
+import { deletePositions }                                  from '../../actions/positions/deletePositions';
 
 export class PositionsConainer extends React.Component {
   static propTypes = {   
@@ -31,12 +33,27 @@ export class PositionsConainer extends React.Component {
 
   onPositionDelete(record)
   {
+    const { dispatch } = this.props
+    let records = [];
+    records.push(record);
 
+    dispatch(deletePositions(records));
   }
 
   onPositionUpdate(record)
   {
+    const { dispatch } = this.props
+    let records = [];
+    records.push(record);
 
+    dispatch(updatePositions(records));
+  }
+
+  onPositionsUpdateAll(records)
+  {
+    const { dispatch } = this.props
+    console.log('onPositionsUpdateAll(records)', records);
+    dispatch(updatePositions(records));
   }
 
   addActions(config, data, isEditable, columns = [])
@@ -122,7 +139,8 @@ export class PositionsConainer extends React.Component {
                                           dispatch                = { this.props.dispatch }
                                           modifyColumns           = { this.addActions.bind(this) }
                                           onPositionDelete        = { this.onPositionDelete.bind(this) }
-                                          onPositionUpdate        = { this.onPositionUpdate.bind(this) } />
+                                          onPositionUpdate        = { this.onPositionUpdate.bind(this) }
+                                          onPositionsUpdateAll    = { this.onPositionsUpdateAll.bind(this) } />
                   </Col>
               </Row>
           </Spin>

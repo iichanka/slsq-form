@@ -1,4 +1,4 @@
-/* export const clone = function(element) {
+export const clone_ = function(element) {
   let result = (element instanceof Array) ? [] : {};
   for (let key in element) {
     if (element[key])
@@ -6,7 +6,7 @@
       if(typeof element[key] == "object")
       {
         if(element[key])
-        result[key] = clone(element[key]);
+        result[key] = clone_(element[key]);
       } 
       else 
       {
@@ -15,7 +15,7 @@
     }
   }
   return result;
-}; */
+};
 
 
 export const clone = (element, references = [], cachedResults = []) => {
@@ -58,5 +58,6 @@ export const isEqual = (a,b) => {
 
 export default {
   isEqual,
-  clone
+  clone,
+  clone_
 }

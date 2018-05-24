@@ -3,7 +3,6 @@ import { Modal, Tabs, Spin }                                from 'antd';
 import PropTypes                                            from 'prop-types';
 import Configurator                                         from './configurator';
 import { updateConfigs }                                    from '../../actions/configs/main';
-import { clone }                                            from '../../utils';
 
 import { toggleConfiguratorVisible }                        from '../../actions/configs/main'
 
@@ -61,8 +60,7 @@ export class ConfiguratorPanel extends React.Component {
   }
 
   onTargetKayesChange = (type, targetKeys = []) => {
-    let visibleFields   = clone(this.state.visibleFields);
-    let allFields       = clone(this.state.allFields);
+    let { visibleFields, allFields }   = this.state;
     let orderIndex      = 0;
 
     console.log('containers.configurator.panel.onTargetKayesChange[visibleFields, allFields, targetKeys]', visibleFields, allFields, targetKeys);

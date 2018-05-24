@@ -42,7 +42,7 @@ export const TableCell = ({ children, style, className, column, action, ...props
       return children;
     }
   
-    needPopOver = (width / length) < 10;
+    needPopOver = (width / length) < 8;
   
     if(needPopOver)
     {
