@@ -1,5 +1,5 @@
 import React                                                from 'react';
-import { Transfer, InputNumber, Row, Col }                  from 'antd';
+import { Transfer, InputNumber, Row, Col, Button }          from 'antd';
 import PropTypes                                            from 'prop-types';
 
 const initialState = {
@@ -110,6 +110,16 @@ export default class Configurator extends React.Component {
                 height: 300,
               }}
             />
+          </Col>
+        </Row>
+        <Row>
+          <Col span = { 24 } >
+            <Button 
+              style = {{ float: 'right', margin: 15 }} 
+              icon = 'reload' 
+              type = 'danger'>
+              Сбросить конфигурацию
+            </Button>
           </Col>
         </Row>
       </div>

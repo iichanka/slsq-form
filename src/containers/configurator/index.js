@@ -181,14 +181,14 @@ export class ConfiguratorPanel extends React.Component {
           onCancel        = { this.onClose }
           confirmLoading  = { this.props.isProcessing }
           okText          = 'Сохранить'
-          bodyStyle       = {{ width: 700, height: 355 }}
+          bodyStyle       = {{ width: 700, height: 405 }}
           style           = {{ minWidth: 700 }}
         >
           <Spin spinning = { this.props.isProcessing }>
             <Tabs
               defaultActiveKey = "RFR"
               tabPosition      = 'left'
-              style            = {{ height: 355 }}
+              style            = {{ height: 405 }}
               tabBarStyle      = {{ textAlign: "left !important" }}
             >
               <TabPane 
