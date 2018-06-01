@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "npm": "^6.0.1",
+    "npm": "^6.1.0",
     "prop-types": "^15.5.10",
     "react": "^15.5.0",
     "react-dom": "^15.5.0",

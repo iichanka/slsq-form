@@ -32,7 +32,7 @@ export default class ClassificatorMenu extends React.Component {
     {
       if(item.key)
       {
-        let itemID = parseInt(item.key);
+        let itemID = parseInt(item.key, 10);
         dispatch(loadItemsIfNeeded(itemID));
         dispatch(selectClass(itemID));
       }

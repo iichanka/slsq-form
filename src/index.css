@@ -156,3 +156,25 @@
 .highlighted-row {
     background-color:rgb(230, 247, 255);
 }
+
+
+/* li.ant-menu-submenu.ant-menu-submenu-inline.submenu-selected.ant-menu-submenu-open */
+li.ant-menu-submenu.ant-menu-submenu-inline.submenu-selected
+{
+    background-color: rgb(230, 247, 255) !important;
+    color: rgb(24, 144, 255) !important;
+    position: relative;
+}
+
+.submenu-selected:after
+{
+    border-right-color: rgb(24, 144, 255);
+    border-right-style: solid;
+    border-right-width: 3px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 32px;
+    width: 3px;
+    content: "";
+}

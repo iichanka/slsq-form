@@ -12,6 +12,8 @@ import { clone }                                    from '../../utils';
 import { addPositionItem }                          from '../../actions/positions/addPosition';
 import { TableCell, ConfigEditorButtons }           from '../../components';
 
+import { HierarchyMenu }                            from './criterias/hierarchy';
+
 
 const { TabPane } = Tabs;
 
@@ -160,9 +162,11 @@ export default class SearchContainer extends Component {
                          key        = 'SBH' 
                          className  = 'searchPanelTabs' >
 
-                  <Alert message  = 'В разработке'
-                         type     = 'info'
-                         style    = {{ margin: 8 }} />
+                  <HierarchyMenu
+                    isLoading         = { this.props.criterias.hierarchy.isLoading }
+                    items             = { this.props.criterias.hierarchy.items }
+                    selectedCategory  = { this.props.criterias.hierarchy.selectedCategoryItemID }
+                    dispatch          = { this.props.dispatch } />
 
                 </TabPane>
 
