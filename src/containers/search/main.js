@@ -34,6 +34,17 @@ export default class SearchContainer extends Component {
       type: 'RFR',
       columns: [],
     };
+
+    this.rfitConfig = {
+      type: 'RFIT',
+      columns: [],
+    };
+
+    this.rfmConfig = {
+      type: 'RFM',
+      columns: [],
+    };
+
     this.saveConfigs(props.configs);
   }
 
@@ -63,6 +74,17 @@ export default class SearchContainer extends Component {
         case 'RFR':
         {
           this.rfrConfig = config;
+          break;
+        }
+        case 'RFIT':
+        {
+          this.rfitConfig = config;
+          break;
+        }
+        case 'RFM':
+        {
+          this.rfmConfig = config;
+          break;
         }
       }
     })
@@ -91,6 +113,17 @@ export default class SearchContainer extends Component {
         case 'RFR':
         {
           dispatch(addPositionItem({ remnants: {...record, count: record.countInputReference.input.value } }));
+          break;
+        }
+        case 'RFIT':
+        {
+          dispatch(addPositionItem({ inTransit: {...record, count: record.countInputReference.input.value } }));
+          break;
+        }
+        case 'RFM':
+        {
+          dispatch(addPositionItem({ materilas: {...record, count: record.countInputReference.input.value } }));
+          break;
         }
       }
     }
@@ -204,7 +237,7 @@ export default class SearchContainer extends Component {
                 
                 <ConfigurableTable isProcessing             = { this.props.isSearching }
                                    config                   = { this.rfrConfig }
-                                   data                     = { this.props.results.remnants.map( r => { r.itemType = 'RFR'; return r; }) }
+                                   data                     = { this.props.results.remnants.map( r => r ) }
                                    isEditable               = { this.props.isEditable }
                                    isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
                                    dispatch                 = { this.props.dispatch }
@@ -218,9 +251,15 @@ export default class SearchContainer extends Component {
                        key        = 'RFIT' 
                        className  = 'searchPanelTabsFull' >
 
-                <Alert message  = 'В разработке'
-                       type     = 'info'
-                       style    = {{ margin: 8 }} />
+                <ConfigurableTable isProcessing             = { this.props.isSearching }
+                                   config                   = { this.rfitConfig }
+                                   data                     = { this.props.results.inTransit.map( r => r ) }
+                                   isEditable               = { this.props.isEditable }
+                                   isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
+                                   dispatch                 = { this.props.dispatch }
+                                   modifyColumns            = { this.addActions.bind(this) } 
+                                   onAddClick               = { this.onAddClick.bind(this) }
+                                   scrollHeight             = { 217 } />
 
               </TabPane>
 

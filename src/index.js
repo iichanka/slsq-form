@@ -16,10 +16,23 @@ if (process.env.NODE_ENV !== 'production') {
   middleware.push(createLogger())
 }
 
+
+
+function ready(callback){
+  // in case the document is already rendered
+  if (document.readyState!='loading') callback();
+  // modern browsers
+  else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback);
+  // IE <= 8
+  else document.attachEvent('onreadystatechange', function(){
+      if (document.readyState=='complete') callback();
+  });
+}
+
 const store = createStore(
   rootReducer,
   applyMiddleware(...middleware)
-)
+);
 
 render(
   <Provider store={store}>
@@ -27,7 +40,9 @@ render(
       <Form />
     </LocaleProvider>
   </Provider>,
-  document.getElementById('root')
-)
+  document.getElementById('customSLSQ')
+);
+
+
 
 
