@@ -105,19 +105,19 @@
 
 .small-table-line
 {
-    line-height: 28px;
+    line-height: 22px;
 }
 
 .ant-menu-submenu-title
 {
-    line-height: 28px !important;
-    height: 28px !important;
+    line-height: 22px !important;
+    height: 22px !important;
 }
 
 .ant-menu-item
 {
-    line-height: 28px !important;
-    height: 28px !important;
+    line-height: 22px !important;
+    height: 22px !important;
 }
 
 .ant-table-small .ant-table-content .ant-table-scroll .ant-table-body table .ant-table-tbody tr td
@@ -128,7 +128,7 @@
 
 .ant-table-fixed
 {
-    height: 34px !important;
+    height: 22px !important;
 }
 
 .ant-modal-body
@@ -137,24 +137,24 @@
 }
 
 .custom-filter-dropdown {
-    padding: 8px;
-    border-radius: 6px;
-    background: #fff;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
-    width: 250px;
-  }
+  padding: 8px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
+  width: 250px;
+}
   
-  .custom-filter-dropdown input {
-    width: 130px;
-    margin-right: 8px;
-  }
+.custom-filter-dropdown input {
+  width: 130px;
+  margin-right: 8px;
+}
 
-  .ant-tabs-vertical.ant-tabs-left .ant-tabs-bar .ant-tabs-tab {
-    text-align: left !important;
+.ant-tabs-vertical.ant-tabs-left .ant-tabs-bar .ant-tabs-tab {
+  text-align: left !important;
 }
 
 .highlighted-row {
-    background-color:rgb(230, 247, 255);
+  background-color:rgb(230, 247, 255);
 }
 
 
@@ -177,4 +177,9 @@ li.ant-menu-submenu.ant-menu-submenu-inline.submenu-selected
     height: 32px;
     width: 3px;
     content: "";
+}
+
+.my-menu
+{
+  margin: 0;
 }
