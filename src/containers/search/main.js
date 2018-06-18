@@ -198,7 +198,6 @@ export default class SearchContainer extends Component {
                   <HierarchyMenu
                     isLoading         = { this.props.criterias.hierarchy.isLoading }
                     items             = { this.props.criterias.hierarchy.items }
-                    selectedCategory  = { this.props.criterias.hierarchy.selectedCategoryItemID }
                     dispatch          = { this.props.dispatch } />
 
                 </TabPane>

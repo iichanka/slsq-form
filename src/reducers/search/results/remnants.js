@@ -7,7 +7,7 @@ export const remnants = (state = [], action) => {
         {
             return action.results.rfr.map((record, index) => {
                 record.itemType = 'RFR';
-                record.key      = index + '';
+                record.key      = index.toString();
                 return record;
             });
         }

@@ -1,15 +1,14 @@
 import React                                  from 'react';
 import PropTypes                              from 'prop-types';
-import { Menu, Spin, Tooltip }                from 'antd';
+import { Menu, Spin, Checkbox }               from 'antd';
 import { loadItemsIfNeeded, selectCategory }  from '../../../../actions/search/criterias/hierarchy';
 
-const SubMenu = Menu.SubMenu;
+const SubMenu       = Menu.SubMenu;
 
 class HierarchyMenu extends React.Component {
   static propTypes = {
     isLoading:        PropTypes.bool.isRequired,
     items:            PropTypes.array.isRequired,
-    selectedCategory: PropTypes.number.isRequired,
     dispatch:         PropTypes.func.isRequired,
   }
 
@@ -25,7 +24,7 @@ class HierarchyMenu extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(!this.props.items || ( this.props.items.length == 0 && nextProps.items.length != 0))
+    if(!this.props.items || ( this.props.items.length === 0 && nextProps.items.length !== 0))
     {
       if(nextProps.items)
       {
@@ -49,10 +48,9 @@ class HierarchyMenu extends React.Component {
 
 
   onOpenChange = (openKeys) => {
-    const { dispatch } = this.props;
+    const { dispatch, selectedCategoryItemIDs } = this.props;
     let latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1);
     let latestOpenKeyInt = parseInt(openKeys.find(key => this.state.openKeys.indexOf(key) === -1));
-    dispatch(selectCategory(latestOpenKeyInt));
 
     if(latestOpenKey)
     {
@@ -61,11 +59,12 @@ class HierarchyMenu extends React.Component {
         openKeys
       });
     }
-    else {
-      this.setState({
-        openKeys: []
-      });
-    }
+  }
+
+  onCheck = (item, checked) => 
+  {
+    const { dispatch } = this.props;
+    dispatch(selectCategory(item.id));
   }
 
   getChilds = (itemID) =>
@@ -75,17 +74,24 @@ class HierarchyMenu extends React.Component {
     if(subMenuItems.length > 0)
     {
       subMenuItems.map(item => {
+        let className = 'my-menu';
+
+        if(item.selected)
+        {
+          className = 'my-menu submenu-selected';
+        }
+
         if(item.haveChilds)
         {
-          let className = 'my-menu';
-          if(item.id === this.props.selectedCategory)
-          {
-            className = 'my-menu submenu-selected';
-          }
           result.push(
             <SubMenu 
               key   = { item.id } 
-              title = { item.title }
+              title = { <Checkbox 
+                          indeterminate = { item.indeterminate }
+                          checked       = { item.selected } 
+                          onChange      = { e => { e.preventDefault(); this.onCheck(item, e.target.checked) } } >
+                          { item.title }
+                        </Checkbox> }
               className = { className } >
               { this.getChilds(item.id) }
             </SubMenu>);
@@ -96,13 +102,16 @@ class HierarchyMenu extends React.Component {
             <Menu.Item 
               key     = { item.id } 
               style   = {{ margin: 0 }} 
-              className = 'my-menu'>
-              { item.title }
+              className = { className }>
+                <Checkbox 
+                  checked       = { item.selected } 
+                  onChange      = { e => { e.preventDefault(); this.onCheck(item, e.target.checked) } }>
+                  { item.title }
+                </Checkbox>
             </Menu.Item>);
         }
       })
     }
-    console.log('getChilds(result)', result);
     return result;
   }
 
@@ -111,13 +120,12 @@ class HierarchyMenu extends React.Component {
       <Spin spinning={this.props.isLoading}>
         <Menu
           mode="inline"
-          openKeys={this.state.openKeys}
+          /* openKeys={this.state.openKeys} */
           onOpenChange={this.onOpenChange}
-          onSelect={this.onSelect}
+          /* onSelect={this.onSelect} */
           style={{ margin: 0 }}
           className = 'scrollable-y searchPanelTabHeight'
           inlineIndent = "8"
-          selectedKeys = { [this.props.selectedCategory.toString()] }
         >
           { this.getChilds(-1) }
         </Menu>

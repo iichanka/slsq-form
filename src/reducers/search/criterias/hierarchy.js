@@ -8,7 +8,6 @@ import {
   
   const hierarchyInitState = {
     isLoading: false,
-    selectedCategoryItemID: -2, //value that can't exist as parent ID in item
     items: [],
   }
   
@@ -17,11 +16,13 @@ import {
     let newItems = action.items || [];
     let result = [];
     let lastID = oldItems.length;
+    let checkedAndIndeterminate = false;
   
     result = oldItems.map(item => {
       if(item.id === action.itemID)
       {
         item.childsLoaded = true;
+        checkedAndIndeterminate = item.selected && !item.indeterminate;
       }
       return item;
     });
@@ -30,6 +31,17 @@ import {
       ...state,
       isLoading: false,
       items: result.concat(newItems.map(item => {
+        if(checkedAndIndeterminate)
+        {
+          item.selected = true;
+          item.indeterminate = item.haveChilds ? false : true;
+        }
+        else
+        {
+          item.selected       = false;
+          item.indeterminate  = false;
+        }
+
         item.id = lastID;
         item.parent = action.itemID;
         lastID ++;
@@ -45,6 +57,18 @@ import {
       ...state,
       isLoading: true
     }
+  }
+
+  const toggleItem = (items = [], selectedItemId) =>
+  {
+    return items.map( item => {
+      if(item.id === selectedItemId)
+      {
+        item.selected       = !item.selected;
+        item.indeterminate  = !item.selected;
+      }
+      return item;
+    })
   }
   
   export const hierarchy = (state = hierarchyInitState, action) => {
@@ -65,7 +89,7 @@ import {
       {
         return {
           ...state,
-          selectedCategoryItemID: action.itemID
+          items: toggleItem(state.items, action.itemID)
         }
       }
   
@@ -73,7 +97,7 @@ import {
       {
         return {
           ...state,
-          selectedCategoryItemID: null,
+          selectedCategoryItemIDs: null,
         }
       }
   
@@ -83,4 +107,5 @@ import {
       }
     }
   }
+
   

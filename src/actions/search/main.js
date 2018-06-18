@@ -66,6 +66,22 @@ const getRequstForClassificator = (state = {}) => {
 }
 
 
+const getRequstForHierarchy = (state = { items: []}) => {
+    const { items } = state;
+
+    console.log('getRequstForHierarchy(state)', state);
+
+    let levels = items.map( item => {
+        return item.selected ? item: null;
+    }).filter(item => !!item);
+
+    return {
+        levels
+    }
+}
+
+
+
 const loadResults = (parameters = {}) => (dispatch, getState) =>{
     dispatch(startSearch(parameters));
     
@@ -108,6 +124,12 @@ export const search = (lastParameters = false) => (dispatch, getState) => {
         case 'SBC':
         {
             request = getRequstForClassificator(currentState.search.criterias.classificator);
+            break;
+        }
+
+        case 'SBH':
+        {
+            request = getRequstForHierarchy(currentState.search.criterias.hierarchy);
             break;
         }
     }
