@@ -266,9 +266,15 @@ export default class SearchContainer extends Component {
                        key        = 'RFM' 
                        className  = 'searchPanelTabsFull' >
                         
-                <Alert message  = 'В разработке'
-                       type     = 'info'
-                       style    = {{ margin: 8 }} />
+                <ConfigurableTable  isProcessing             = { this.props.isSearching }
+                                    config                   = { this.rfmConfig }
+                                    data                     = { this.props.results.materials.map( r => r ) }
+                                    isEditable               = { this.props.isEditable }
+                                    isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
+                                    dispatch                 = { this.props.dispatch }
+                                    modifyColumns            = { this.addActions.bind(this) } 
+                                    onAddClick               = { this.onAddClick.bind(this) }
+                                    scrollHeight             = { 217 } />
 
               </TabPane>
             </Tabs>
