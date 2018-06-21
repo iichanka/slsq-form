@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import {Row, Col, Card, Button } from 'antd';
+import { receiveEditableStatus } from '../actions/isEditable';
 
 import { load as loadConfigs }                      from '../actions/configs/main';
 import { getEditableStatus as loadStatus }          from '../actions/isEditable';
@@ -23,6 +23,16 @@ class Form extends Component {
     const { dispatch } = this.props;
     dispatch(loadConfigs());
     dispatch(loadStatus());
+    alert(document.domain );
+    window.setEditableStatus = (status) =>
+    {
+      dispatch(receiveEditableStatus(status));
+    }
+
+    document.setEditableStatus = (status) =>
+    {
+      dispatch(receiveEditableStatus(status));
+    }
   }
 
   render()

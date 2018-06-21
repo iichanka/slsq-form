@@ -27,7 +27,7 @@ const ResizeableTitle = props => {
   );
 }; */
 
-const Search = Input.Search;
+
 const Option = Select.Option;
 
 const initialState = {
@@ -241,11 +241,12 @@ export default class ConfigurableTable extends React.Component {
 
             if(column.editable && isEditable)
             {
+              console.log('hit for column', column);
               column.render = (text, record) => { return this.renderForEditableColumn(text, record, column) };
             }
 
             column.onHeaderCell = (cell) => {
-              console.log('onHeaderCell', cell);
+              //console.log('onHeaderCell', cell);
               return {
                 width: cell.width,
                 onResize: this.onColumnResize(index).bind(this),
@@ -597,6 +598,7 @@ export default class ConfigurableTable extends React.Component {
     console.log('containers.configurableTable.render(state)', this.state);
     console.log('containers.configurableTable.render(data, filteredData)', this.props.data, data);
     console.log('containers.configurableTable.render(sorters, filters)', this.sorters, this.filters);
+    console.log('containers.configurableTable.render(columns, data, state.scroll, state.pagination)', columns, data, this.state.scroll, this.state.pagination);
 
     if(data.length > 0)
     {

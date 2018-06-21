@@ -29,10 +29,14 @@ function ready(callback){
   });
 }
 
+document.domain = 'spk.ru';
+
 const store = createStore(
   rootReducer,
   applyMiddleware(...middleware)
 );
+
+
 
 render(
   <Provider store={store}>

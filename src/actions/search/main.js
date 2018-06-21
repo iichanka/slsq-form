@@ -85,10 +85,13 @@ const getRequstForHierarchy = (state = { items: []}) => {
 const loadResults = (parameters = {}) => (dispatch, getState) =>{
     dispatch(startSearch(parameters));
     
-    axios.post(localStorage.getItem('AjaxURL'), {
+    axios.post(
+        localStorage.getItem('AjaxURL'), 
+        {
           action:   'loadResults',              
           data:     parameters,
-        })
+        },
+    )
       .then(response => {
         let haveError = false;
         showMessages(response.data.messages, haveError);
@@ -102,7 +105,7 @@ const loadResults = (parameters = {}) => (dispatch, getState) =>{
       })
       .catch(function (error) {
         console.log('loadResults[error]:', error);
-        showMessages([{type: 'E', text: 'Не удалось получить результаты поиска.'}]);
+        showMessages([{type: 'E', text: 'Не удалось получить результаты поиска.' + error.message}]);
         dispatch(endSearch());
       });
 }
