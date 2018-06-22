@@ -23,7 +23,7 @@ class Form extends Component {
     const { dispatch } = this.props;
     dispatch(loadConfigs());
     dispatch(loadStatus());
-    alert(document.domain );
+    
     window.setEditableStatus = (status) =>
     {
       dispatch(receiveEditableStatus(status));

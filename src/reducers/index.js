@@ -2,9 +2,7 @@ import { header }                     from './header/main';
 import { positions }                  from './positions/main';
 import { search }                     from './search/main';
 import { configs }                    from './configs/main';
-import { F_LOAD_EDITABLE_STATUS }     from '../actions/isEditable';
 import { F_RECEIVE_EDITABLE_STATUS }  from '../actions/isEditable';
-import { F_END_LOAD_EDITABLE_STATUS } from '../actions/isEditable';
 
 const isEditable = (state = false, action) => {
   console.log('rootReducer.isEditable[action]:', action);
@@ -12,8 +10,11 @@ const isEditable = (state = false, action) => {
   {
     case F_RECEIVE_EDITABLE_STATUS:
     {
-      
-      return action.isEditable === 'true';
+      if(typeof action.isEditable === 'string')
+      {
+        return action.isEditable === 'true' ? true : false;
+      }
+      return action.isEditable;
     }
 
     default:

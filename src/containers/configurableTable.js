@@ -6,26 +6,19 @@ import {  Table, Icon, Button,
           Tooltip }                     from 'antd';
 import { localUpdateItem }              from '../actions/positions/main';
 import { TableCell }                    from '../components';
-import { PersonalizationModifier }      from '../components';
-import { ResizableColumn }              from '../components';
-import { isEqual }                      from '../utils';
+import { FixedHeader }                  from '../components';
 
 /* import { Resizable } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 
-const ResizeableTitle = props => {
-  const { onResize, width, ...restProps } = props;
+const HeaderWithFixedWidth = props => {
+  const { width, ...restProps } = props;
 
-  if (!width) {
-    return <th {...restProps} />;
+  if (width) {
+    return <th {...restProps} style = {{ maxWidth: width, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} />;
   }
-
-  return (
-    <Resizable width={width} height={0} onResize={onResize}>
-      <th {...restProps} />
-    </Resizable>
-  );
-}; */
+  return <th { ...props } />;
+};  */
 
 
 const Option = Select.Option;
@@ -58,6 +51,16 @@ export default class ConfigurableTable extends React.Component {
 
   filters = [];
   sorters = [];
+  columns = [];
+  filteredData = [];
+
+  components = {
+    header: {
+      cell: FixedHeader,
+    },
+  };
+
+  
 
   constructor(props)
   {
@@ -79,6 +82,8 @@ export default class ConfigurableTable extends React.Component {
     };
   }
 
+
+
   componentWillReceiveProps(props)
   {
     this.setState(this.getStateFromProps(props));
@@ -86,31 +91,53 @@ export default class ConfigurableTable extends React.Component {
 
   getStateFromProps = (newProps) => {
     const { config, data, isEditable, isPersonalizationActive } = newProps;
-    let oldConfig                   = {}, 
-        oldData                     = [], 
-        oldColumns                  = [], 
-        oldComponents               = {},
-        oldIsPersonalizationActive  = false;
+    let oldConfig                     = {};
+    let oldData                       = [];        
+    let oldIsPersonalizationActive    = false;
+    let oldIsEditabe                  = false;
+    let configChanged                 = false;
+    let dataChanged                   = false;
+    let personalizationStatusChanged  = false;
+    let editableStatusChanged         = false;
     
+
     if(this.state)
     {
       oldConfig                   = this.state.config;
       oldData                     = this.state.data;
       oldIsPersonalizationActive  = this.state.isPersonalizationActive;
-      oldColumns                  = this.state.columns;
-      oldComponents               = this.state.components;
+      oldIsEditabe                = this.state.isEditable;
+    }
+
+    var seen = [];
+
+    let compareCb = (key, val) => 
+    {
+      if (val != null && typeof val == "object") {
+        if (seen.indexOf(val) >= 0) {
+            return;
+        }
+        seen.push(val);
+      }
+      return val;
     }
     
+    configChanged                 = oldConfig !== config;
+    dataChanged                   = oldData   !== data;
+    personalizationStatusChanged  = oldIsPersonalizationActive  !== isPersonalizationActive;
+    editableStatusChanged         = oldIsEditabe                !== isEditable;
 
     return {
-      pagination: this.getPagination(config),
-      scroll: this.getScroll(newProps),
+      config,
+      data,
       isPersonalizationActive,
-      components: {
-        header: {
-          cell: ResizableColumn,
-        },
-      },
+      isEditable,
+      configChanged,
+      dataChanged,
+      personalizationStatusChanged,
+      editableStatusChanged,
+      pagination: this.getPagination(config),
+      scroll:     this.getScroll(newProps),
     };
   }
 
@@ -210,6 +237,7 @@ export default class ConfigurableTable extends React.Component {
   getColumns()
   {
     const {config, data, isEditable} = this.props;
+    console.log("getColumns, props", this.props);
 
     if(config && data)
     {
@@ -241,15 +269,14 @@ export default class ConfigurableTable extends React.Component {
 
             if(column.editable && isEditable)
             {
-              console.log('hit for column', column);
               column.render = (text, record) => { return this.renderForEditableColumn(text, record, column) };
             }
 
             column.onHeaderCell = (cell) => {
-              //console.log('onHeaderCell', cell);
               return {
-                width: cell.width,
-                onResize: this.onColumnResize(index).bind(this),
+                width: column.width,
+                title: column.title,
+                /* onResize: this.onColumnResize(index).bind(this), */
               }
             };
 
@@ -589,31 +616,25 @@ export default class ConfigurableTable extends React.Component {
   }
 
   render() {
-    
+    const { configChanged, dataChanged, personalizationStatusChanged, editableStatusChanged } = this.state;
 
-    let data = this.filterData();
-    this.updateFilters(data);
-    let columns = this.getColumns();
+    if(configChanged || dataChanged || editableStatusChanged)
+    {
+      this.filteredData = this.filterData();
+      this.updateFilters(this.filteredData);
+      this.columns      = this.getColumns();
+    }    
 
-    console.log('containers.configurableTable.render(state)', this.state);
-    console.log('containers.configurableTable.render(data, filteredData)', this.props.data, data);
-    console.log('containers.configurableTable.render(sorters, filters)', this.sorters, this.filters);
-    console.log('containers.configurableTable.render(columns, data, state.scroll, state.pagination)', columns, data, this.state.scroll, this.state.pagination);
-
-    if(data.length > 0)
+    if(this.filteredData.length > 0)
     {
       if( this.props.isEditable && this.props.config.type === 'POS' )
       {
-        if(this.isModified(data))
+        if(this.isModified(this.filteredData))
         {
           return(
-            <PersonalizationModifier 
-              isPersonalizationActive = { this.props.isPersonalizationActive }
-              components              = { this.state.components }
-              {...this.dragConfig} >
               <Table 
-                columns      = { columns }
-                dataSource   = { data }
+                columns      = { this.columns }
+                dataSource   = { this.filteredData }
                 size         = 'small'
                 scroll       = { this.state.scroll } 
                 loading      = { this.props.isProcessing }
@@ -621,44 +642,36 @@ export default class ConfigurableTable extends React.Component {
                 onChange     = { this.onTableFilterChange.bind(this) }
                 pagination   = { this.state.pagination }
                 footer       = { this.getFooterForTable.bind(this) }
+                components   = { this.components }
                 />
-            </PersonalizationModifier>
           );
         }
         return(
-          <PersonalizationModifier 
-            isPersonalizationActive = { this.props.isPersonalizationActive }
-            components              = { this.state.components }
-            {...this.dragConfig} >
             <Table 
-              columns      = { columns }
-              dataSource   = { data }
+              columns      = { this.columns }
+              dataSource   = { this.filteredData }
               size         = 'small'
               scroll       = { this.state.scroll } 
               loading      = { this.props.isProcessing }
               rowClassName = { this.getRowClassName.bind(this) } 
               onChange     = { this.onTableFilterChange.bind(this) }
               pagination   = { this.state.pagination }
+              components   = { this.components }
               />
-          </PersonalizationModifier>
         );
       }
       return(
-        <PersonalizationModifier 
-          isPersonalizationActive = { this.props.isPersonalizationActive }
-          components              = { this.state.components }
-          {...this.dragConfig} >
           <Table 
-            columns      = { columns }
-            dataSource   = { data }
+            columns      = { this.columns }
+            dataSource   = { this.filteredData }
             size         = 'small'
             scroll       = { this.state.scroll } 
             loading      = { this.props.isProcessing }
             rowClassName = { this.getRowClassName.bind(this) } 
             onChange     = { this.onTableFilterChange.bind(this) }
             pagination   = { this.state.pagination }
+            components   = { this.components }
             />
-        </PersonalizationModifier>
       );
     }
     else

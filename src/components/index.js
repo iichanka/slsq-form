@@ -3,13 +3,15 @@ import { TableCell }                        from './TableCell';
 import { AttributeGroup }                   from './AttributeGroup';
 import { PersonalizationModifier }          from './PersonalizationModifier';
 import ResizableColumn                      from './ResizableColumn';
+import FixedHeader                          from './FixedHeader';
 
 export {
     ConfigEditorButtons,
     TableCell,
     AttributeGroup,
     PersonalizationModifier,
-    ResizableColumn
+    ResizableColumn,
+    FixedHeader
 }
 
 export default {
@@ -17,5 +19,6 @@ export default {
     TableCell,
     AttributeGroup,
     PersonalizationModifier,
-    ResizableColumn
+    ResizableColumn,
+    FixedHeader
 }

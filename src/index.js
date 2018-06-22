@@ -29,7 +29,11 @@ function ready(callback){
   });
 }
 
-document.domain = 'spk.ru';
+
+if (process.env.NODE_ENV === 'production') {
+  document.domain = 'spk.ru';
+}
+
 
 const store = createStore(
   rootReducer,

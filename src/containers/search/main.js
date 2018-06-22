@@ -242,7 +242,7 @@ export default class SearchContainer extends Component {
                                    dispatch                 = { this.props.dispatch }
                                    modifyColumns            = { this.addActions.bind(this) } 
                                    onAddClick               = { this.onAddClick.bind(this) }
-                                   scrollHeight             = { 217 } />
+                                   scrollHeight             = { 237 } />
 
               </TabPane>
 
@@ -258,7 +258,7 @@ export default class SearchContainer extends Component {
                                    dispatch                 = { this.props.dispatch }
                                    modifyColumns            = { this.addActions.bind(this) } 
                                    onAddClick               = { this.onAddClick.bind(this) }
-                                   scrollHeight             = { 217 } />
+                                   scrollHeight             = { 237 } />
 
               </TabPane>
 
@@ -274,7 +274,7 @@ export default class SearchContainer extends Component {
                                     dispatch                 = { this.props.dispatch }
                                     modifyColumns            = { this.addActions.bind(this) } 
                                     onAddClick               = { this.onAddClick.bind(this) }
-                                    scrollHeight             = { 217 } />
+                                    scrollHeight             = { 237 } />
 
               </TabPane>
             </Tabs>

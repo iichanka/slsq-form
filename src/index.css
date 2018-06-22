@@ -125,6 +125,13 @@
     padding: 0;
 }
 
+.ant-table-small .ant-table-content .ant-table-scroll .ant-table-header table .ant-table-thead tr th
+{
+    padding: 5px 0 5px 0;
+    margin-left: 5px;
+    
+}
+
 
 .ant-table-fixed
 {
