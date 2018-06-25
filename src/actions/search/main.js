@@ -72,7 +72,7 @@ const getRequstForHierarchy = (state = { items: []}) => {
     console.log('getRequstForHierarchy(state)', state);
 
     let levels = items.map( item => {
-        return item.selected ? item: null;
+        return item.selected ? item : null;
     }).filter(item => !!item);
 
     return {

@@ -88,7 +88,7 @@ class HierarchyMenu extends React.Component {
               key   = { item.id } 
               title = { <Checkbox 
                           indeterminate = { item.indeterminate }
-                          checked       = { item.selected } 
+                          checked       = { item.selectedAll } 
                           onChange      = { e => { e.preventDefault(); this.onCheck(item, e.target.checked) } } >
                           { item.title }
                         </Checkbox> }

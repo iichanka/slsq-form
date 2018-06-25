@@ -22,7 +22,7 @@ import {
       if(item.id === action.itemID)
       {
         item.childsLoaded = true;
-        checkedAndIndeterminate = item.selected && !item.indeterminate;
+        checkedAndIndeterminate = item.selected;
       }
       return item;
     });
@@ -34,7 +34,6 @@ import {
         if(checkedAndIndeterminate)
         {
           item.selected = true;
-          item.indeterminate = item.haveChilds ? false : true;
         }
         else
         {
@@ -59,13 +58,43 @@ import {
     }
   }
 
+  fillParentsIfNeeded = ( items = [], itemID = -1, status ) =>
+  {
+    let parent      = items.find( item => item.id === itemID );
+    let otherChilds = [];
+    if(parent)
+    {
+      otherChilds = items.filter( item => item.id !== itemID && item.parent === parent.id )
+    }
+
+    if(otherChilds.size > 0)
+    {
+      let notSelectedItem = otherChilds.find( item => !item.selected )
+      if(!notSelectedItem)
+      {
+        
+      }
+    }
+
+    if(parents.size > 0)
+    {
+
+    }
+  }
+
   const toggleItem = (items = [], selectedItemId) =>
   {
+    let parent
+
     return items.map( item => {
       if(item.id === selectedItemId)
       {
         item.selected       = !item.selected;
         item.indeterminate  = !item.selected;
+        if(item.haveChilds && item.selected)
+        {
+          
+        }
       }
       return item;
     })
