@@ -58,34 +58,43 @@ import {
     }
   }
 
-  fillParentsIfNeeded = ( items = [], itemID = -1, status ) =>
+  /* selectParentsIfNeeded( items = [], itemID = -1, selected )
   {
     let parent      = items.find( item => item.id === itemID );
     let otherChilds = [];
+
     if(parent)
     {
-      otherChilds = items.filter( item => item.id !== itemID && item.parent === parent.id )
+      if(selected)
+      {
+        otherChilds = items.filter( item => item.id !== itemID && item.parent === parent.id );
+    
+        if(otherChilds.size > 0)
+        {
+          let notSelectedItem = otherChilds.find( item => !item.selected )
+          if(!notSelectedItem)
+          {
+            parent.selected = true;
+          }
+        }
+      }
+      else
+      {
+        parent.selected = false;
+      }
+      selectParentsIfNeeded(items, parent.id, select)
     }
 
-    if(otherChilds.size > 0)
-    {
-      let notSelectedItem = otherChilds.find( item => !item.selected )
-      if(!notSelectedItem)
-      {
-        
-      }
-    }
+    
 
     if(parents.size > 0)
     {
 
     }
-  }
+  } */
 
   const toggleItem = (items = [], selectedItemId) =>
   {
-    let parent
-
     return items.map( item => {
       if(item.id === selectedItemId)
       {
