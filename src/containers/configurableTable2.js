@@ -97,7 +97,7 @@ export default class ConfigurableTable extends React.Component {
     this.columns.unshift({
         key:    'actions',
         title:  'Действия',
-        width:  100,
+        width:  '100px',
         className: 'table-actions-without-padding',
         render: (text, record) => {
             if(this.props.isEditable)

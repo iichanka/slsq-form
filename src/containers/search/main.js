@@ -129,7 +129,7 @@ export default class SearchContainer extends Component {
     }
   }
 
-  addActions(config, data, isEditable, columns = [])
+  addActions(config, isEditable, columns = [])
   {
     if(columns.length === 0 || !isEditable)
     {
@@ -145,8 +145,14 @@ export default class SearchContainer extends Component {
         columns.unshift({
           key:    'actions',
           title:  'Действия',
-          width:  100,
+          width:  200,
           className: 'table-actions-without-padding',
+          onHeaderCell: (cell) => {
+            return {
+              width: 200,
+              title: 'Действия',
+            }
+          },
           render: (text, record) => { 
             return(
               <TableCell action = { true } >
@@ -162,6 +168,7 @@ export default class SearchContainer extends Component {
             );
           },
         });
+      
         break;
       }
     }

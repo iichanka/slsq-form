@@ -106,7 +106,10 @@
 .small-table-line
 {
     line-height: 22px;
+
 }
+
+
 
 .ant-menu-submenu-title
 {
@@ -190,3 +193,5 @@ li.ant-menu-submenu.ant-menu-submenu-inline.submenu-selected
 {
   margin: 0;
 }
+
+.ant-table td { white-space: nowrap; }

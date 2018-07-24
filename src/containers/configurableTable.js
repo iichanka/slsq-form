@@ -3,7 +3,7 @@ import PropTypes                        from 'prop-types'
 import {  Table, Icon, Button, 
           Popover, Input, Row, Col,
           Checkbox, Select, Divider,
-          Tooltip }                     from 'antd';
+          Alert }                     from 'antd';
 import { localUpdateItem }              from '../actions/positions/main';
 import { TableCell }                    from '../components';
 import { FixedHeader }                  from '../components';
@@ -23,6 +23,15 @@ const HeaderWithFixedWidth = props => {
 
 const Option = Select.Option;
 
+const rowSelection = {
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+  },
+  getCheckboxProps: record => ({
+    name: record.dataIndex,
+  }),
+};
+
 const initialState = {
   filtered: [],
   sorted: [],
@@ -30,6 +39,12 @@ const initialState = {
   columns: [],
   data: [],
   filter: [],
+};
+
+const components = {
+  header: {
+    cell: FixedHeader,
+  },
 };
 
 export default class ConfigurableTable extends React.Component {
@@ -54,42 +69,29 @@ export default class ConfigurableTable extends React.Component {
   columns = [];
   filteredData = [];
 
-  components = {
-    header: {
-      cell: FixedHeader,
-    },
-  };
+  
 
   
 
   constructor(props)
   {
     super(props);
+    this.onTableFilterChange  = this.onTableFilterChange.bind(this);
+    this.getRowClassName      = this.getRowClassName.bind(this);
+
     this.state = this.getStateFromProps(props);
-
-    const that = this;
-    this.dragConfig = {
-      onDragEnd(fromIndex, toIndex) {
-        console.log('onDragEnd');
-        const columns = that.state.columns;
-        const item = columns.splice(fromIndex, 1)[0];
-        columns.splice(toIndex, 0, item);
-        that.setState({
-            columns
-        });
-      },
-      nodeSelector: "th"
-    };
+    this.state = {...this.state, components};
   }
-
 
 
   componentWillReceiveProps(props)
   {
     this.setState(this.getStateFromProps(props));
+    this.updateStateAfterRefresh();
   }
 
   getStateFromProps = (newProps) => {
+    console.log('getStateFromProps(), newProps, oldProps:', newProps, this.props);
     const { config, data, isEditable, isPersonalizationActive } = newProps;
     let oldConfig                     = {};
     let oldData                       = [];        
@@ -100,7 +102,6 @@ export default class ConfigurableTable extends React.Component {
     let personalizationStatusChanged  = false;
     let editableStatusChanged         = false;
     
-
     if(this.state)
     {
       oldConfig                   = this.state.config;
@@ -109,19 +110,6 @@ export default class ConfigurableTable extends React.Component {
       oldIsEditabe                = this.state.isEditable;
     }
 
-    var seen = [];
-
-    let compareCb = (key, val) => 
-    {
-      if (val != null && typeof val == "object") {
-        if (seen.indexOf(val) >= 0) {
-            return;
-        }
-        seen.push(val);
-      }
-      return val;
-    }
-    
     configChanged                 = oldConfig !== config;
     dataChanged                   = oldData   !== data;
     personalizationStatusChanged  = oldIsPersonalizationActive  !== isPersonalizationActive;
@@ -234,10 +222,46 @@ export default class ConfigurableTable extends React.Component {
     };
   }
 
+  updateStateAfterRefresh = () =>
+  {
+    /* const { configChanged, dataChanged, editableStatusChanged } = this.state;
+    console.log("updateStateAfterRefresh", this.state);
+    if(configChanged || dataChanged || editableStatusChanged)
+    {
+      
+      let filteredData = this.filterData();
+      this.updateFilters(filteredData);
+      //let columns      = this.getColumns();
+
+      this.setState(...this.state, {
+        filteredData: filteredData,
+        //columns:      columns,
+      });    
+    }  */  
+  }
+
+  updateStateAfterRefreshWReturn = () =>
+  {
+    const { configChanged, dataChanged, editableStatusChanged } = this.state;
+    console.log("updateStateAfterRefreshWReturn", this.state);
+    if(configChanged || dataChanged || editableStatusChanged)
+    {
+      
+      let filteredData = this.filterData();
+      this.updateFilters(filteredData);
+      let columns      = this.getColumns();
+
+      this.data = {
+        filteredData: filteredData,
+        columns:      columns,
+      };
+    }
+  }
+
   getColumns()
   {
-    const {config, data, isEditable} = this.props;
-    console.log("getColumns, props", this.props);
+    const {config, data, isEditable} = this.state;
+    console.log("getColumns, state, props", this.state, this.props);
 
     if(config && data)
     {
@@ -285,12 +309,13 @@ export default class ConfigurableTable extends React.Component {
           return null;
         }).filter( column => !!column );
 
+        console.log('getColumns modi')
         if(this.props.modifyColumns)
         {
-          this.props.modifyColumns(config, data, isEditable, columns);
+          this.props.modifyColumns(config, isEditable, columns);
         }
 
-        console.log('containers.configurableTable.getColumns(config, data, isEditable, columns)', config, data, isEditable, columns);
+        console.log('containers.configurableTable.getColumns(config, isEditable, columns)', config, isEditable, columns);
         return columns;
       }
     }
@@ -606,7 +631,7 @@ export default class ConfigurableTable extends React.Component {
     }
   }
 
-  getRowClassName(record, index)
+  getRowClassName = (record, index) =>
   {
     if(record.isModified)
     {
@@ -616,68 +641,78 @@ export default class ConfigurableTable extends React.Component {
   }
 
   render() {
-    const { configChanged, dataChanged, personalizationStatusChanged, editableStatusChanged } = this.state;
+    /* const { configChanged, dataChanged, editableStatusChanged } = this.state;
 
     if(configChanged || dataChanged || editableStatusChanged)
     {
       this.filteredData = this.filterData();
       this.updateFilters(this.filteredData);
       this.columns      = this.getColumns();
-    }    
+    } */    
+    this.updateStateAfterRefreshWReturn();
+    console.log('configurableTable.render(): state, props, data', this.state, this.props, this.data);
 
-    if(this.filteredData.length > 0)
+
+    if(this.data && this.data.filteredData && this.data.filteredData.length > 0)
     {
       if( this.props.isEditable && this.props.config.type === 'POS' )
       {
-        if(this.isModified(this.filteredData))
+        if(this.isModified(this.data.filteredData))
         {
           return(
               <Table 
-                columns      = { this.columns }
-                dataSource   = { this.filteredData }
+                columns      = { this.data.columns }
+                dataSource   = { this.data.filteredData }
                 size         = 'small'
                 scroll       = { this.state.scroll } 
                 loading      = { this.props.isProcessing }
-                rowClassName = { this.getRowClassName.bind(this) } 
-                onChange     = { this.onTableFilterChange.bind(this) }
+                rowClassName = { this.getRowClassName } 
+                onChange     = { this.onTableFilterChange }
                 pagination   = { this.state.pagination }
-                footer       = { this.getFooterForTable.bind(this) }
-                components   = { this.components }
+                footer       = { this.getFooterForTable }
+                components   = { this.state.components }
+                rowSelection = { rowSelection }
                 />
           );
         }
         return(
             <Table 
-              columns      = { this.columns }
-              dataSource   = { this.filteredData }
+              columns      = { this.data.columns }
+              dataSource   = { this.data.filteredData }
               size         = 'small'
               scroll       = { this.state.scroll } 
               loading      = { this.props.isProcessing }
-              rowClassName = { this.getRowClassName.bind(this) } 
-              onChange     = { this.onTableFilterChange.bind(this) }
+              rowClassName = { this.getRowClassName } 
+              onChange     = { this.onTableFilterChange }
               pagination   = { this.state.pagination }
-              components   = { this.components }
+              components   = { this.state.components }
+              rowSelection = { rowSelection }
               />
         );
       }
       return(
           <Table 
-            columns      = { this.columns }
-            dataSource   = { this.filteredData }
+            columns      = { this.data.columns }
+            dataSource   = { this.data.filteredData }
             size         = 'small'
             scroll       = { this.state.scroll } 
             loading      = { this.props.isProcessing }
-            rowClassName = { this.getRowClassName.bind(this) } 
-            onChange     = { this.onTableFilterChange.bind(this) }
+            rowClassName = { this.getRowClassName } 
+            onChange     = { this.onTableFilterChange }
             pagination   = { this.state.pagination }
-            components   = { this.components }
+            components   = { this.state.components }
+            rowSelection = { rowSelection }
             />
       );
     }
     else
     {
       return(
-          <div />
+        <Alert
+          message = 'Ничего не найдено'
+          type    = 'info'
+          style   = {{ margin: 8 }}
+        />
       );
     }
       

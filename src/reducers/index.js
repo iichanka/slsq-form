@@ -5,7 +5,7 @@ import { configs }                    from './configs/main';
 import { F_RECEIVE_EDITABLE_STATUS }  from '../actions/isEditable';
 
 const isEditable = (state = false, action) => {
-  console.log('rootReducer.isEditable[action]:', action);
+  console.log('rootReducer.isEditable[action][state]:', action, state);
   switch(action.type)
   {
     case F_RECEIVE_EDITABLE_STATUS:

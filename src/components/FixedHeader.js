@@ -3,8 +3,13 @@ import { Tooltip }  from 'antd';
 
 export const FixedHeader = props => {
   const { width, title, children, ...restProps } = props;
- 
-  let clearWidth = width.toString().replace('px', '');
+
+  let clearWidth = 200;
+  if(width)
+  {
+    clearWidth = width.toString().replace('px', '');
+  }
+  
   clearWidth -= 27;
   clearWidth = clearWidth + 'px';
 

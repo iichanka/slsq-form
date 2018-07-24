@@ -4,6 +4,7 @@ import { AttributeGroup }                   from './AttributeGroup';
 import { PersonalizationModifier }          from './PersonalizationModifier';
 import ResizableColumn                      from './ResizableColumn';
 import FixedHeader                          from './FixedHeader';
+import SearchResultList                     from './SearchResultList';
 
 export {
     ConfigEditorButtons,
@@ -11,7 +12,8 @@ export {
     AttributeGroup,
     PersonalizationModifier,
     ResizableColumn,
-    FixedHeader
+    FixedHeader,
+    SearchResultList
 }
 
 export default {
@@ -20,5 +22,6 @@ export default {
     AttributeGroup,
     PersonalizationModifier,
     ResizableColumn,
-    FixedHeader
+    FixedHeader,
+    SearchResultList
 }

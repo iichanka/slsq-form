@@ -56,7 +56,7 @@ export class PositionsConainer extends React.Component {
     dispatch(updatePositions(records));
   }
 
-  addActions(config, data, isEditable, columns = [])
+  addActions(config, isEditable, columns = [])
   {
     if(columns.length === 0 || !isEditable)
     {
@@ -68,8 +68,14 @@ export class PositionsConainer extends React.Component {
       columns.push({
         key:    'actions',
         title:  'Действия',
-        width:  150,
+        width:  200,
         className: 'table-actions-without-padding',
+        onHeaderCell: (cell) => {
+          return {
+            width: 200,
+            title: 'Действия',
+          }
+        },
         render: (text, record) => {
           return(
               <span>
@@ -100,34 +106,47 @@ export class PositionsConainer extends React.Component {
     }
 
     return (
+      <div>        
         <div className = 'positions-box' >
           <Spin spinning = { this.props.positions.isLoading } >
-              <Row className = 'positionsTableToolbar' >
-                      <Col span     = { 24 } >
-                          { this.props.isEditable &&
-                          <Button type     = "primary" 
-                                  icon     = "reload" 
-                                  loading  = { this.props.positions.isLoading }
-                                  style    = {{ float: 'right' }}
-                                  onClick  = { (event) => { this.onCalcPositionsSum(); } }  >
-                              Рассчитать цены
-                            </Button>
-                          }
-                          { !this.props.isEditable &&
-                            <Popover content = { msg.content }
-                                    title   = { msg.title } >
-                              <Button type     = "primary" 
-                                      icon     = "frown-o"
-                                      loading  = { this.props.positions.isLoading }
-                                      style    = {{ float: 'right' }}
-                                      onClick  = { (event) => { this.onCalcPositionsSum(); } }
-                                      disabled  >
-                                  Рассчитать цены
-                              </Button>
-                            </Popover>
-                          }
-                      </Col>
-              </Row>
+          <Row className = 'positionsTableToolbar'>
+            <Col span = { 12 }>
+              
+                <Button 
+                  type = 'danger'
+                  icon = 'delete' 
+                  size = 'small' />
+                <Divider type="vertical" />
+              
+            </Col>
+            <Col span     = { 12 } >
+              
+                { this.props.isEditable &&
+                <Button type     = "primary" 
+                        icon     = "reload" 
+                        loading  = { this.props.positions.isLoading }
+                        style    = {{ float: 'right' }}
+                        onClick  = { (event) => { this.onCalcPositionsSum(); } }  
+                        size     = 'small' >
+                    Рассчитать цены
+                  </Button>
+                }
+                { !this.props.isEditable &&
+                  <Popover content = { msg.content }
+                          title   = { msg.title } >
+                    <Button type     = "primary" 
+                            icon     = "frown-o"
+                            loading  = { this.props.positions.isLoading }
+                            style    = {{ float: 'right' }}
+                            onClick  = { (event) => { this.onCalcPositionsSum(); } }
+                            size     = 'small'
+                            disabled  >
+                        Рассчитать цены
+                    </Button>
+                  </Popover>
+                }
+            </Col>
+          </Row>
               <Row className = 'positionsTable' >    
                   <Col span      = { 24 }
                       className = 'positionsTable' >
@@ -144,7 +163,8 @@ export class PositionsConainer extends React.Component {
                   </Col>
               </Row>
           </Spin>
-        </div>);
+        </div>
+      </div>);
   } 
 }
 
