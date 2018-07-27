@@ -10,9 +10,20 @@ export const FixedHeader = props => {
     clearWidth = width.toString().replace('px', '');
   }
   
-  clearWidth -= 27;
-  clearWidth = clearWidth + 'px';
+  clearWidth -= 5;
 
+  if(children.props.children[1])
+  {
+    clearWidth -= 22;
+  }
+
+  if(children.props.children[2])
+  {
+    clearWidth -= 22;
+  }
+
+  clearWidth = clearWidth + 'px';
+  
   return (
     <th { ...restProps }>
       <Tooltip 
@@ -22,9 +33,18 @@ export const FixedHeader = props => {
           <div style = {{ maxWidth: clearWidth, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left', marginLeft: '5px', flex: 1}}>
             { children.props.children[0] }
           </div>
-          <div style = {{ width: 22 }}>
-            { children.props.children[2] }
-          </div>
+          {
+            children.props.children[1] !== undefined &&
+            <div style = {{ width: 22 }}>
+              { children.props.children[1] }
+            </div>
+          }
+          {
+            children.props.children[2] !== undefined &&
+            <div style = {{ width: 22 }}>
+              { children.props.children[2] }
+            </div>
+          }
         </div>
       </Tooltip>
     </th>

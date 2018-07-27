@@ -186,21 +186,21 @@ export class ConfiguratorPanel extends React.Component {
         >
           <Spin spinning = { this.props.isProcessing }>
             <Tabs
-              defaultActiveKey = "RFR"
+              defaultActiveKey = "REMNANTS"
               tabPosition      = 'left'
               style            = {{ height: 405 }}
               tabBarStyle      = {{ textAlign: "left !important" }}
             >
               <TabPane 
                 tab   = 'Остатки'
-                key   = 'RFR'
+                key   = 'REMNANTS'
                 style = {{ marginLeft: -7, marginTop: 7 }}
                 >
-                <Configurator allFields             = { this.state.allFields['RFR'] }
-                              visibleFields         = { this.state.visibleFields['RFR'] }
-                              pageSize              = { this.state.pageSize['RFR'] }
-                              onTargetKeysChange    = { (targetKeys) => { this.onTargetKayesChange('RFR', targetKeys) } } 
-                              onPageSizeChange      = { (newValue) => { this.onPageSizeChange('RFR', newValue) } }
+                <Configurator allFields             = { this.state.allFields['REMNANTS'] }
+                              visibleFields         = { this.state.visibleFields['REMNANTS'] }
+                              pageSize              = { this.state.pageSize['REMNANTS'] }
+                              onTargetKeysChange    = { (targetKeys) => { this.onTargetKayesChange('REMNANTS', targetKeys) } } 
+                              onPageSizeChange      = { (newValue) => { this.onPageSizeChange('REMNANTS', newValue) } }
                                />
               </TabPane>
               
@@ -209,11 +209,11 @@ export class ConfiguratorPanel extends React.Component {
                 key   = "RFIT"
                 style = {{ marginLeft: -7, marginTop: 7 }}
                 >
-                <Configurator allFields             = { this.state.allFields['RFIT'] }
-                              visibleFields         = { this.state.visibleFields['RFIT'] }
-                              pageSize              = { this.state.pageSize['RFIT'] }
-                              onTargetKeysChange    = { (targetKeys) => { this.onTargetKayesChange('RFIT', targetKeys) } }
-                              onPageSizeChange      = { (newValue) => { this.onPageSizeChange('RFIT', newValue) } } />
+                <Configurator allFields             = { this.state.allFields['IN_TRANSIT'] }
+                              visibleFields         = { this.state.visibleFields['IN_TRANSIT'] }
+                              pageSize              = { this.state.pageSize['IN_TRANSIT'] }
+                              onTargetKeysChange    = { (targetKeys) => { this.onTargetKayesChange('IN_TRANSIT', targetKeys) } }
+                              onPageSizeChange      = { (newValue) => { this.onPageSizeChange('IN_TRANSIT', newValue) } } />
               </TabPane>
               
               <TabPane 
@@ -221,11 +221,11 @@ export class ConfiguratorPanel extends React.Component {
                 key="FRM"
                 style = {{ marginLeft: -7, marginTop: 7 }}
                 >
-                <Configurator allFields             = { this.state.allFields['RFM'] }
-                              visibleFields         = { this.state.visibleFields['RFM'] }
-                              pageSize              = { this.state.pageSize['RFM'] }
-                              onTargetKeysChange    = { (targetKeys) => { this.onTargetKayesChange('RFM', targetKeys) } }
-                              onPageSizeChange      = { (newValue) => { this.onPageSizeChange('RFM', newValue) } } />
+                <Configurator allFields             = { this.state.allFields['MATERIALS'] }
+                              visibleFields         = { this.state.visibleFields['MATERIALS'] }
+                              pageSize              = { this.state.pageSize['MATERIALS'] }
+                              onTargetKeysChange    = { (targetKeys) => { this.onTargetKayesChange('MATERIALS', targetKeys) } }
+                              onPageSizeChange      = { (newValue) => { this.onPageSizeChange('MATERIALS', newValue) } } />
               </TabPane>
               
               <TabPane
@@ -233,11 +233,11 @@ export class ConfiguratorPanel extends React.Component {
                 key="POS"
                 style = {{ marginLeft: -7, marginTop: 7 }}
                 >
-                <Configurator allFields             = { this.state.allFields['POS'] }
-                              visibleFields         = { this.state.visibleFields['POS'] }
-                              pageSize              = { this.state.pageSize['POS'] }
-                              onTargetKeysChange    = { (targetKeys) => { this.onTargetKayesChange('POS', targetKeys); } }
-                              onPageSizeChange      = { (newValue) => { this.onPageSizeChange('POS', newValue); } } />
+                <Configurator allFields             = { this.state.allFields['POSITIONS'] }
+                              visibleFields         = { this.state.visibleFields['POSITIONS'] }
+                              pageSize              = { this.state.pageSize['POSITIONS'] }
+                              onTargetKeysChange    = { (targetKeys) => { this.onTargetKayesChange('POSITIONS', targetKeys); } }
+                              onPageSizeChange      = { (newValue) => { this.onPageSizeChange('POSITIONS', newValue); } } />
               </TabPane>
             </Tabs>
           </Spin>

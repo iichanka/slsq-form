@@ -5,8 +5,8 @@ export const materials = (state = [], action) => {
     {
         case S_RECEIVE_RESULTS:
         {
-            return action.results.rfm.map((record, index) => {
-                record.itemType = 'RFM';
+            return action.results.materials.map((record, index) => {
+                record.itemType = 'MATERIALS';
                 record.key      = index.toString();
                 return record;
             });

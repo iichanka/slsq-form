@@ -259,9 +259,9 @@ export default class ConfigurableTable extends React.Component {
     console.log('containers.search.results.ConfigurableTable.buildConfig()[config]', config);
     switch(config.type)
     {
-        case 'RFR':
-        case 'RFIT':
-        case 'RFM':
+        case 'REMNANTS':
+        case 'IN_TRANSIT':
+        case 'MATERIALS':
         {
             this.scroll = {
                 y: 217, 
@@ -305,9 +305,9 @@ export default class ConfigurableTable extends React.Component {
     {
         switch(config.type)
         {
-            case 'RFR':
-            case 'RFIT':
-            case 'RFM':
+            case 'REMNANTS':
+            case 'IN_TRANSIT':
+            case 'MATERIALS':
             {
                 this.buildConfigForResults(config);
                 break;
@@ -328,7 +328,7 @@ export default class ConfigurableTable extends React.Component {
         input.blur();
         switch(config.type)
         {
-            case 'RFR':
+            case 'REMNANTS':
             {
                 dispatch(addPositionItem({ remnants: {...record, count: input.value } }));
             }

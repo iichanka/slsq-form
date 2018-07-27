@@ -1,5 +1,5 @@
 import React                            from 'react';
-import ReactDragListView                from 'react-drag-listview';
+import ReactDragListView                from 'react-drag-listview/lib';
 
 export const PersonalizationModifier = ( {isPersonalizationActive, components, children, ...props}) => {
   if(isPersonalizationActive)

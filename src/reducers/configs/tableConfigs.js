@@ -18,10 +18,12 @@ export const tableConfigs = (state = [], action) => {
 
                 let configType      = config.type;
                 let configPageSize  = config.pageSize;
+                let default_        = config.default;
                 return {
                     type: configType,
                     columns: newConfigColumns,
                     pageSize: configPageSize,
+                    default: default_,
                 }
             });
 

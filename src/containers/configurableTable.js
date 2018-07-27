@@ -655,7 +655,7 @@ export default class ConfigurableTable extends React.Component {
 
     if(this.data && this.data.filteredData && this.data.filteredData.length > 0)
     {
-      if( this.props.isEditable && this.props.config.type === 'POS' )
+      if( this.props.isEditable && this.props.config.type === 'POSITIONS' )
       {
         if(this.isModified(this.data.filteredData))
         {

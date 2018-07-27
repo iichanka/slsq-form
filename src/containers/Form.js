@@ -7,7 +7,10 @@ import { load as loadConfigs }                      from '../actions/configs/mai
 import { getEditableStatus as loadStatus }          from '../actions/isEditable';
 import SearchContainer                              from './search/main';
 import { PositionsContainer }                       from './positions';
-import { SearchResultList } from '../components';
+import { SearchResultList }                         from '../components';
+import { SearchHelp } from '../components/SearchHelp';
+import { PTable } from '../components/PositionsTable/PTable';
+import { PositionsTable } from '../components/PositionsTable/PositionsTable';
 
 class Form extends Component {
   static propTypes = {
@@ -36,6 +39,12 @@ class Form extends Component {
     }
   }
 
+  constructor(props)
+  {
+    super(props);
+    this.state = {visible: true};
+  }
+
   render()
   {
     console.log("Form.Render[props]:", this.props);
@@ -54,44 +63,14 @@ class Form extends Component {
                             isEditable  = { this.props.isEditable }
                             dispatch    = { this.props.dispatch } />
           
-        <div style={{maxHeight: "10px"}}>
-          {/* SearchHelpTst */}
-          <SearchResultList
-            data = {[{
-              key: '1',
-              name: 'John Brown',
-              age: 32,
-              address: 'New York No. 1 Lake Park',
-            }, {
-              key: '2',
-              name: 'Jim Green',
-              age: 42,
-              address: 'London No. 1 Lake Park',
-            }, {
-              key: '3',
-              name: 'Joe Black',
-              age: 32,
-              address: 'Sidney No. 1 Lake Park',
-            }, {
-              key: '4',
-              name: 'Disabled User',
-              age: 99,
-              address: 'Sidney No. 1 Lake Park',
-            }]}
-            columns = {[{
-              title: 'Name',
-              dataIndex: 'name',
-              width: '900px',
-            }, {
-              title: 'Age',
-              dataIndex: 'age',
-            }, {
-              title: 'Address',
-              dataIndex: 'address',
-            }]}
-            onSelect = { (rec) => { console.log(rec) } }
-          />
+        <div>
+          {/* <input id="sh5" svhtype="backgroundSearch" autocomplete="off" onClick = { (evt) => { window.parent.F4Help(evt, 'COM_PR_IND_OBJECT_SHTEXT', document.getElementById('sh5')); } }/> */}
+          
+          
         </div>
+
+        {/* SearchHelpTst */}
+        
       </div>
     );
   }

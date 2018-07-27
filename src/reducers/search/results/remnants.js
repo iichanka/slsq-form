@@ -5,8 +5,8 @@ export const remnants = (state = [], action) => {
     {
         case S_RECEIVE_RESULTS:
         {
-            return action.results.rfr.map((record, index) => {
-                record.itemType = 'RFR';
+            return action.results.remnants.map((record, index) => {
+                record.itemType = 'REMNANTS';
                 record.key      = index.toString();
                 return record;
             });

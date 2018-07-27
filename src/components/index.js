@@ -4,7 +4,7 @@ import { AttributeGroup }                   from './AttributeGroup';
 import { PersonalizationModifier }          from './PersonalizationModifier';
 import ResizableColumn                      from './ResizableColumn';
 import FixedHeader                          from './FixedHeader';
-import SearchResultList                     from './SearchResultList';
+import { SearchResultList }                 from './SearchHelp';
 
 export {
     ConfigEditorButtons,

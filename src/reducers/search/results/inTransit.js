@@ -5,8 +5,8 @@ export const inTransit = (state = [], action) => {
     {
         case S_RECEIVE_RESULTS:
         {
-            return action.results.rfit.map((record, index) => {
-                record.itemType = 'RFIT';
+            return action.results.intransit.map((record, index) => {
+                record.itemType = 'IN_TRANSIT';
                 record.key      = index.toString();
                 return record;
             });

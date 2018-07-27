@@ -30,18 +30,18 @@ export default class SearchContainer extends Component {
   constructor(props)
   {
     super(props);
-    this.rfrConfig = {
-      type: 'RFR',
+    this.remnantsConfig = {
+      type: 'REMNANTS',
       columns: [],
     };
 
-    this.rfitConfig = {
-      type: 'RFIT',
+    this.inTransintConfig = {
+      type: 'IN_TRANSIT',
       columns: [],
     };
 
-    this.rfmConfig = {
-      type: 'RFM',
+    this.materialsConfig = {
+      type: 'MATERIALS',
       columns: [],
     };
 
@@ -71,19 +71,19 @@ export default class SearchContainer extends Component {
     configs.tableConfigs.map(config => {
       switch(config.type)
       {
-        case 'RFR':
+        case 'REMNANTS':
         {
-          this.rfrConfig = config;
+          this.remnantsConfig = config;
           break;
         }
-        case 'RFIT':
+        case 'IN_TRANSIT':
         {
-          this.rfitConfig = config;
+          this.inTransintConfig = config;
           break;
         }
-        case 'RFM':
+        case 'MATERIALS':
         {
-          this.rfmConfig = config;
+          this.materialsConfig = config;
           break;
         }
       }
@@ -110,17 +110,17 @@ export default class SearchContainer extends Component {
       record.countInputReference.input.blur();
       switch(record.itemType)
       {
-        case 'RFR':
+        case 'REMNANTS':
         {
           dispatch(addPositionItem({ remnants: {...record, count: record.countInputReference.input.value } }));
           break;
         }
-        case 'RFIT':
+        case 'IN_TRANSIT':
         {
           dispatch(addPositionItem({ inTransit: {...record, count: record.countInputReference.input.value } }));
           break;
         }
-        case 'RFM':
+        case 'MATERIALS':
         {
           dispatch(addPositionItem({ materilas: {...record, count: record.countInputReference.input.value } }));
           break;
@@ -138,9 +138,9 @@ export default class SearchContainer extends Component {
 
     switch(config.type)
     {
-      case 'RFR':
-      case 'RFIT':
-      case 'RFM':
+      case 'REMNANTS':
+      case 'IN_TRANSIT':
+      case 'MATERIALS':
       {
         columns.unshift({
           key:    'actions',
@@ -238,11 +238,11 @@ export default class SearchContainer extends Component {
                                             dispatch                = { this.props.dispatch } /> } >
 
               <TabPane  tab       = 'Остатки'
-                        key       = 'RFR'
+                        key       = 'REMNANTS'
                         className = 'searchPanelTabsFull'>
                 
                 <ConfigurableTable isProcessing             = { this.props.isSearching }
-                                   config                   = { this.rfrConfig }
+                                   config                   = { this.remnantsConfig }
                                    data                     = { this.props.results.remnants.map( r => r ) }
                                    isEditable               = { this.props.isEditable }
                                    isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
@@ -254,11 +254,11 @@ export default class SearchContainer extends Component {
               </TabPane>
 
               <TabPane tab        = 'В пути'
-                       key        = 'RFIT' 
+                       key        = 'IN_TRANSIT' 
                        className  = 'searchPanelTabsFull' >
 
                 <ConfigurableTable isProcessing             = { this.props.isSearching }
-                                   config                   = { this.rfitConfig }
+                                   config                   = { this.inTransintConfig }
                                    data                     = { this.props.results.inTransit.map( r => r ) }
                                    isEditable               = { this.props.isEditable }
                                    isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
@@ -270,11 +270,11 @@ export default class SearchContainer extends Component {
               </TabPane>
 
               <TabPane tab        = 'Материалы' 
-                       key        = 'RFM' 
+                       key        = 'MATERIALS' 
                        className  = 'searchPanelTabsFull' >
                         
                 <ConfigurableTable  isProcessing             = { this.props.isSearching }
-                                    config                   = { this.rfmConfig }
+                                    config                   = { this.materialsConfig }
                                     data                     = { this.props.results.materials.map( r => r ) }
                                     isEditable               = { this.props.isEditable }
                                     isPersonalizationActive  = { this.props.configs.isPersonalizationActive }

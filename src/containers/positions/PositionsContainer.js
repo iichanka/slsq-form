@@ -1,11 +1,12 @@
 import React                                                from 'react';
 import PropTypes                                            from 'prop-types';
-import { Row, Col, Button, Spin, Popover, Divider }         from 'antd';
+import { Row, Col, Button, Spin, Popover, Divider, Menu, Dropdown, Icon }         from 'antd';
 import ConfigurableTable                                    from '../configurableTable';
 import { loadItems }                                        from '../../actions/positions/main';
 import { calcPositionSum }                                  from '../../actions/positions/calcPositionsSum';
 import { updatePositions }                                  from '../../actions/positions/updatePositions';
 import { deletePositions }                                  from '../../actions/positions/deletePositions';
+import { PositionsTable } from '../../components/PositionsTable/PositionsTable';
 
 export class PositionsConainer extends React.Component {
   static propTypes = {   
@@ -63,7 +64,7 @@ export class PositionsConainer extends React.Component {
       return;
     }
 
-    if(config.type === 'POS')
+    if(config.type === 'POSITIONS')
     {
       columns.push({
         key:    'actions',
@@ -94,6 +95,16 @@ export class PositionsConainer extends React.Component {
     }
   }
 
+  handleMenuClick = () => {};
+
+  menu = (
+    <Menu onClick={ this.handleMenuClick }>
+      <Menu.Item key="1">??? 1</Menu.Item>
+      <Menu.Item key="2">??? 2</Menu.Item>
+      <Menu.Item key="3">??? 3</Menu.Item>
+    </Menu>
+  );
+
 
   render() {
     const msg = {
@@ -105,21 +116,89 @@ export class PositionsConainer extends React.Component {
       title: 'Рассчет цен недоступен',
     }
 
+    
+
     return (
       <div>        
         <div className = 'positions-box' >
           <Spin spinning = { this.props.positions.isLoading } >
           <Row className = 'positionsTableToolbar'>
-            <Col span = { 12 }>
+            <Col span = { 20 }>
+              <Button 
+                icon = 'file' 
+                size = 'small' />
+              <Button 
+                style = {{marginLeft: 5}}
+                type = 'danger'
+                icon = 'delete' 
+                size = 'small' />
+
+              <Divider 
+                type="vertical"
+                size = 'small' />
+
+              <Dropdown 
+                overlay={this.menu}
+                >
+                <Button
+                  size = 'small'>
+                  Завод ???<Icon type="down" />
+                </Button>
+              </Dropdown>
+
+              <Dropdown 
+                overlay={this.menu}
+                >
+                <Button
+                  style = {{marginLeft: 5}}                  
+                  size = 'small'>
+                  Склад ???<Icon type="down" />
+                </Button>
+              </Dropdown>
+
+              <Dropdown 
+                overlay={this.menu} >
+                <Button
+                  style = {{marginLeft: 5}}
+                  size = 'small'>
+                  ЕИ длины<Icon type="down" />
+                </Button>
+              </Dropdown>
+
+              <Dropdown 
+                overlay={this.menu}
+                >
+                <Button
+                  style = {{marginLeft: 5}}
+                  size = 'small'>
+                  АЕИ<Icon type="down" />
+                </Button>
+              </Dropdown>
               
-                <Button 
-                  type = 'danger'
-                  icon = 'delete' 
-                  size = 'small' />
-                <Divider type="vertical" />
-              
+              <Divider
+                type="vertical" 
+                size = 'small' />
+
+              <Button 
+                icon = 'tool' 
+                size = 'small' />
+
+              <Button 
+                style = {{marginLeft: 5}}
+                icon = 'car' 
+                size = 'small' />
+
+              <Button 
+                style = {{marginLeft: 5}}
+                type = 'danger' 
+                size = 'small'>
+                <Icon type="car" size = 'small' />
+                <Icon type="delete" size = 'small'/>
+              </Button>
+
+
             </Col>
-            <Col span     = { 12 } >
+            <Col span     = { 4 } >
               
                 { this.props.isEditable &&
                 <Button type     = "primary" 
@@ -150,8 +229,11 @@ export class PositionsConainer extends React.Component {
               <Row className = 'positionsTable' >    
                   <Col span      = { 24 }
                       className = 'positionsTable' >
-                      <ConfigurableTable  isProcessing            = { false }
-                                          config                  = { this.props.configs.tableConfigs.find( config => config.type === 'POS' ) }
+                      <PositionsTable
+                        config                  = { this.props.configs.tableConfigs.find( config => config.type === 'POSITIONS' && config.default ) }
+                        data                    = { this.props.positions.items } />
+{/*                       <ConfigurableTable  isProcessing            = { false }
+                                          config                  = { this.props.configs.tableConfigs.find( config => config.type === 'POSITIONS' ) }
                                           data                    = { this.props.positions.items }
                                           isEditable              = { this.props.isEditable }
                                           isPersonalizationActive = { this.props.configs.isPersonalizationActive }
@@ -159,7 +241,7 @@ export class PositionsConainer extends React.Component {
                                           modifyColumns           = { this.addActions.bind(this) }
                                           onPositionDelete        = { this.onPositionDelete.bind(this) }
                                           onPositionUpdate        = { this.onPositionUpdate.bind(this) }
-                                          onPositionsUpdateAll    = { this.onPositionsUpdateAll.bind(this) } />
+                                          onPositionsUpdateAll    = { this.onPositionsUpdateAll.bind(this) } /> */}
                   </Col>
               </Row>
           </Spin>

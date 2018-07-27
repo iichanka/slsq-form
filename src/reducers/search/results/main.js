@@ -4,7 +4,7 @@ import { materials }        from './materials';
 import { SR_SELECT_TAB }    from '../../../actions/search/results/main';
 
 
-const activeTab = (state = 'RFR', action) => {
+const activeTab = (state = 'REMNANTS', action) => {
     switch(action.type)
     {
         case SR_SELECT_TAB:
