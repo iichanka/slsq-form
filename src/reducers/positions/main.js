@@ -26,21 +26,12 @@ const isLoading = (state = false, action) => {
     }
 }
 
-const clearItems = (items = []) => {
-  return items.map( item => {
-    item.quantity   = item.quantity.trim().replace(/\./g,'').replace('.','').replace(',','.');
-    item.price      = item.price.trim().replace(/\./g,'').replace('.','').replace(',','.');
-    item.sum        = item.sum.trim().replace(/\./g,'').replace('.','').replace(',','.');
-    return item;
-  });
-}
-
 const items = (state = [], action) => {
     switch(action.type)
     {
         case P_RECEIVE_ITEMS:
         {
-            return clearItems(action.items);
+            return action.items;
         }
 
         case P_LOCAL_UPDATE_ITEM:
@@ -77,7 +68,7 @@ const localUpdateItem = (items = [], action) => {
 
 const updateItems = (items = [], action) => {
   let newItems      = items.map(item => item);
-  let updatedItems  = clearItems(action.items);
+  let updatedItems  = action.items;
 
   let found         = false;
 

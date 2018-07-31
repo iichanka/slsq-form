@@ -1,6 +1,6 @@
 import React                    from 'react';
 import PropTypes                from 'prop-types';
-import { PTable }               from '.';
+import { PTable, Cell }         from '.';
 
 
 const defaultOnSelectChange = (keys, records) => {
@@ -8,7 +8,8 @@ const defaultOnSelectChange = (keys, records) => {
 }
 
 export class PositionsTable extends React.Component {
-  static propTypes = {   
+  static propTypes = { 
+    editMode:         PropTypes.bool.isRequired,  
     data:             PropTypes.array.isRequired,
     columns:          PropTypes.array.isRequired,
     onSelectChange:   PropTypes.func.isRequired,
@@ -44,6 +45,7 @@ export class PositionsTable extends React.Component {
     selectedRowKeys: [],
     columns: [],
     config: null,
+    editMode: false,
   };
 
   constructor(props)
@@ -82,6 +84,7 @@ export class PositionsTable extends React.Component {
 
   componentWillReceiveProps = (newProps) => {
     //есть кастомный обработчик изменения списка позиций
+    let needRebuildColumns = false;
     if(newProps.onSelectChange !== this.customerOnSelectChange)
     {
       if(typeof newProps.onSelectChange === 'function')
@@ -93,15 +96,59 @@ export class PositionsTable extends React.Component {
     //изменение конфига
     if(newProps.config && this.state.config !== newProps.config)
     {
-      this.setState({ config: newProps.config, columns: newProps.config.columns });
+      this.setState(
+        { 
+          config: newProps.config, 
+        });
+
+        needRebuildColumns = true;
+    }
+
+    //изменение режима
+    if(newProps.editMode != this.state.editMode)
+    {
+      this.setState({ editMode: newProps.editMode });
+      //needRebuildColumns = true;
+    }
+
+
+    if(needRebuildColumns)
+    {
+      this.setState({columns: this.buildColumns(newProps.config.columns)});
     }
   }
 
-  
+  buildColumns = (originalColumns = []) =>
+  {
+    return originalColumns.map(column => {
+      if(column.visible)
+      {
+        //quantity, integers and floats - right align
+        let columnAlign = 
+          column.data_type === 'Q' || 
+          column.data_type === 'F' ||
+          column.data_type === 'I' ? 'right' : 'left';
+
+        column.render = (text, record) => 
+          <Cell 
+            editMode    = { this.props.editMode }
+            isEditable  = { column.editable }
+            data        = { record } 
+            align       = { columnAlign } 
+            width       = { column.width }
+            dataIndex   = { column.dataIndex }>
+            { text }
+          </Cell>
+
+        return column;
+      }
+      return null;
+    }).filter(column => !!column);
+  }
 
 
   render = () => {
-    return(
+    return(      
       <PTable
         selections      = { this.state.selections }
         data            = { this.props.data }

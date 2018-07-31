@@ -1,10 +1,15 @@
 import PTable                     from './PTable';
-
+import Cell                       from './Cell';
+import PositionsTable             from './PositionsTable';
 
 export {
-    PTable
+    PTable,
+    Cell,
+    PositionsTable
 }
 
 export default {
-    PTable
+    PTable,
+    Cell,
+    PositionsTable
 }

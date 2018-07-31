@@ -61,7 +61,7 @@ export class ConfiguratorPanel extends React.Component {
 
   onTargetKayesChange = (type, targetKeys = []) => {
     let { visibleFields, allFields }   = this.state;
-    let orderIndex      = 0;
+    let order_index      = 0;
 
     console.log('containers.configurator.panel.onTargetKayesChange[visibleFields, allFields, targetKeys]', visibleFields, allFields, targetKeys);
 
@@ -93,7 +93,7 @@ export class ConfiguratorPanel extends React.Component {
     //скрываем все елементы
     allFields[type] = allFields[type].map( field => {
       field.visible     = false;
-      field.orderIndex  = -1;
+      field.order_index  = -1;
       return field;
     });
 
@@ -103,15 +103,15 @@ export class ConfiguratorPanel extends React.Component {
       { 
         if(allFields[type][i].key === key)
         {
-          allFields[type][i].orderIndex = orderIndex;
+          allFields[type][i].order_index = order_index;
           allFields[type][i].visible    = true;
           break;
         }       
       }
-      orderIndex++;
+      order_index++;
     });
 
-    allFields[type].sort( (a, b) => a.orderIndex - b.orderIndex );
+    allFields[type].sort( (a, b) => a.order_index - b.order_index );
     this.setState({ visibleFields, allFields });
   }
 
@@ -137,15 +137,15 @@ export class ConfiguratorPanel extends React.Component {
     return fields.map( field => {
       let clearField = {};
       clearField.title      = field.title;
-      clearField.dataIndex  = field.dataIndex;
-      clearField.dataType   = field.dataType;
+      clearField.dataIndex  = field.data_index;
+      clearField.data_type   = field.data_type;
       clearField.width      = field.width;
       clearField.sortable   = field.sortable;
       clearField.searchable = field.searchable;
       clearField.visible    = field.visible;
       clearField.editable   = field.editable;
       clearField.fixed      = field.fixed;
-      clearField.orderIndex = field.orderIndex;
+      clearField.order_index = field.order_index;
       clearField.technical  = field.technical;
       return clearField;
     });

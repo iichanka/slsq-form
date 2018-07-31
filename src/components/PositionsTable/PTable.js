@@ -81,6 +81,8 @@ export class PTable extends React.Component {
       columnWidth: '35px',
     };
 
+    console.log('PTable->render(): state, props', this.state, this.props);
+
     if(this.props.data && this.props.data.length > 0)
     {
       return (
@@ -92,8 +94,9 @@ export class PTable extends React.Component {
           rowClassName  = { this.getRowClassName } 
           loading       = { this.props.loading }
           components    = { components }
-          onChange      = { onChange }
+          onChange      = { this.onChange }
           indentSize    = { 0 }
+          scroll        = {{ x: '100%', y: '100%' }}
           size          = 'small' />
       );
     }

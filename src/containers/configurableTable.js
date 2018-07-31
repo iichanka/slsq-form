@@ -271,7 +271,7 @@ export default class ConfigurableTable extends React.Component {
           if(column.visible && !column.technical)
           {
             column.className    = 'table-line-without-padding';
-            if(column.dataType === 'C' || column.dataType === 'Q')
+            if(column.data_type === 'C' || column.data_type === 'Q')
             {
               column.className    = 'table-line-without-padding numeric-field';
             }
@@ -286,7 +286,7 @@ export default class ConfigurableTable extends React.Component {
 
             column.render = (text, record) => { return this.simpleFieldRender(text, record, column) };
             
-            if(column.dataType === 'C' || column.dataType === 'Q')
+            if(column.data_type === 'C' || column.data_type === 'Q')
             {
               column.render = (text, record) => { return this.renderForCurrencyOrQuantity(text, record, column) };
             }
@@ -512,7 +512,7 @@ export default class ConfigurableTable extends React.Component {
           </Select>
         </TableCell>);
     }
-    if(column.dataType === 'CB')
+    if(column.data_type === 'CB')
     {
       return(
         <TableCell column = { column }>
@@ -527,8 +527,8 @@ export default class ConfigurableTable extends React.Component {
     return(
       <TableCell column = { column }>
         <Input 
-          style         = {{ width: column.width, textAlign: (column.dataType === 'C' || column.dataType === 'Q') ? 'right' : 'left' }}
-          value         = { (column.dataType === 'C' || column.dataType === 'Q') ? this.formatValueToCurrency(record[column.dataIndex]) : record[column.dataIndex] }
+          style         = {{ width: column.width, textAlign: (column.data_type === 'C' || column.data_type === 'Q') ? 'right' : 'left' }}
+          value         = { (column.data_type === 'C' || column.data_type === 'Q') ? this.formatValueToCurrency(record[column.dataIndex]) : record[column.dataIndex] }
           onChange      = { (event) => { this.onFieldChange(record, column, event.target.value); } }
           onBlur        = { this.onFieldBlur(record, column) }
           onPressEnter  = { (event) => this.onFieldPressEnter(record, column, event) }
@@ -671,7 +671,6 @@ export default class ConfigurableTable extends React.Component {
                 pagination   = { this.state.pagination }
                 footer       = { this.getFooterForTable }
                 components   = { this.state.components }
-                rowSelection = { rowSelection }
                 />
           );
         }
@@ -686,7 +685,6 @@ export default class ConfigurableTable extends React.Component {
               onChange     = { this.onTableFilterChange }
               pagination   = { this.state.pagination }
               components   = { this.state.components }
-              rowSelection = { rowSelection }
               />
         );
       }
@@ -701,7 +699,6 @@ export default class ConfigurableTable extends React.Component {
             onChange     = { this.onTableFilterChange }
             pagination   = { this.state.pagination }
             components   = { this.state.components }
-            rowSelection = { rowSelection }
             />
       );
     }
