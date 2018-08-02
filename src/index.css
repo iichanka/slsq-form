@@ -220,6 +220,15 @@ li.ant-menu-submenu.ant-menu-submenu-inline.submenu-selected
     width: 35px;
 }
 
+.very-small-select > div.ant-select-selection.ant-select-selection--single {
+    height: 22px;
+}
+
+input.ant-input.ant-input-sm.very-small-input
+{
+    height: 22px;
+}
+
 /* .very-small-table .ant-table-tbody tr td.ant-table-selection-column-custom span label span span
 {
     margin-left: 5px;

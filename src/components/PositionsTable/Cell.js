@@ -1,6 +1,6 @@
 import React                            from 'react';
 import PropTypes                        from 'prop-types';
-import { Tooltip, Select }               from 'antd';
+import { Tooltip, Select, Input }       from 'antd';
 
 const Option = Select.Option;
 
@@ -56,11 +56,11 @@ const DefaultRenderEditable = (props) => {
     <Tooltip 
       title     = { children }
       placement = { placement } >
-      <div 
-        className = 'field-no-wrap'
-        style     = {{ textAlign: align, maxWidth: width}}>
-        { children }
-      </div>
+      <Input
+        className = 'very-small-input'
+        style     = {{ textAlign: align }}
+        size      = 'small'
+        value     = { children } />
     </Tooltip>
   );
 }
@@ -78,7 +78,8 @@ const SelectRenderEditable = (props) => {
   return(
     <Select         
       showSearch
-      style             = {{ width }}
+      style             = {{ width, textAlign: align }}
+      className         = 'very-small-select'
       optionFilterProp  = "children"
       /* onChange          = { (newValue) => { this.onFieldChange(record, column, newValue); } } */
       /* onBlur            = { this.onFieldBlur(record, column) } */
