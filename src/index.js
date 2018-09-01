@@ -11,6 +11,7 @@ import './index.css';
 import { LocaleProvider } from 'antd';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
 
+
 const middleware = [ thunk ]
 if (process.env.NODE_ENV !== 'production') {
   middleware.push(createLogger())
@@ -35,7 +36,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 
-const store = createStore(
+export const store = createStore(
   rootReducer,
   applyMiddleware(...middleware)
 );
@@ -50,7 +51,3 @@ render(
   </Provider>,
   document.getElementById('customSLSQ')
 );
-
-
-
-

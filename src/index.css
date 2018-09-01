@@ -224,3 +224,57 @@ li.ant-menu-submenu.ant-menu-submenu-inline.submenu-selected
 {
     margin-left: 5px;
 } */
+
+.modal-services-list .ant-list{
+    padding: 0 10px;
+}
+
+.delivery-form-wrapp{
+    padding: 0 24px;
+}
+.delivery-form-wrapp .ant-form-item{
+    margin-bottom: 5px;
+}
+.delivery-form-wrapp .ant-input-number{
+    width: 100%;
+}
+.delivery-form-wrapp .ant-table tr.active{
+    background: #096dd9;
+    color: #fff;
+}
+.delivery-form-wrapp .ant-table tr.active:hover{
+    color: #000;
+}
+.delivery-form-wrapp .ant-table-tbody > tr > td {
+    padding: 0px 16px;
+    cursor: pointer;
+}
+
+.delivery-form-wrapp .delivery-table {
+   margin-bottom: 10px;
+}
+.delivery-form-wrapp .ant-form-item-label {
+    line-height: 1;
+}
+
+.helper-wrapp .ant-input-group-addon{
+    cursor: pointer;
+}
+
+.helper-table .ant-table-tbody > tr > td{
+    padding: 0px 16px;
+    cursor: pointer;
+}
+.helper-table{
+    padding-bottom: 20px;
+}
+
+.checkboxes .ant-form-item-control {
+    line-height: 20px;
+}
+.delivery-form-actions{
+    margin-top: 10px;
+    padding-bottom: 20px;
+    text-align: right;
+}
+

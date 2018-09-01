@@ -3,11 +3,17 @@ import { showMessages } from '../messages';
 import { requestItems, endRequestItems, updateItems }  from './main';
 
 
-export const updatePositions = (records) => dispatch => {
+export const updatePositions = (records = []) => dispatch => {
+  let positions = records.filter(record => !!record._changed) || [];
+  if(positions.length <= 0)
+  {
+    return;
+  }
+
   dispatch(requestItems());
 
   let msg = {
-      positions: records
+      positions: positions
   };
 
   axios.post(localStorage.getItem('AjaxURL'), {
