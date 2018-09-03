@@ -4,6 +4,7 @@ import { Tooltip, Select, Input }              from 'antd';
 import { store }                        from '../../index';
 import { updatePositions }              from '../../actions/positions/updatePositions';
 import { localUpdateItem }              from '../../actions/positions/main';
+import BasicSearchHelperPositionField   from '../SearchHelpers/basic/BasicSearchHelperPositionField';
 
 const Option = Select.Option;
 
@@ -51,7 +52,7 @@ const DefaultRender = (props) => {
 }
 
 const DefaultRenderEditable = (props) => {
-  const { children, align, width, isBlocked } = props;
+  const { children, align, width, isBlocked, withSH, shType, shTitle } = props;
 
   let placement = align === 'left' ? 'topLeft' : 'topRight';
 
@@ -59,6 +60,23 @@ const DefaultRenderEditable = (props) => {
     <Tooltip 
       title     = { children }
       placement = { placement } >
+      { withSH && shType === 'BASIC' &&
+        <BasicSearchHelperPositionField
+          onBlur        = { ()  => { props.onBlur(); } }
+          onLocalChange = { (v) => { props.onLocalChange(v) } }
+          onPressEnter  = { ()  => { props.onBlur(); } }
+          onSHSelect    = { (v) => { props.onSHSelect(v);} }
+          helperTile    = { shTitle }
+          dataIndex     = { props.dataIndex }
+          align         = { align }
+          width         = { width }
+          isBlocked     = { isBlocked }
+          value         = { children }
+          record        = { props.data }
+
+        />
+      }
+      { !withSH &&
       <div 
         className = 'field-no-wrap'
         style     = {{ maxWidth: width}}>
@@ -70,7 +88,7 @@ const DefaultRenderEditable = (props) => {
           value    = { children }
           size     = 'small' 
           disabled = { isBlocked } />
-      </div>
+      </div>}
     </Tooltip>
   );
 }
@@ -136,6 +154,9 @@ export class Cell extends React.Component {
     originalWidth: null,
     width: '195px',
     editMode: false,
+    withSH: false,
+    shTitle: '',
+    shType: '',
   }
 
   defaultRender = DefaultRender;
@@ -182,6 +203,22 @@ export class Cell extends React.Component {
     }
     this.setState({ isBlocked });
 
+
+    let shType  = '';
+    let shTitle = '';
+    let withSH   = false;
+
+    if(newProps.data.search_helpers)
+    {
+      if(newProps.data.search_helpers[newProps.dataIndex])
+      {
+        shType  = newProps.data.search_helpers[newProps.dataIndex].type;
+        shTitle = newProps.data.search_helpers[newProps.dataIndex].title;
+        withSH   = true;
+      }
+    }
+    this.setState({ withSH, shType, shTitle });
+
     switch(this.type)  
     {
       case 'input': 
@@ -205,6 +242,14 @@ export class Cell extends React.Component {
     temp_record[this.props.dataIndex] = newValue;
 
     store.dispatch(updatePositions([temp_record]));
+  }
+
+  onSHSelect = (newValue) => {
+    
+    let temp_record = this.props.data;
+    temp_record[this.props.dataIndex] = newValue;
+
+    store.dispatch(updatePositions([temp_record], true));
   }
 
   // отправляем изменненные данные
@@ -232,6 +277,12 @@ export class Cell extends React.Component {
       onBlur:       this.onBlur,
       onLocalChange:this.onLocalChange,
       isBlocked:    this.state.isBlocked,
+      withSH:       this.state.withSH,
+      shType:       this.state.shType,
+      shTitle:      this.state.shTitle,
+      dataIndex:    this.props.dataIndex,
+      data:         this.props.data,
+      onSHSelect:   this.onSHSelect,
     });
   }
   

@@ -22,7 +22,7 @@ class SearchHelperTable extends React.Component {
 
     componentDidMount(){
         this.setState({ loading: true });
-        getBasicHelpersList( this.props.dataGetAction, this.props.inputValue, this.setListData);
+        getBasicHelpersList( this.props.dataGetAction, this.props.inputValue, this.setListData, this.props.record);
     }
 
     setListData = (newData) => {
@@ -31,6 +31,13 @@ class SearchHelperTable extends React.Component {
         this.setState({ data: newData.data });
         this.setState({ loading: false });
 
+    }
+
+    componentWillReceiveProps = (newProps) => {
+        if(this.props.inputValue != newProps.inputValue)
+        {
+            getBasicHelpersList( newProps.dataGetAction, newProps.inputValue, this.setListData, newProps.record);
+        }
     }
 
     render() {
@@ -72,7 +79,12 @@ class BasicSearchHelper extends React.Component {
             footer = { null }
             centered
         >
-            <SearchHelperTable inputValue={this.props.inputValue} dataGetAction={this.props.dataGetAction} helperValueSelect={this.props.helperValueSelect} />
+            <SearchHelperTable 
+                inputValue={this.props.inputValue} 
+                dataGetAction={this.props.dataGetAction} 
+                helperValueSelect={this.props.helperValueSelect} 
+                record  = { this.props.record }
+            />
         </Modal>
       )
     }

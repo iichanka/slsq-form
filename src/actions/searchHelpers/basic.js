@@ -3,14 +3,15 @@ import { showMessages }     from '../messages';
 import { store }            from '../../index';
 
 
-export const getBasicHelpersList = (actionName, inputValue='', callbackFunction) => {
+export const getBasicHelpersList = (actionName, inputValue='', callbackFunction, record = null) => {
   console.log('getBasicHelpersList request');
   console.log(actionName);
   console.log(inputValue);
   axios.post(localStorage.getItem('AjaxURL'), {
     action: 'getBasicSHValues',
     sh: actionName,
-    currentvalue: inputValue
+    currentvalue: inputValue,
+    data: record
   })
   .then(response => {
     let haveError = false;
