@@ -60,7 +60,7 @@ const localUpdateItem = (items = [], action) => {
   return items.map( item => {
     if(item.guid === action.item.guid)
     {
-      item = {...action.item};
+      item = {...action.item, _changed: true};
     }
     return item;
   });
@@ -82,6 +82,7 @@ const updateItems = (items = [], action) => {
       if(newItems[i].guid === updatedItem.guid)
       {
         newItems[i] = updatedItem;
+        newItems[i]._changed = false;
         found = true;
         break;
       }

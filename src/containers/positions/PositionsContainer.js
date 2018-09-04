@@ -7,6 +7,7 @@ import { calcPositionSum }                                  from '../../actions/
 import { updatePositions }                                  from '../../actions/positions/updatePositions';
 import { deletePositions }                                  from '../../actions/positions/deletePositions';
 import { PositionsTable } from '../../components/PositionsTable/PositionsTable';
+import { Sbuttons } from '../../components/PositionsTable/Sbuttons';
 
 export class PositionsConainer extends React.Component {
   static propTypes = {   
@@ -126,10 +127,12 @@ export class PositionsConainer extends React.Component {
               <Row className = 'positionsTable' >    
                   <Col span      = { 24 }
                       className = 'positionsTable' >
+                      <Sbuttons/>
                       <PositionsTable
                         editMode                = { this.props.isEditable }
                         config                  = { this.props.configs.tableConfigs.find( config => config.type === 'POSITIONS' && config.default ) }
-                        data                    = { this.props.positions.items } />
+                        data                    = { this.props.positions.items } 
+                        />
 {/*                       <ConfigurableTable  isProcessing            = { false }
                                           config                  = { this.props.configs.tableConfigs.find( config => config.type === 'POSITIONS' ) }
                                           data                    = { this.props.positions.items }

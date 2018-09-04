@@ -80,8 +80,16 @@ export class PTable extends React.Component {
       selections,
       columnWidth: '35px',
     };
-
+    
+    let tableWidth = 0;
     console.log('PTable->render(): state, props', this.state, this.props);
+
+    if(this.props.columns.length){
+      //Считаем ширину таблицы
+      this.props.columns.forEach(function(item, i, arr) {
+        tableWidth+=parseInt(item.width);
+      });
+    }
 
     if(this.props.data && this.props.data.length > 0)
     {
@@ -96,7 +104,7 @@ export class PTable extends React.Component {
           components    = { components }
           onChange      = { this.onChange }
           indentSize    = { 0 }
-          scroll        = {{ x: '100%', y: '100%' }}
+          scroll        = {{ x: tableWidth, y: '100%' }}
           size          = 'small' />
       );
     }

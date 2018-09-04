@@ -1,6 +1,8 @@
 import React                    from 'react';
 import PropTypes                from 'prop-types';
+import { store }                from '../../index';
 import { PTable, Cell }         from '.';
+import { checkButtonsAvailability } from '../../actions/servicesButtons/main';
 
 
 const defaultOnSelectChange = (keys, records) => {
@@ -19,7 +21,7 @@ export class PositionsTable extends React.Component {
       pageSize:       PropTypes.number.isRequired,
       type:           PropTypes.string.isRequired,
       default:        PropTypes.bool.isRequired,
-    })
+    }),
   }
 
   state = {
@@ -59,8 +61,15 @@ export class PositionsTable extends React.Component {
 
   //изменение списка выделенных позиций
   onSelectChange = (keys, records) => {
+  
     this.setState({ selectedRowKeys: keys });
     this.customerOnSelectChange(keys, records);
+    
+    // Запрос на проверку доступности услуг
+    store.dispatch(checkButtonsAvailability(records));
+
+    // Добавляем выделенные услуги в store
+    store.dispatch({ type: 'P_SELECTED_POSITIONS', data: records});
   }
 
   //выделение позиций-материалов
@@ -148,7 +157,7 @@ export class PositionsTable extends React.Component {
 
 
   render = () => {
-    return(      
+    return(
       <PTable
         selections      = { this.state.selections }
         data            = { this.props.data }
