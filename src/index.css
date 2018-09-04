@@ -105,7 +105,7 @@
 
 .small-table-line
 {
-    line-height: 22px;
+    line-height: 25px;
 
 }
 
@@ -138,7 +138,7 @@
 
 .ant-table-fixed
 {
-    height: 22px !important;
+    height: 25px !important;
 }
 
 .ant-modal-body

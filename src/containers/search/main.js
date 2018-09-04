@@ -243,7 +243,7 @@ export default class SearchContainer extends Component {
                 
                 <ConfigurableTable isProcessing             = { this.props.isSearching }
                                    config                   = { this.remnantsConfig }
-                                   data                     = { this.props.results.remnants.map( r => r ) }
+                                   data                     = { this.props.results.remnants }
                                    isEditable               = { this.props.isEditable }
                                    isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
                                    dispatch                 = { this.props.dispatch }
@@ -259,7 +259,7 @@ export default class SearchContainer extends Component {
 
                 <ConfigurableTable isProcessing             = { this.props.isSearching }
                                    config                   = { this.inTransintConfig }
-                                   data                     = { this.props.results.inTransit.map( r => r ) }
+                                   data                     = { this.props.results.inTransit }
                                    isEditable               = { this.props.isEditable }
                                    isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
                                    dispatch                 = { this.props.dispatch }
@@ -275,7 +275,7 @@ export default class SearchContainer extends Component {
                         
                 <ConfigurableTable  isProcessing             = { this.props.isSearching }
                                     config                   = { this.materialsConfig }
-                                    data                     = { this.props.results.materials.map( r => r ) }
+                                    data                     = { this.props.results.materials }
                                     isEditable               = { this.props.isEditable }
                                     isPersonalizationActive  = { this.props.configs.isPersonalizationActive }
                                     dispatch                 = { this.props.dispatch }

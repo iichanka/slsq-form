@@ -3,34 +3,18 @@ import PropTypes                        from 'prop-types'
 import {  Table, Icon, Button, 
           Popover, Input, Row, Col,
           Checkbox, Select, Divider,
-          Alert }                     from 'antd';
-import { localUpdateItem }              from '../actions/positions/main';
-import { TableCell }                    from '../components';
-import { FixedHeader }                  from '../components';
+          Tooltip }   from 'antd';
+import { addPositionItem }              from '../actions/positions/addPosition';
+import { FixedHeader }          from '../components/';
 
-/* import { Resizable } from 'react-resizable';
-import 'react-resizable/css/styles.css';
-
-const HeaderWithFixedWidth = props => {
-  const { width, ...restProps } = props;
-
-  if (width) {
-    return <th {...restProps} style = {{ maxWidth: width, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} />;
-  }
-  return <th { ...props } />;
-};  */
-
-
-const Option = Select.Option;
-
-const rowSelection = {
-  onChange: (selectedRowKeys, selectedRows) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+const components = {
+  header: {
+    cell: FixedHeader,
   },
-  getCheckboxProps: record => ({
-    name: record.dataIndex,
-  }),
 };
+
+const Search = Input.Search;
+const Option = Select.Option;
 
 const initialState = {
   filtered: [],
@@ -41,239 +25,152 @@ const initialState = {
   filter: [],
 };
 
-const components = {
-  header: {
-    cell: FixedHeader,
-  },
-};
-
 export default class ConfigurableTable extends React.Component {
   static PropTypes = {
-    isProcessing:             PropTypes.bool.isRequired,
-    config:                   PropTypes.object.isRequired,
-    data:                     PropTypes.array.isRequired,
-    isEditable:               PropTypes.bool.isRequired,
-    isPersonalizationActive:  PropTypes.bool.isRequired,
-    dispatch:                 PropTypes.func.isRequired,
-    modifyColumns:            PropTypes.func,
-    onPositionDelete:         PropTypes.func,
-    onPositionUpdate:         PropTypes.func,
-    onPositionsUpdateAll:     PropTypes.func,
-    onAddClick:               PropTypes.func,
-    scrollWidth:              PropTypes.any,
-    scrollHeight:             PropTypes.any,
+    isProcessing:       PropTypes.bool.isRequired,
+    config:             PropTypes.object.isRequired,
+    data:               PropTypes.array.isRequired,
+    isEditable:         PropTypes.bool.isRequired,
+    dispatch:           PropTypes.func.isRequired,
   }
-
-  filters = [];
-  sorters = [];
-  columns = [];
-  filteredData = [];
-
-  
-
-  
 
   constructor(props)
   {
     super(props);
-    this.onTableFilterChange  = this.onTableFilterChange.bind(this);
-    this.getRowClassName      = this.getRowClassName.bind(this);
+    this.state = {
+      columns: this.getColumns_(props),
+      data: props.data
+    };
 
-    this.state = this.getStateFromProps(props);
-    this.state = {...this.state, components};
+      /* this.state = this.getStateFromProps(props);
+    console.log('containers.configurableTable.constructor(props, state)', props, this.state); */
   }
 
-
-  componentWillReceiveProps(props)
-  {
-    this.setState(this.getStateFromProps(props));
-    this.updateStateAfterRefresh();
-  }
-
-  getStateFromProps = (newProps) => {
-    console.log('getStateFromProps(), newProps, oldProps:', newProps, this.props);
-    const { config, data, isEditable, isPersonalizationActive } = newProps;
-    let oldConfig                     = {};
-    let oldData                       = [];        
-    let oldIsPersonalizationActive    = false;
-    let oldIsEditabe                  = false;
-    let configChanged                 = false;
-    let dataChanged                   = false;
-    let personalizationStatusChanged  = false;
-    let editableStatusChanged         = false;
-    
-    if(this.state)
+  getColumns_ = ({config, isEditable}) => {
+    let columns = [];
+    if(config && config.columns && config.columns.length)
     {
-      oldConfig                   = this.state.config;
-      oldData                     = this.state.data;
-      oldIsPersonalizationActive  = this.state.isPersonalizationActive;
-      oldIsEditabe                = this.state.isEditable;
+      columns = config.columns.map(column => {
+        if(column.visible)
+        {
+          //quantity, integers and floats - right align
+          let columnAlign = 
+            column.data_type === 'Q' || 
+            column.data_type === 'F' ||
+            column.data_type === 'I' ? 'right' : 'left';
+  
+          column.render = (text, record) => {
+            let placement = columnAlign === 'left' ? 'topLeft' : 'topRight';
+            return(
+              <Tooltip 
+                title     = { text }
+                placement = { placement } >
+                <div 
+                  className = 'field-no-wrap'
+                  style     = {{ textAlign: columnAlign, maxWidth: column.width}}>
+                  { text }
+                </div>
+              </Tooltip>
+            );
+          }  
+          return column;
+        }
+        return null;
+      }).filter(column => !!column);
+
+      if(isEditable)
+      {
+        columns.unshift({
+          key: 'action',
+          width: 100,
+          render: (text, record) => {
+            return(
+                <div>
+                    <Input  
+                      size = "small" 
+                      placeholder = "1,000"
+                      defaultValue = '1,000'
+                      ref = { (ref) => { this.saveInputReference(record.key, ref) } }
+                      addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
+                      onPressEnter = { (e) => { this.onAddClick(record) } } />
+                </div>
+            ); 
+          }
+        });
+      }
+    }
+    return columns;
+  }
+
+  componentWillReceiveProps(newProps)
+  {
+    //перестройка колонок
+    if(this.state.config !== newProps.config)
+    {
+      this.setState({columns: this.getColumns_(newProps)});
     }
 
-    configChanged                 = oldConfig !== config;
-    dataChanged                   = oldData   !== data;
-    personalizationStatusChanged  = oldIsPersonalizationActive  !== isPersonalizationActive;
-    editableStatusChanged         = oldIsEditabe                !== isEditable;
+    if(this.state.data !== newProps.data)
+    {
+      this.setState({ data: newProps.data });
+    }
 
-    return {
-      config,
-      data,
-      isPersonalizationActive,
-      isEditable,
-      configChanged,
-      dataChanged,
-      personalizationStatusChanged,
-      editableStatusChanged,
-      pagination: this.getPagination(config),
-      scroll:     this.getScroll(newProps),
-    };
+
+    /* this.setState(this.getStateFromProps(newProps));
+    console.log('containers.configurableTable.componentWillReceiveProps(props, state)', newProps, this.state); */
   }
 
-  filterData = () =>
+  getStateFromProps = (props) => {
+    const { config, data, isEditable } = props;
+    let oldState = this.state;
+
+    let state = { 
+      columns: this.getColumns(config, data, isEditable),
+      pagination: this.getPagination(config),
+      scroll: this.getScroll(config),
+      data
+    };
+
+    console.log('containers.configurableTable.getStateFromProps(props, state)', props, this.state);
+    return state;
+  }
+
+  getScroll(config = { type: '' })
   {
-    const { data } = this.props;
-    
-    if(data)
+    switch(config.type)
     {
-      let filteredData = data.map(record => record);
-      
-      for(let field in this.filters)
+      case 'RFR':
+      case 'RFIT':
+      case 'RFM':
       {
-        if(this.filters[field].active === true)
-        {
-          filteredData = filteredData.map(record => {
-            if(this.filters[field].selectedValues.indexOf(record[field]) === -1)
-            {
-              return null;
-            }
-            return record;
-          }).filter(record => !!record);
-        }       
-
-        if(this.sorters[field] === 'asc')
-        {
-          filteredData.sort((a, b) => {
-            if(a[field] < b[field]) return -1;
-            if(a[field] > b[field]) return 1;
-            return 0;
-          });
-        }
-
-        if(this.sorters[field] === 'desc')
-        {
-          filteredData.sort((a, b) => {
-            if(a[field] > b[field]) return -1;
-            if(a[field] < b[field]) return 1;
-            return 0;
-          });
+        return {
+          y: 217, 
+          x: '100%'
         }
       }
-
-      return filteredData;
-    }
-    return null;
-  }
-
-
-  updateFilters = (data) =>
-  {
-    let columns = [];
-    if(this.props.config)
-    {
-      columns = this.props.config.columns;
-    }
-
-    if(data && columns)
-    {
-      columns.map(column => {
-        if(!this.filters[column.dataIndex])
-        {
-          this.filters[column.dataIndex] = { };
-        }
-
-        if(!this.filters[column.dataIndex].active)
-        {
-          if(!this.filters[column.dataIndex].selectedValues)
-          {
-            this.filters[column.dataIndex].selectedValues = [];
-          }
-
-          this.filters[column.dataIndex].allValues = [];
-
-          data.map(record => {
-            if(this.filters[column.dataIndex].allValues.indexOf(record[column.dataIndex]) === -1)
-            {
-              this.filters[column.dataIndex].allValues.push(record[column.dataIndex]);
-            }
-          })
-
-          this.filters[column.dataIndex].allValues.sort((a, b) => a > b );    
-        }
-      })
+      default:
+      {
+        return {
+          y: '100%', 
+          x: '100%'
+        };
+      }
     }
   }
 
-
-  getScroll({ scrollWidth, scrollHeight})
+  getColumns(config, data, isEditable)
   {
-    return {
-      x: scrollWidth  ? scrollWidth  : '100%',
-      y: scrollHeight ? scrollHeight : '100%',
-    };
-  }
-
-  updateStateAfterRefresh = () =>
-  {
-    /* const { configChanged, dataChanged, editableStatusChanged } = this.state;
-    console.log("updateStateAfterRefresh", this.state);
-    if(configChanged || dataChanged || editableStatusChanged)
-    {
-      
-      let filteredData = this.filterData();
-      this.updateFilters(filteredData);
-      //let columns      = this.getColumns();
-
-      this.setState(...this.state, {
-        filteredData: filteredData,
-        //columns:      columns,
-      });    
-    }  */  
-  }
-
-  updateStateAfterRefreshWReturn = () =>
-  {
-    const { configChanged, dataChanged, editableStatusChanged } = this.state;
-    console.log("updateStateAfterRefreshWReturn", this.state);
-    if(configChanged || dataChanged || editableStatusChanged)
-    {
-      
-      let filteredData = this.filterData();
-      this.updateFilters(filteredData);
-      let columns      = this.getColumns();
-
-      this.data = {
-        filteredData: filteredData,
-        columns:      columns,
-      };
-    }
-  }
-
-  getColumns()
-  {
-    const {config, data, isEditable} = this.state;
-    console.log("getColumns, state, props", this.state, this.props);
-
     if(config && data)
     {
       if(config.columns && config.columns.length > 0)
       {
-        let columns = config.columns.map( (column, index) => {
+        let columns = config.columns.map( column => {
           if(column.visible && !column.technical)
           {
-            column.className    = 'table-line-without-padding';
-            if(column.data_type === 'C' || column.data_type === 'Q')
+            column.className    = 'table-actions-without-padding';
+            if(column.dataType === 'C' || column.dataType === 'Q')
             {
-              column.className    = 'table-line-without-padding numeric-field';
+              column.className    = 'table-actions-without-padding numeric-field';
             }
             column.filterIcon   = ( column.searchable || column.sortable ) && 
               <Icon type  = "filter" 
@@ -283,10 +180,8 @@ export default class ConfigurableTable extends React.Component {
             column.filterDropdownVisible  = this.getDropdownVisible(column.dataIndex);
             
             column.onFilterDropdownVisibleChange  = (visible) => { this.onFilterDropdownVisibleChange(visible, column.dataIndex) };
-
-            column.render = (text, record) => { return this.simpleFieldRender(text, record, column) };
             
-            if(column.data_type === 'C' || column.data_type === 'Q')
+            if(column.dataType === 'C' || column.dataType === 'Q')
             {
               column.render = (text, record) => { return this.renderForCurrencyOrQuantity(text, record, column) };
             }
@@ -295,160 +190,124 @@ export default class ConfigurableTable extends React.Component {
             {
               column.render = (text, record) => { return this.renderForEditableColumn(text, record, column) };
             }
-
-            column.onHeaderCell = (cell) => {
-              return {
-                width: column.width,
-                title: column.title,
-                /* onResize: this.onColumnResize(index).bind(this), */
-              }
-            };
-
             return column;
           }
           return null;
         }).filter( column => !!column );
 
-        console.log('getColumns modi')
-        if(this.props.modifyColumns)
-        {
-          this.props.modifyColumns(config, isEditable, columns);
-        }
+        this.getColumnsExtended(config, data, isEditable, columns);
 
-        console.log('containers.configurableTable.getColumns(config, isEditable, columns)', config, isEditable, columns);
+        console.log('containers.configurableTable.getColumns(config, data, isEditable, columns)', config, data, isEditable, columns);
         return columns;
       }
     }
     return [];
   }
 
-  simpleFieldRender(text, record, column)
+  getActionsColmunForResults()
   {
-    if(!record.allowedValues)
-    {
-      record.allowedValues = [];
-    }
-    let allowedValues     = record.allowedValues.find( allowedValuesForFields => allowedValuesForFields.fieldName === column.dataIndex);
-    let replacmentValue   = text;  
-    if(allowedValues)
-    {
-      allowedValues.values.find( valueRange => {
-        if(valueRange.low === text)
-        {
-          replacmentValue = valueRange.lowTitle;
-          return true;
-        }
-        return false;
-      });
-    }
-    return (
-      <TableCell column = { column } >
-        { replacmentValue }
-      </TableCell> );
-  } 
-
-  onSorterToogle = (column, type) => {
-    if(this.sorters[column.dataIndex] === type)
-    {
-      this.sorters[column.dataIndex] = '';
-    }
-    else
-    {
-      this.sorters[column.dataIndex] = type;
-    }
-
-    this.forceUpdate();
+    return {
+      key:    'actions',
+      title:  'Действия',
+      width:  100,
+      className: 'table-actions-without-padding',
+      render: (text, record) => {
+        return(
+            <div>
+                <Input  size = "small" 
+                        placeholder = "1,000"
+                        defaultValue = '1,000'
+                        ref = { (ref) => { this.saveInputReference(record.key, ref) } }
+                        style = {{ width: 100 }}
+                        addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
+                        onPressEnter = { (e) => { this.onAddClick(record) } } />
+            </div>
+        ); 
+      }
+    };
   }
 
-  getSortButton = (column, type) => {
-    let label = '';
-    let icon  = ''
-    switch(type)
+  getColumnsExtended(config, data, isEditable, columns = [])
+  {
+    if(columns.length === 0 || !isEditable)
     {
-      case 'asc'  : { label = 'Сортировать от А до Я'; icon = 'arrow-down'; break; }
-      case 'desc' : { label = 'Сортировать от Я до А'; icon = 'arrow-up';   break; }
+      return;
     }
 
-    if(this.sorters[column.dataIndex] === type)
+    switch(config.type)
     {
-      return(
-        <Button style = {{ width: '100%', marginTop: 5 }}
-                size = 'small'
-                icon = { icon }
-                type = 'primary'
-                onClick = { event => { this.onSorterToogle(column, type) } }>
-          { label }
-        </Button>
-      )
+      case 'RFR':
+      case 'RFIT':
+      case 'RFM':
+      {
+        columns.unshift(this.getActionsColmunForResults());
+        break;
+      }
+
+      case 'POS':
+      {
+        columns.push(this.getActionsColmunForPositions());
+      }
     }
-    return(
-      <Button style = {{ width: '100%', marginTop: 5 }}
-              size = 'small'
-              icon = { icon }
-              onClick = { event => { this.onSorterToogle(column, type) } }>
-        { label }
-      </Button>);
+  }
+
+  getActionsColmunForPositions()
+  {
+    return {
+      key:    'actions',
+      title:  'Действия',
+      width:  150,
+      className: 'table-actions-without-padding',
+      render: (text, record) => {
+        return(
+            <span>
+              <a>Удалить</a>
+              {
+                record.isModified &&
+                <span>
+                  <Divider type="vertical" />
+                  <a>Обновить</a>
+                </span>
+              }              
+            </span>
+        ); 
+      }
+    };
+  }
+
+  onAddClick(record)
+  {
+    const { dispatch, config } = this.props;
+    let input = this.state.inputReference[record.key].input;
+
+    if(input)
+    {
+      input.blur();
+      switch(config.type)
+      {
+        case 'RFR':
+        {
+          dispatch(addPositionItem({ remnants: {...record, count: input.value } }));
+        }
+      }
+    }
+  }
+
+  saveInputReference(key, ref)
+  {
+    let inputReference = this.state.inputReference || [];
+    inputReference = inputReference.slice(0);
+
+    if(!inputReference[key])
+    {
+      inputReference[key] = ref;
+      this.setState({ inputReference });
+    }
   }
 
   buildDropdownForColumn(column, data)
   {
-    if(column.searchable)
-    return(
-      <div className="custom-filter-dropdown">
-        <Row>
-          <Col span = { 24 }>
-            { this.getSortButton(column, 'asc') }
-          </Col>
-        </Row>
-        <Row>
-          <Col span = { 24 } >
-          { this.getSortButton(column, 'desc') }
-          </Col>
-        </Row>
-{/*         <Row>
-          <Col span = { 24 } >
-            <Search
-              style       = {{ marginTop: 5 }}
-              placeholder = "Поиск..."
-              //onSearch    = { value => { aviableValues.push(value); this.filters.push({ field: column.dataIndex, values: aviableValues}) } }
-              size        = 'small'
-              enterButton
-            />
-          </Col>
-        </Row> */}
-        <Row>
-          <Col span = { 24 } className = 'scrollable-y' style = {{ maxHeight: 250 }}>
-            { 
-              this.filters[column.dataIndex].allValues.map( (value) => 
-              <Row>
-                <Col span = { 24 } >
-                  <Checkbox checked = { this.filters[column.dataIndex].selectedValues.indexOf(value) !== -1 } 
-                            onChange = { event => { this.onFilterSelect(column.dataIndex, value, event.target.checked) } }>
-                    { value }
-                  </Checkbox>
-                </Col>
-              </Row>
-              )
-            }
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-
-  onFilterSelect = (field, value, checked) =>
-  {
-    if(checked)
-    {
-      this.filters[field].selectedValues.push(value);
-      this.filters[field].active = true;
-    }
-    else
-    {
-      this.filters[field].selectedValues.splice(this.filters[field].selectedValues.indexOf(value), 1);
-      this.filters[field].active = this.filters[field].selectedValues.length !== 0;
-    }
-    this.forceUpdate();
+    return null;
   }
 
   onFilterDropdownVisibleChange(visible, columnName)
@@ -458,28 +317,16 @@ export default class ConfigurableTable extends React.Component {
     this.setState( { dropdownVisible });
   }
 
-  onColumnResize = index => (e, { size }) => {
-    console.log('onColumnResize', e, size);
-    this.setState(({ columns }) => {
-      const nextColumns = [...columns];
-      nextColumns[index] = {
-        ...nextColumns[index],
-        width: size.width,
-      };
-      return { columns: nextColumns };
-    });
-  };
-
   renderForCurrencyOrQuantity(text, record, column)
   {
     return(
-      <TableCell column = { column } >
+      <span style = {{ textAlign: 'right' }}>
         { this.formatValueToCurrency(record[column.dataIndex]) }
-      </TableCell>
+      </span>
     );
   };
 
-  formatValueToCurrency = (data = '') => {
+  formatValueToCurrency = (data) => {
     return Number(data.replace(',','')).toLocaleString('en', {style: 'currency', currency: 'USD'}).replace('$', '').replace('NaN', '0.00');
   }
 
@@ -489,79 +336,73 @@ export default class ConfigurableTable extends React.Component {
     if(allowedValues)
     {
       return(
-        <TableCell column = { column }>
-          <Select         
-            showSearch
-            style             = {{ width: column.width }}
-            optionFilterProp  = "children"
-            onChange          = { (newValue) => { this.onFieldChange(record, column, newValue); } }
-            onBlur            = { this.onFieldBlur(record, column) }
-            value             = { record[column.dataIndex] }
-            filterOption      = { (input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 }
-            size              = 'small'
-          >
-          {
-            allowedValues.values.map( valueRange => {
-              return(
-                <Option value = { valueRange.low } >
-                  { valueRange.lowTitle }
-                </Option>
-              );
-            })
-          }
-          </Select>
-        </TableCell>);
+        <Select         
+          showSearch
+          style             = {{ width: column.width }}
+          optionFilterProp  = "children"
+          onChange          = { (newValue) => { this.onFieldChange(record, column, newValue); } }
+          onBlur            = { this.onFieldBlur(record, column) }
+          value             = { record[column.dataIndex] }
+          filterOption      = { (input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 }
+          size              = 'small'
+        >
+        {
+          allowedValues.values.map( valueRange => {
+            return(
+              <Option value = { valueRange.low } >
+                { valueRange.lowTitle }
+              </Option>
+            );
+          })
+        }
+        </Select>);
     }
-    if(column.data_type === 'CB')
+    if(column.dataType === 'CB')
     {
       return(
-        <TableCell column = { column }>
-          <Checkbox
-            style         = {{ width: column.width, textAlign: 'center' }}
-            value         = { record[column.dataIndex] }
-            onChange      = { (event) => { this.onFieldChange(record, column, event.target.checked); } }
-            size          = 'small' />
-        </TableCell>
+        <Checkbox
+          style         = {{ width: column.width, textAlign: 'center' }}
+          value         = { record[column.dataIndex] }
+          onChange      = { (event) => { this.onFieldChange(record, column, event.target.checked); } }
+          size          = 'small'
+        />
       );
     }
     return(
-      <TableCell column = { column }>
-        <Input 
-          style         = {{ width: column.width, textAlign: (column.data_type === 'C' || column.data_type === 'Q') ? 'right' : 'left' }}
-          value         = { (column.data_type === 'C' || column.data_type === 'Q') ? this.formatValueToCurrency(record[column.dataIndex]) : record[column.dataIndex] }
-          onChange      = { (event) => { this.onFieldChange(record, column, event.target.value); } }
-          onBlur        = { this.onFieldBlur(record, column) }
-          onPressEnter  = { (event) => this.onFieldPressEnter(record, column, event) }
-          size          = 'small' />
-      </TableCell>
+      <Input 
+        style         = {{ width: column.width, textAlign: (column.dataType === 'C' || column.dataType === 'Q') ? 'right' : 'left' }}
+        value         = { (column.dataType === 'C' || column.dataType === 'Q') ? this.formatValueToCurrency(record[column.dataIndex]) : record[column.dataIndex] }
+        onChange      = { (event) => { this.onFieldChange(record, column, event.target.value); } }
+        onBlur        = { this.onFieldBlur(record, column) }
+        onPressEnter  = { (event) => this.onFieldPressEnter(record, column, event) }
+        size          = 'small'
+      />
     );
   };
 
   onFieldBlur = (record, column) => {
-    //console.log('containers.configurableTable.onFieldBlur()[record, column]', record, column);
+    console.log('containers.configurableTable.onFieldBlur()[record, column]', record, column);
   }
 
   onFieldPressEnter = (record, column, event) => {
-    //console.log('containers.configurableTable.onFieldPressEnter()[record, column, event]', record, column, event);
+    console.log('containers.configurableTable.onFieldPressEnter()[record, column, event]', record, column, event);
   }
 
 
   onFieldChange = (record, column, newValue) => {
-    const { dispatch, data } = this.props;
-    
-
     console.log('containers.configurableTable.onFieldChange()[record, column, newValue]', record, column, newValue);
+    let data = this.state.data.slice(0);
     for(let i = 0; i < data.length; i++)
     {
       if(data[i].guid === record.guid)
       {
-        let item = { ...data[i] };
-        item.isModified = item[column.dataIndex] !== newValue;
-        item[column.dataIndex] = newValue;
-        dispatch(localUpdateItem(item));
+        data[i].isModified = data[i][column.dataIndex] !== newValue;
+        data[i][column.dataIndex] = newValue;
         break;
       }
     }
+
+    this.setState({ data });
   }
 
   getDropdownVisible(columnName)
@@ -579,7 +420,7 @@ export default class ConfigurableTable extends React.Component {
   {
     let applyed = false;
     try {
-      applyed = this.filters[columnName].active || this.sorters[columnName] === 'asc' || this.sorters[columnName] === 'desc';
+      applyed = this.state.filter[columnName].applyed;
     } catch (error) {
     }
     
@@ -592,7 +433,7 @@ export default class ConfigurableTable extends React.Component {
     {
       if(config.pageSize)
       {
-        return config.pageSize > 0 ? { pageSize: config.pageSize } : { pageSize: false };
+        return config.pageSize > 0 ? { pageSize: config.pageSize } : false;
       }
       else
       {
@@ -605,113 +446,61 @@ export default class ConfigurableTable extends React.Component {
     console.log('containers.configurableTable.onTableFilterChange(pagination, filters, sorter)', pagination, filters, sorter);
   }
 
-  isModified(data = [])
+  getFooterForTable(currentPageData)
   {
+    console.log('containers.configurableTable.getFooterForTable(currentPageData, state)', currentPageData, this.state);
+    let updateAllButton = false;
+    let data = this.state.data || [];
+    data = data.slice(0);
+
     for(let i = 0; i < data.length; i++)
     {
       if(data[i].isModified)
       {
-        return true;
+        updateAllButton = true;
+        break;
       }     
     }
-    return false;
-  }
-
-  getFooterForTable(currentPageData)
-  {  
-    if(this.props.onPositionsUpdateAll)
-    {
-      return(
-        <Button 
-          type = "primary" 
-          icon = 'save' 
-          onClick = { event => { this.props.onPositionsUpdateAll(this.props.data.map(item => item.isModified ? item : null).filter(item => !!item)) } }
-          style = {{ float: 'right', top: -8 }} >Сохранить все изменения</Button>
-      );
-    }
+    
+    return(
+      updateAllButton ? 
+        <Button type = "primary" icon = 'save' style = {{ float: 'right', top: -8 }} >Сохранить все изменения</Button> :
+        <Button type = "primary" icon = 'save' style = {{ float: 'right', top: -8 }} disabled>Сохранить все изменения</Button>
+    );
   }
 
   getRowClassName = (record, index) =>
   {
-    if(record.isModified)
-    {
-      return 'small-table-line highlighted-row';
-    }
-    return 'small-table-line'
+    return 'small-table-line';
   }
 
+
   render() {
-    /* const { configChanged, dataChanged, editableStatusChanged } = this.state;
+    console.log('containers.configurableTable.render(state)', this.state);
 
-    if(configChanged || dataChanged || editableStatusChanged)
-    {
-      this.filteredData = this.filterData();
-      this.updateFilters(this.filteredData);
-      this.columns      = this.getColumns();
-    } */    
-    this.updateStateAfterRefreshWReturn();
-    console.log('configurableTable.render(): state, props, data', this.state, this.props, this.data);
-
-
-    if(this.data && this.data.filteredData && this.data.filteredData.length > 0)
-    {
-      if( this.props.isEditable && this.props.config.type === 'POSITIONS' )
-      {
-        if(this.isModified(this.data.filteredData))
-        {
-          return(
-              <Table 
-                columns      = { this.data.columns }
-                dataSource   = { this.data.filteredData }
-                size         = 'small'
-                scroll       = { this.state.scroll } 
-                loading      = { this.props.isProcessing }
-                rowClassName = { this.getRowClassName } 
-                onChange     = { this.onTableFilterChange }
-                pagination   = { this.state.pagination }
-                footer       = { this.getFooterForTable }
-                components   = { this.state.components }
-                />
-          );
-        }
-        return(
-            <Table 
-              columns      = { this.data.columns }
-              dataSource   = { this.data.filteredData }
-              size         = 'small'
-              scroll       = { this.state.scroll } 
-              loading      = { this.props.isProcessing }
-              rowClassName = { this.getRowClassName } 
-              onChange     = { this.onTableFilterChange }
-              pagination   = { this.state.pagination }
-              components   = { this.state.components }
-              />
-        );
-      }
-      return(
-          <Table 
-            columns      = { this.data.columns }
-            dataSource   = { this.data.filteredData }
-            size         = 'small'
-            scroll       = { this.state.scroll } 
-            loading      = { this.props.isProcessing }
-            rowClassName = { this.getRowClassName } 
-            onChange     = { this.onTableFilterChange }
-            pagination   = { this.state.pagination }
-            components   = { this.state.components }
-            />
-      );
+    let tableWidth = 0;
+    if(this.state.columns.length){
+      //Считаем ширину таблицы
+      this.state.columns.forEach(function(item, i, arr) {
+        tableWidth+=parseInt(item.width);
+      });
     }
-    else
-    {
+    
       return(
-        <Alert
-          message = 'Ничего не найдено'
-          type    = 'info'
-          style   = {{ margin: 8 }}
-        />
-      );
-    }
+        <Table 
+          className    = 'very-small-table'
+          columns      = { this.state.columns } 
+          dataSource   = { this.state.data }
+          size         = 'small'
+          components   = { components }
+          /* scroll       = { this.state.scroll }  */
+          scroll       = {{ x: tableWidth, y: '100%' }}
+          loading      = { this.props.isProcessing }
+          rowClassName = { this.getRowClassName } 
+          /* onChange     = { this.onTableFilterChange.bind(this) } */
+          /* pagination   = { this.state.pagination } */
+          />
+      );   
       
   };
 }

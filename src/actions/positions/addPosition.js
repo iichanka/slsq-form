@@ -1,20 +1,14 @@
 import axios from 'axios';
 import { showMessages } from '../messages';
-import { requestItems, endRequestItems, receiveItems }  from './main';
-import { clone }                                        from '../../utils';
+import { requestItems, endRequestItems, receiveItems } from './main';
 
 
 export const addPositionItem = (record) => dispatch => {
   dispatch(requestItems());
 
-  if(record.remnants.countInputReference)
-  {
-    delete record.remnants.countInputReference;
-  }
-
   axios.post(localStorage.getItem('AjaxURL'), {
     action:   'addPositionItem',              
-    data: record
+    data:     record,
   })
   .then(response => {
     let haveError = false;
@@ -27,7 +21,6 @@ export const addPositionItem = (record) => dispatch => {
     dispatch(endRequestItems());
   })
   .catch(function (error) {
-    console.log('addPositionItem post error: ', error);
     showMessages([{type: 'E', text: 'Не удалось добавить позицию.'}]);
     dispatch(endRequestItems());
   });
