@@ -3,6 +3,7 @@ import PropTypes                from 'prop-types';
 import { store }                from '../../index';
 import { PTable, Cell }         from '.';
 import { checkButtonsAvailability } from '../../actions/servicesButtons/main';
+import { ActionCell }           from '.';
 
 
 const defaultOnSelectChange = (keys, records) => {
@@ -117,19 +118,20 @@ export class PositionsTable extends React.Component {
     if(newProps.editMode != this.state.editMode)
     {
       this.setState({ editMode: newProps.editMode });
-      //needRebuildColumns = true;
+      needRebuildColumns = true;
     }
 
 
     if(needRebuildColumns)
     {
-      this.setState({columns: this.buildColumns(newProps.config.columns)});
+      this.setState({columns: this.buildColumns(newProps.config.columns, newProps.editMode)});
     }
   }
 
-  buildColumns = (originalColumns = []) =>
+  buildColumns = (originalColumns = [], editMode = false) =>
   {
-    return originalColumns.map(column => {
+    
+    let columns = originalColumns.map(column => {
       if(column.visible)
       {
         //quantity, integers and floats - right align
@@ -153,6 +155,14 @@ export class PositionsTable extends React.Component {
       }
       return null;
     }).filter(column => !!column);
+
+    columns.unshift({
+      width: 70,
+      key: 'action',
+      render: (text, record) => <ActionCell data = { record } editMode = { editMode } />
+    });
+
+    return columns;
   }
 
 

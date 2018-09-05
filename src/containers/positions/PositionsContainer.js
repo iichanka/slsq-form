@@ -127,7 +127,7 @@ export class PositionsConainer extends React.Component {
               <Row className = 'positionsTable' >    
                   <Col span      = { 24 }
                       className = 'positionsTable' >
-                      <Sbuttons/>
+                      <Sbuttons editMode = { this.props.isEditable }/>
                       <PositionsTable
                         editMode                = { this.props.isEditable }
                         config                  = { this.props.configs.tableConfigs.find( config => config.type === 'POSITIONS' && config.default ) }

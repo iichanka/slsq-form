@@ -13,15 +13,17 @@ export class Sbuttons extends React.Component {
     }
 
     render() {
-        return (
-            <div class="ant-tabs-nav-wrap">
-                <ButtonGroup style = {{ margin: '5px'}} >
-                    <FileButton />
-                    <DeliveryButton />
-                    <ServiceButton />
-                </ButtonGroup>
-            </div>
-        );
+      return (
+        <div class="ant-tabs-nav-wrap">
+        { this.props.editMode && 
+          <ButtonGroup style = {{ margin: '5px'}} >
+          <FileButton />
+          <DeliveryButton />
+          <ServiceButton />
+        </ButtonGroup>
+        }
+        </div>
+      );
     }
 }
 

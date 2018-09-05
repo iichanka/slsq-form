@@ -59,12 +59,12 @@ class BasicSearchHelperInput extends React.Component {
                     </div>
                     <div className="ant-form-item-control">
                         <Input
-                            name = { this.props.inputName }
-                            value = { this.state.value } 
-                            onChange = { this.handleChange }
-                            onKeyUp={ this.handleKeyPress }
-                            addonAfter={<Icon type="form"  onClick = { event => this.showHelper() }/>}
-                            size="small"
+                            name        = { this.props.inputName }
+                            value       = { this.state.value } 
+                            onChange    = { this.handleChange }
+                            onKeyUp     = { this.handleKeyPress }
+                            addonAfter  = { <Icon type="form"  onClick = { event => this.showHelper() }/> }
+                            size        = "small"
                             />
                             { <BasicSearchHelper
                                 visible = { this.state.showHelper }

@@ -57,6 +57,7 @@ export default class Configurator extends React.Component {
 
 
   filterOption = (inputValue, option) => {
+    console.log('filterOption', option);
     return option.title.toLowerCase.indexOf(inputValue.toLowerCase) > -1;
   }
 

@@ -1,7 +1,7 @@
 import React                            from 'react';
 import PropTypes                        from 'prop-types'
 import {  Table, Icon, Button, 
-          Popover, Input, Row, Col,
+          Alert, Input, Row, Col,
           Checkbox, Select, Divider,
           Tooltip }   from 'antd';
 import { addPositionItem }              from '../actions/positions/addPosition';
@@ -87,12 +87,12 @@ export default class ConfigurableTable extends React.Component {
             return(
                 <div>
                     <Input  
-                      size = "small" 
-                      placeholder = "1,000"
-                      defaultValue = '1,000'
-                      ref = { (ref) => { this.saveInputReference(record.key, ref) } }
-                      addonAfter = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
-                      onPressEnter = { (e) => { this.onAddClick(record) } } />
+                      size            = "small" 
+                      placeholder     = "1,000"
+                      defaultValue    = '1,000'
+                      ref             = { (ref) => { this.saveInputReference(record.key, ref) } }
+                      addonAfter      = { <Icon type = "plus-circle-o" onClick = { (e) => { this.onAddClick(record) } } />}
+                      onPressEnter    = { (e) => { this.onAddClick(record) } } />
                 </div>
             ); 
           }
@@ -210,6 +210,7 @@ export default class ConfigurableTable extends React.Component {
       key:    'actions',
       title:  'Действия',
       width:  100,
+      fixed: 'left',
       className: 'table-actions-without-padding',
       render: (text, record) => {
         return(
@@ -227,67 +228,33 @@ export default class ConfigurableTable extends React.Component {
     };
   }
 
-  getColumnsExtended(config, data, isEditable, columns = [])
-  {
-    if(columns.length === 0 || !isEditable)
-    {
-      return;
-    }
-
-    switch(config.type)
-    {
-      case 'RFR':
-      case 'RFIT':
-      case 'RFM':
-      {
-        columns.unshift(this.getActionsColmunForResults());
-        break;
-      }
-
-      case 'POS':
-      {
-        columns.push(this.getActionsColmunForPositions());
-      }
-    }
-  }
-
-  getActionsColmunForPositions()
-  {
-    return {
-      key:    'actions',
-      title:  'Действия',
-      width:  150,
-      className: 'table-actions-without-padding',
-      render: (text, record) => {
-        return(
-            <span>
-              <a>Удалить</a>
-              {
-                record.isModified &&
-                <span>
-                  <Divider type="vertical" />
-                  <a>Обновить</a>
-                </span>
-              }              
-            </span>
-        ); 
-      }
-    };
-  }
 
   onAddClick(record)
   {
     const { dispatch, config } = this.props;
     let input = this.state.inputReference[record.key].input;
 
+    console.log('onAddClick', record, this.props);
+
     if(input)
     {
       input.blur();
       switch(config.type)
       {
-        case 'RFR':
+        case 'REMNANTS':
         {
           dispatch(addPositionItem({ remnants: {...record, count: input.value } }));
+          break;
+        }
+        case 'IN_TRANSIT':
+        {
+          dispatch(addPositionItem({ in_transit: {...record, count: input.value } }));
+          break;
+        }
+        case 'MATERIALS':
+        {
+          dispatch(addPositionItem({ materials: {...record, count: input.value } }));
+          break;
         }
       }
     }
@@ -486,6 +453,8 @@ export default class ConfigurableTable extends React.Component {
       });
     }
     
+    if(this.state.data && this.state.data.length)
+    {
       return(
         <Table 
           className    = 'very-small-table'
@@ -500,7 +469,15 @@ export default class ConfigurableTable extends React.Component {
           /* onChange     = { this.onTableFilterChange.bind(this) } */
           /* pagination   = { this.state.pagination } */
           />
-      );   
+      );
+    }
       
+    return (
+      <Alert
+        message = 'Ничего не найдено'
+        type    = 'info'
+        style   = {{ margin: 8 }}
+      />
+    );
   };
 }
