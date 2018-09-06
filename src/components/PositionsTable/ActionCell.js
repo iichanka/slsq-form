@@ -25,7 +25,7 @@ export class ActionCell extends React.Component {
             size      = 'small' 
             icon      = 'delete'
             className = 'field-no-wrap'
-            onClick   = { (e) => { store.dispatch(deletePositions([data])) } }
+            onClick   = { (e) => { store.dispatch(deletePositions([this.props.data])) } }
           /> 
         }
         {
