@@ -3,6 +3,7 @@ import { Button, Tooltip } from 'antd';
 import DeliveryButton from './toolbarButtons/deliveryButton'
 import ServiceButton from './toolbarButtons/serviceButton'
 import FileButton from './toolbarButtons/fileButton'
+import RecalcButton from './toolbarButtons/recalcButton'
 
 const ButtonGroup = Button.Group;
 
@@ -20,6 +21,7 @@ export class Sbuttons extends React.Component {
           <FileButton />
           <DeliveryButton />
           <ServiceButton />
+          <RecalcButton />
         </ButtonGroup>
         }
         </div>

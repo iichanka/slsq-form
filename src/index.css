@@ -278,3 +278,37 @@ li.ant-menu-submenu.ant-menu-submenu-inline.submenu-selected
     text-align: right;
 }
 
+.material-search-wrapp{
+    padding: 8px;
+}
+
+.material-search-wrapp .helper-wrapp>.ant-row{
+    display: flex;
+}
+.material-search-wrapp .helper-wrapp>.ant-row .ant-form-item-label{
+    margin-right: 20px;
+    line-height: normal;
+}
+
+.material-search-wrapp .helper-wrapp>.ant-row .ant-form-item-control{
+    flex: 1;
+    line-height: normal;
+    max-width: 250px;
+}
+.search-attributes-list{
+    padding: 0;
+    max-height: 220px;
+    overflow-x: hidden;
+}
+.search-attributes-list li{
+    list-style: none;
+}
+.search-attributes-list .ant-form-item{
+    margin-bottom: 8px;
+}
+.text-center{
+    text-align: center;
+}
+.text-right{
+    text-align: right;
+}

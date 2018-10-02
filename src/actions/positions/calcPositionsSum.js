@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { showMessages } from '../messages';
 import { requestItems, endRequestItems, receiveItems } from './main';
+import { store }            from '../../index';
 
-
-export const calcPositionSum = () => dispatch => {
-  dispatch(requestItems());
+export const calcPositionSum = () => {
+  store.dispatch(requestItems());
 
   axios.get(localStorage.getItem('AjaxURL'), {
     params: {
@@ -20,13 +20,13 @@ export const calcPositionSum = () => dispatch => {
    
     if(!haveError)
     {
-        dispatch(receiveItems(response.data.data));
+      store.dispatch(receiveItems(response.data.data));
     }
-    dispatch(endRequestItems());
+    store.dispatch(endRequestItems());
   })
   .catch(function (error) {
     showMessages([{type: 'E', text: 'Не удалось рассчитать цены.'}]);
-    dispatch(endRequestItems());
+    store.dispatch(endRequestItems());
   });
   
 }

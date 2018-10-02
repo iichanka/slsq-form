@@ -80,10 +80,9 @@ const getRequstForHierarchy = (state = { items: []}) => {
 }
 
 
-
 const loadResults = (parameters = {}) => (dispatch, getState) =>{
     dispatch(startSearch(parameters));
-    
+
     axios.post(
         localStorage.getItem('AjaxURL'), 
         {
@@ -121,6 +120,7 @@ export const search = (lastParameters = false) => (dispatch, getState) => {
     let request;
     let location = '';
 
+    console.log('active tab',currentState.search.criterias.activeTab);
     switch(currentState.search.criterias.activeTab)
     {
         case 'SBC':
@@ -132,6 +132,12 @@ export const search = (lastParameters = false) => (dispatch, getState) => {
         case 'SBH':
         {
             request = getRequstForHierarchy(currentState.search.criterias.hierarchy);
+            break;
+        }
+
+        case 'SBM':
+        {
+            request = currentState.search.criterias.materials;
             break;
         }
     }

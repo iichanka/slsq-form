@@ -13,6 +13,7 @@ import { addPositionItem }                          from '../../actions/position
 import { TableCell, ConfigEditorButtons }           from '../../components';
 
 import { HierarchyMenu }                            from './criterias/hierarchy';
+import { MateralSearch }                            from './criterias/material';
 
 
 const { TabPane } = Tabs;
@@ -212,11 +213,9 @@ export default class SearchContainer extends Component {
                 <TabPane tab        = 'Материал' 
                          key        = 'SBM' 
                          className  = 'searchPanelTabs' >
-                         
-                  <Alert message  = 'В разработке'
-                         type     = 'info'
-                         style    = {{ margin: 8 }} />
-
+                    <div className="material-search-wrapp">
+                      <MateralSearch></MateralSearch>
+                    </div>
                 </TabPane>
               </Tabs>              
             </div>

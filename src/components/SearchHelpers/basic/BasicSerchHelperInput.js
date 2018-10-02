@@ -7,20 +7,33 @@ class BasicSearchHelperInput extends React.Component {
     constructor(props) {
         super(props); 
 
+        let defValue = '';
+        if(props.initialValue || props.initialValue != undefined ){
+            defValue = props.initialValue;
+        }
+
         this.state = {
             showHelper: false,
-            value: ''
+            value: defValue
+        }
+    }
+
+    // catch props change
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.initialValue || nextProps.initialValue != undefined){
+            this.setState({
+                value: nextProps.initialValue
+            });
         }
     }
     
     handleChange = (event) => {
-        console.log('handleChange helpre');
-        console.log(event);
+        console.log('handleChange helper');
         console.log(event.target.value );
         var val = event.target.value;
         this.setState({ value: val});
 
-        this.props.updateSearchHelperValue(this.props.inputName, this.state.value);
+        this.props.updateSearchHelperValue(this.props.inputName, val);
     }
 
     showHelper = () => {
@@ -38,7 +51,7 @@ class BasicSearchHelperInput extends React.Component {
         // устанавливаем новое значение
         this.setState({ value : record.id });
         // обновяем данные в форме
-        this.props.updateSearchHelperValue(this.props.inputName, this.state.value);
+        this.props.updateSearchHelperValue(this.props.inputName, record.id);
         this.hideHelper();
     }
 
@@ -54,9 +67,11 @@ class BasicSearchHelperInput extends React.Component {
         return(
             <div className="helper-wrapp">
                 <div className="ant-row ant-form-item">
-                    <div className="ant-form-item-label">
-                        <label title={this.props.inputLabel}>{this.props.inputLabel}</label>
-                    </div>
+                    {this.props.inputLabel &&
+                        <div className="ant-form-item-label">
+                            <label title={this.props.inputLabel}>{this.props.inputLabel}</label>
+                        </div>
+                    }
                     <div className="ant-form-item-control">
                         <Input
                             name        = { this.props.inputName }
